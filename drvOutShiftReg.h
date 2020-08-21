@@ -1,3 +1,6 @@
+#ifndef DRV_OUT_SHIFT_REG_H
+#define DRV_OUT_SHIFT_REG_H
+
 #include "hardware.h"
 
 typedef union{
@@ -72,3 +75,5 @@ extern void drvOutShiftRegMain( void );
 extern void setDrvOutShiftRegLedBar( DRV_LED_BAR_DATA *inP );
 extern void setDrvOutShiftReg7seg( DRV_LED_7SEG_DATA *inP );
 extern void interDrvOutLedBar( void );
+
+#endif

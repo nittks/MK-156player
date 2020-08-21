@@ -1,3 +1,6 @@
+#ifndef APL_DISP_DATA_H
+#define APL_DISP_DATA_H
+
 #include "hardware.h"
 
 enum{
@@ -41,3 +44,4 @@ typedef struct {
 extern void initAplDispData( void );
 extern APL_DISP_DATA *getAplDispData( void );
 extern void aplDispDataMain( void );
+#endif

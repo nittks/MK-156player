@@ -1,3 +1,5 @@
+#ifndef LNK_OUT_LED_INC_H
+#define LNK_OUT_LED_INC_H
 
 #define CNTMAX		((unsigned char)10)	//8bit
 #define CNT100MSMAX	((unsigned char)20)	//5msäÑÇËçûÇ›20âÒÇ≈100ms
@@ -52,3 +54,5 @@ static const unsigned char	led7SegBit[LED_7SEG_MAX]={
 	0b00000000,
 };
 */
+
+#endif

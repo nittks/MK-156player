@@ -1,3 +1,6 @@
+#ifndef TIMER_H
+#define TIMER_H
+
 
 typedef enum{
 	TIMER_DRV_IN_UART_TIMEOUT,
@@ -17,3 +20,4 @@ extern void startTimer( TIMER_ID timerId );
 extern void stopTimer( TIMER_ID timerId );
 extern void clearTimer( TIMER_ID timerId );
 extern unsigned char getTimerCnt( TIMER_ID timerId );
+#endif

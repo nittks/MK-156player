@@ -1,3 +1,6 @@
+#ifndef HARDWARE_H
+#define HARDWARE_H
+
 
 #define		LED_BAR_NUM			4
 #define		LED_BAR_SEG			10
@@ -7,3 +10,4 @@
 
 #define		ON		1
 #define		OFF		0
+#endif

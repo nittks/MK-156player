@@ -1,3 +1,6 @@
+#ifndef MAIN_INC_H
+#define MAIN_INC_H
+
 typedef struct{
 	unsigned char	regist;			//登録状態。タスクが有効か無効か
 	unsigned short	currentTime;	//現在時間。0になったらタスク起動
@@ -68,3 +71,4 @@ enum{
 #define		SET_TIMSK0	(( REG_OCIE0A << OCIE0A))
 #define		SET_OSCCAL	REG_CAL
 
+#endif

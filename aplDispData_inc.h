@@ -1,5 +1,5 @@
-
-
+#ifndef APL_DISP_DATA_INC_H
+#define APL_DISP_DATA_INC_H
 
 //********************************************************************************
 // 標準動作用定数
@@ -46,3 +46,4 @@ const unsigned char SETTING_PALSE_REV[9]={0,1,2,3,4,5,6,8,10,12};	//回転数パルス
 
 
 
+#endif
