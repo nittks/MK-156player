@@ -2,6 +2,16 @@
 #define APL_DISP_DATA_H
 
 #include "hardware.h"
+#include "aplCtrl.h"
+
+
+enum{
+	APL_DISP_DATA_RED	= SETTING_COLOR_RED,
+	APL_DISP_DATA_GREEN	= SETTING_COLOR_GREEN,
+	APL_DISP_DATA_BLUE	= SETTING_COLOR_BLUE,
+	APL_DISP_DATA_WHITE	= SETTING_COLOR_WHITE,
+	APL_DISP_DATA_MAX
+};
 
 enum{
 	APL_DSP_DATA_7SEG_0,
@@ -22,26 +32,17 @@ typedef enum{
 	APL_DISP_SETTING_ON
 }APL_DISP_SETTING;
 
-typedef enum{
-	APL_DISP_SETTING_NO_BRIGHT_7SEG,
-	APL_DISP_SETTING_NO_BRIGHT_BARLED,
-	APL_DISP_SETTING_NO_DISP_CYC_7SEG,
-	APL_DISP_SETTING_NO_DISP_CYC_BARLED,
-	APL_DISP_SETTING_NO_DISP_PALSE_SPEED,
-	APL_DISP_SETTING_NO_DISP_PALSE_REV
-}APL_DISP_SETTING_NO;
-
 typedef struct {
-	unsigned char	led7Seg[LED_7SEG_NUM];
-	unsigned char	barLedOnNum;
+	unsigned char	led7Seg[LED_7SEG_DIGIT_NUM];
 	unsigned char	bright7seg;
-	unsigned char	brightBarled;
+	unsigned char	color7seg;
 	APL_DISP_SETTING	settingMode;
-	APL_DISP_SETTING_NO	settingNo;
 }APL_DISP_DATA;
 
 
 extern void initAplDispData( void );
 extern APL_DISP_DATA *getAplDispData( void );
 extern void aplDispDataMain( void );
+
+
 #endif

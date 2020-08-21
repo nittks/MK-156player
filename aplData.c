@@ -25,11 +25,8 @@ void initAplData( void )
 
 	aplDataEep.read				= APL_DATA_EEP_STATE_UNREAD;
 	aplDataEep.bright7seg		= 0;
-	aplDataEep.brightBarled		= 0;
 	aplDataEep.brightDim7seg	= 0;
-	aplDataEep.brightDimBarled	= 0;
 	aplDataEep.dispcyc7seg		= 0;
-	aplDataEep.dispcycBarled	= 0;
 }
 //********************************************************************************
 // ƒƒCƒ“ˆ—

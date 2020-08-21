@@ -2,7 +2,7 @@
 #define DRV_IN_SW_H
 
 #define	ROT_ENC_NUM	1		//ロータリーエンコーダー数
-#define	PUSH_SW_NUM	2		//プッシュスイッチ数
+#define	PUSH_SW_NUM	1		//プッシュスイッチ数
 
 //ロータリーエンコーダー状態
 typedef enum{

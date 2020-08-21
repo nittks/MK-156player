@@ -1,7 +1,6 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-
 enum{
 	TASK_DRV_IN_MAIN,
 	TASK_LINK_IN,
@@ -17,4 +16,5 @@ extern void interTaskTime( void );
 extern void initMain( void );
 extern void enableTask( unsigned char taskNo );
 extern void disableTask( unsigned char taskNo );
+
 #endif

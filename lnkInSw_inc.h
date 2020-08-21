@@ -1,7 +1,6 @@
 #ifndef LNK_IN_SW_INC_H
 #define LNK_IN_SW_INC_H
 
-
 //”z—ñNo
 typedef enum{
 	ROT_ENC_SET

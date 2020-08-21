@@ -30,6 +30,7 @@ static unsigned char	rxDataBuf[DRV_UART_RX_BUF_SIZE];			//受信中データを入れてい
 static unsigned char	rxDataBufCnt;		//受信中データバッファ用カウンタ
 static unsigned char	rxDataCnt;			//URATデータ長カウンタ
 static unsigned char	rxDataLen;			//UARTフレームより取得したフレームレングス
+static unsigned char	rxFlag;
 
 //********************************************************************************//
 // 初期化
@@ -55,6 +56,7 @@ void initDrvUart( void )
 		
 	rxDataCnt		= 0;
 	rxDataLen		= 0;
+	rxFlag			= false;
 
 	//送受信許可
 	EN_UART_TX;
@@ -133,6 +135,7 @@ void interUartTxFin(void)
 //********************************************************************************//
 DRV_UART_RX *getDrvUartRx( void )
 {
+	rxFlag = false;
 	return( &drvUartRx );
 }
 
