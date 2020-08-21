@@ -1,3 +1,5 @@
+#ifndef DRV_IN_SW_INC_H
+#define DRV_IN_SW_INC_H
 
 #define	ROT_ENC_DEBTIME	(1)	//1周期待ち(翌周期まで待つ→10+10x1ms
 #define	PUSH_SW_DEBTIME		(60)	//デバウンス待ち時間
@@ -61,7 +63,4 @@ typedef enum{
 #define	SET_PCMSK1	(PCMSK1 | 0x30)
 #define	SET_PCMSK0	(PCMSK0 | 0x30)
 
-
-
-
-
+#endif

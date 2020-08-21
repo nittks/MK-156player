@@ -1,3 +1,6 @@
+#ifndef APL_CTRL_H
+#define APL_CTRL_H
+
 
 //èÛë‘
 typedef enum{
@@ -55,3 +58,4 @@ extern void aplCtrlMain( void );
 extern APL_CTRL *getAplCtrl( void );
 extern APL_CTRL_SET *getAplCtrlSet( void );
 extern APL_CTRL_SET_PALSE *getAplCtrlSetPalse( void );
+#endif

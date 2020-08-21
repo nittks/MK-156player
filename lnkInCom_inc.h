@@ -1,3 +1,6 @@
+#ifndef LNK_IN_COM_INC_H
+#define LNK_IN_COM_INC_H
+
 
 #include "hardware.h"
 
@@ -38,3 +41,4 @@ enum{
 	POS_ILL,
 	POS_VTC,
 };
+#endif

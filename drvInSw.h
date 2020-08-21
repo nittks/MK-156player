@@ -1,3 +1,5 @@
+#ifndef DRV_IN_SW_H
+#define DRV_IN_SW_H
 
 #define	ROT_ENC_NUM	1		//ロータリーエンコーダー数
 #define	PUSH_SW_NUM	2		//プッシュスイッチ数
@@ -27,3 +29,5 @@ extern void drvInSwMain( void );
 extern void interSwInput( void );
 extern void interPcInt00_07( void );
 extern void interPcInt08_14( void );
+
+#endif

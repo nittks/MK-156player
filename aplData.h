@@ -1,3 +1,6 @@
+#ifndef APL_DATA_H
+#define APL_DATA_H
+
 
 
 //********************************************************************************
@@ -97,3 +100,4 @@ extern void setAplDataEep( APL_DATA_EEP * inData );
 extern APL_DATA_CAR *getAplDataCar(void);
 extern APL_DATA_SW *getAplDataSw(void);
 extern APL_DATA_EEP *getAplDataEep(void);
+#endif

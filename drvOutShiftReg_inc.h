@@ -1,4 +1,5 @@
-
+#ifndef DRV_OUT_SHIFT_REG_INC_H
+#define DRV_OUT_SHIFT_REG_INC_H
 
 #define CNTMAX		((unsigned char)10)	//8bit
 #define CNT100MSMAX	((unsigned char)20)	//5msŠ„‚èž‚Ý20‰ñ‚Å100ms
@@ -78,3 +79,4 @@
 //#define SET_ICR2		((ICR2 = REG_ICR1>>8);(ICR1L = REG_ICR1&0x0F))
 #define	SET_OCR2A( data )	(OCR2A = (((unsigned long)data*OCR2A_MAX)/100))
 
+#endif
