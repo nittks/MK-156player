@@ -5,11 +5,10 @@
 #define	PUSH_SW_DEBTIME		(60)	//デバウンス待ち時間
 #define	PUSH_SW_LONGTIME	(100)	//長押し判定時間(10x100=1000ms
 
-#define	PORT_ROT_ENC0_A		((PORTB & (1<<PB4))>> PB4)
-#define	PORT_ROT_ENC0_B		((PORTB & (1<<PB5))>> PB5)
+#define	PORT_ROT_ENC0_A		((PORTB & (1<<PD5))>> PD5)
+#define	PORT_ROT_ENC0_B		((PORTB & (1<<PD6))>> PD6)
 
-#define	PORT_PUSHSW_0		((PORTC & (1<<PC4))>> PC4)
-#define	PORT_PUSHSW_1		((PORTC & (1<<PC5))>> PC5)
+#define	PORT_PUSHSW_0		((PORTC & (1<<PD7))>> PD7)
 
 
 #define	ROT_VECT_FORWARD	((signed char)(4))

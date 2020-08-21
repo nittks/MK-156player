@@ -1,7 +1,6 @@
 #ifndef DRV_UART_INC_H
 #define DRV_UART_INC_H
 
-
 //----------------------------------------
 // 全体
 //----------------------------------------
@@ -47,4 +46,5 @@ typedef enum{
 #define EN_UART_RX						(UCSR0B = UCSR0B | ( (1<<RXEN0)))	//受信許可
 #define DI_INTER_UART_RX_COMP			(UCSR0B = UCSR0B & (~(1<<RXCIE0)))	//受信完了割込み禁止
 #define EN_INTER_UART_RX_COMP			(UCSR0B = UCSR0B | ( (1<<RXCIE0)))	//受信完了割込み許可
+
 #endif

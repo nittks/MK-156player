@@ -16,7 +16,7 @@ static APL_CTRL_SET_PALSE	aplCtrlSetPalseBak;
 static void stateJudge( void );
 static void procSetting( void );
 static void changeSettingVal( unsigned char *val );
-static void changeSettingPalse( unsigned char *setNo , SET_PALSE_NO no );
+static void changeSettingItem( unsigned char *setNo , SET_ITEM_NO no );
 static void chkSetPalse( void );
 static void apryEep( void );
 //********************************************************************************
@@ -56,6 +56,7 @@ APL_CTRL_SET_PALSE *getAplCtrlSetPalse( void )
 //********************************************************************************
 void aplCtrlMain( void )
 {
+//	PORTB = (PORTB & 0xFE) | (~(PORTB & 0x01) );
 
 	//状態判定、状態遷移
 	stateJudge();
@@ -134,16 +135,11 @@ static void stateJudge( void )
 			break;
 		case APL_CTRL_STATE_TEST_SPEED:
 			if( inAplDataSw->pushSwTest == APL_DATA_PUSH_SW_ON ){
-				aplCtrl.stateTest = APL_CTRL_STATE_TEST_REV;
+				aplCtrl.stateTest = APL_CTRL_STATE_TEST_AUTO;
 			}
 			break;
-		case APL_CTRL_STATE_TEST_REV:
-			if( inAplDataSw->pushSwTest == APL_DATA_PUSH_SW_ON ){
-				aplCtrl.stateTest = APL_CTRL_STATE_TEST_SPEED;
-			}
-			break;
-		break;
 		}
+		break;
 		
 	//****************************************
 	// 設定
@@ -152,38 +148,19 @@ static void stateJudge( void )
 		switch( aplCtrl.stateSet ){
 		case APL_CTRL_STATE_SET_BRIGHT_7SEG:		//調光(7セグ
 			if( inAplDataSw->pushSwSet == APL_DATA_PUSH_SW_ON ){
-				aplCtrl.stateSet = APL_CTRL_STATE_SET_BRIGHT_BARLED;
+				aplCtrl.stateSet = APL_CTRL_STATE_SET_DISPCYC_7SEG;
 			}else if( inAplDataCar->ill == ON ){
 				aplCtrl.stateSet = APL_CTRL_STATE_SET_BRIGHT_DIM_7SEG;
 			}
 			break;
-		case APL_CTRL_STATE_SET_BRIGHT_BARLED:		//調光(バーLED
-			if( inAplDataSw->pushSwSet == APL_DATA_PUSH_SW_ON ){
-				aplCtrl.stateSet = APL_CTRL_STATE_SET_DISPCYC_7SEG;
-			}else if( inAplDataCar->ill == ON ){
-				aplCtrl.stateSet = APL_CTRL_STATE_SET_BRIGHT_DIM_BARLED;
-			}
-			break;
 		case APL_CTRL_STATE_SET_BRIGHT_DIM_7SEG:	//調光減光(7セグ
 			if( inAplDataSw->pushSwSet == APL_DATA_PUSH_SW_ON ){
-				aplCtrl.stateSet = APL_CTRL_STATE_SET_BRIGHT_DIM_BARLED;
-			}else if( inAplDataCar->ill == OFF ){
-				aplCtrl.stateSet = APL_CTRL_STATE_SET_BRIGHT_7SEG;
-			}
-			break;
-		case APL_CTRL_STATE_SET_BRIGHT_DIM_BARLED:	//調光減光(バーLED
-			if( inAplDataSw->pushSwSet == APL_DATA_PUSH_SW_ON ){
 				aplCtrl.stateSet = APL_CTRL_STATE_SET_DISPCYC_7SEG;
 			}else if( inAplDataCar->ill == OFF ){
-				aplCtrl.stateSet = APL_CTRL_STATE_SET_BRIGHT_BARLED;
+				aplCtrl.stateSet = APL_CTRL_STATE_SET_DISPCYC_7SEG;
 			}
 			break;
 		case APL_CTRL_STATE_SET_DISPCYC_7SEG:		//表示更新速度(7セグ
-			if( inAplDataSw->pushSwSet == APL_DATA_PUSH_SW_ON ){
-				aplCtrl.stateSet = APL_CTRL_STATE_SET_DISPCYC_BARLED;
-			}
-			break;
-		case APL_CTRL_STATE_SET_DISPCYC_BARLED:		//表示更新速度(バーLED
 			if( inAplDataSw->pushSwSet == APL_DATA_PUSH_SW_ON ){
 				aplCtrl.stateSet = APL_CTRL_STATE_SET_PALSE_SPEED;
 			}
@@ -238,29 +215,23 @@ static void procSetting( void )
 		
 	case APL_CTRL_STATE_SETTING:		//設定
 		switch( aplCtrl.stateSet ){
+		case APL_CTRL_STATE_SET_COLOR_7SEG:			//調色
+			changeSettingItem( &aplCtrlSet.color7seg ,SET_COLOR);
+			break;
 		case APL_CTRL_STATE_SET_BRIGHT_7SEG:			//調光(7セグ
 			changeSettingVal( &aplCtrlSet.bright7seg );
-			break;
-		case APL_CTRL_STATE_SET_BRIGHT_BARLED:		//調光(バーLED
-			changeSettingVal( &aplCtrlSet.brightBarled );
 			break;
 		case APL_CTRL_STATE_SET_BRIGHT_DIM_7SEG:		//調光減光(7セグ
 			changeSettingVal( &aplCtrlSet.brightDim7seg );
 			break;
-		case APL_CTRL_STATE_SET_BRIGHT_DIM_BARLED:	//調光減光(バーLED
-			changeSettingVal( &aplCtrlSet.brightDimBarled );
-			break;
 		case APL_CTRL_STATE_SET_DISPCYC_7SEG:		//表示更新速度(7セグ
 			changeSettingVal( &aplCtrlSet.dispcyc7seg );
 			break;
-		case APL_CTRL_STATE_SET_DISPCYC_BARLED:		//表示更新速度(バーLED
-			changeSettingVal( &aplCtrlSet.dispcycBarled );
-			break;
 		case APL_CTRL_STATE_SET_PALSE_SPEED:			//パルス仕様車速 
-			changeSettingPalse(	&aplCtrlSetPalse.speed ,SET_PALSE_SPEED);
+			changeSettingItem(	&aplCtrlSetPalse.speed ,SET_PALSE_SPEED);
 			break;
 		case APL_CTRL_STATE_SET_PALSE_REV:			//パルス仕様回転数 
-			changeSettingPalse(	&aplCtrlSetPalse.rev,SET_PALSE_REV);
+			changeSettingItem(	&aplCtrlSetPalse.rev,SET_PALSE_REV);
 			break;
 		default:
 			break;
@@ -294,9 +265,9 @@ void changeSettingVal( unsigned char *val )
 	}
 }
 //********************************************************************************
-// 設定値変更
+// パルス設定値変更
 //********************************************************************************
-void changeSettingPalse( unsigned char *setNo , SET_PALSE_NO no )
+void changeSettingItem( unsigned char *setNo , SET_ITEM_NO no )
 {
 	APL_DATA_SW		*inAplDataSw;
 	inAplDataSw		= getAplDataSw();
@@ -343,20 +314,16 @@ static void apryEep( void )
 
 	if( inAplDataEep->read == APL_DATA_EEP_STATE_READED){
 		//読込済みなら反映
+		aplCtrlSet.color7seg			= inAplDataEep->color7seg;
 		aplCtrlSet.bright7seg			= inAplDataEep->bright7seg;
-		aplCtrlSet.brightBarled			= inAplDataEep->brightBarled;
 		aplCtrlSet.brightDim7seg		= inAplDataEep->brightDim7seg;
-		aplCtrlSet.brightDimBarled		= inAplDataEep->brightDimBarled;
 		aplCtrlSet.dispcyc7seg			= inAplDataEep->dispcyc7seg;
-		aplCtrlSet.dispcycBarled		= inAplDataEep->dispcycBarled;
 	}else if( inAplDataEep->read == APL_DATA_EEP_STATE_SUMERROR){
 		//SUMエラー時はデフォルト値読込
+		aplCtrlSet.color7seg			= eepDefault[COLOR_7SEG];
 		aplCtrlSet.bright7seg			= eepDefault[BRIGHT_7SEG];
-		aplCtrlSet.brightBarled			= eepDefault[BRIGHT_BARLED];
 		aplCtrlSet.brightDim7seg		= eepDefault[BRIGHT_DIM_7SEG];
-		aplCtrlSet.brightDimBarled		= eepDefault[BRIGHT_DIM_BARLED];
 		aplCtrlSet.dispcyc7seg			= eepDefault[DISPCYC_7SEG];
-		aplCtrlSet.dispcycBarled		= eepDefault[DISPCYC_BARLED];
 		setLnkOutEep();	//EEPROM書込み要求
 	}
 }
