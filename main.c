@@ -11,13 +11,6 @@ MPU		:ATmega328
 clock	:内蔵8MHz
 */
 
-#define F_CPU 8000000UL
-#define CNTMAX		((unsigned char)7)	//8bit
-#define CNT100MSMAX	((unsigned char)200)	//5ms割り込み20回で100ms
-
-#define FOSC	8000000				/* MCUｸﾛｯｸ周波数 */
-#define BAUD	9600				/* 目的USARTﾎﾞｰﾚｰﾄ速度 */
-#define MYUBRR	(FOSC/16/BAUD-1)	 /* 目的UBRR値 */
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
@@ -134,41 +127,60 @@ void disableTask( unsigned char taskNo )
 //********************************************************************************
 static void initReg(void)
 {
+	cli();
+
 	//I/O設定
-	DDRB	= 0x00;	
-	DDRC	= 0x3E;
-	DDRD	= 0x05;
+	PORTA.DIR	-= 0x00;
+	PORTC.DIR	-= 0x00;
+	PORTD.DIR	-= 0x00;
+	PORTE.DIR	-= 0x00;
 
-	//初期出力値設定
-	PORTB	= 0x00;
-	PORTC	= 0x00;
-	PORTD	= 0x00;
+	PORTA.PIN0CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
+	PORTA.PIN1CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
+	PORTA.PIN2CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
+	PORTA.PIN3CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
+	PORTA.PIN4CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
+	PORTA.PIN5CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
+	PORTA.PIN6CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
+	PORTA.PIN7CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
 
-//		set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+	PORTC.PIN0CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
+	PORTC.PIN1CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
+	PORTC.PIN2CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
+	PORTC.PIN3CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
 
-	//タイマ0、CTC、割り込み用、比較A一致で割り込み
-	TCCR0A	= SET_TCCR0A;
-	TCCR0B	= SET_TCCR0B;
-	OCR0A	= SET_OCR0A;
-	TIMSK0	= SET_TIMSK0;
-	OSCCAL	= SET_OSCCAL;	//クロック校正
-	
-	USART_Init( MYUBRR );		//UARTレジスタ初期化
+	PORTD.PIN0CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_BOTHEDGES_gc;
+	PORTD.PIN1CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_BOTHEDGES_gc;
+	PORTD.PIN2CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_BOTHEDGES_gc;
+	PORTD.PIN3CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
+	PORTD.PIN4CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
+	PORTD.PIN5CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
+	PORTD.PIN6CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
+	PORTD.PIN7CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
+
+	PORTE.PIN0CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
+	PORTE.PIN1CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
+	PORTE.PIN2CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
+	PORTE.PIN3CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
+	PORTE.PIN4CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
+	PORTE.PIN5CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
+	PORTE.PIN6CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
+	PORTE.PIN7CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
+
+	//クロック設定
+	CLKCTRL.MCLKCTRLB	= SET_CLKCTRL_MCLKCTRLB( CLKCTRL_PDIV_64X_gc );
+
+	//タイマ設定
+	TCA0.SINGLE.CTRLESET	= SET_TCA_CTRLESET( TCA_SINGLE_DIR_UP_gc );
+	TCA0.SINGLE.CTRLA		= SET_TCA_CTRLA( TCA_SINGLE_CLKSEL_DIV2_gc );
+	TCA0.SINGLE.PER			= (double)0.001/((double)1/(FOSC/64/2));
+	TCA0.SINGLE.CTRLB		= SET_TCA_CTRLB( TCA_SINGLE_WGMODE_NORMAL_gc );
+	TCA0.SINGLE.INTCTRL		= SET_TCA_INTCTRL( OVF_EN );
 	
 	//割り込み許可
 	sei();
 }
 
-//********************************************************************************
-// UARTレジスタ初期化
-//********************************************************************************
-static void USART_Init( unsigned short baud )
-{
-	UBRR0H	= (unsigned char)(baud>>8);	//ボーレート上位
-	UBRR0L	= (unsigned char) baud;		//ボーレート下位
-	UCSR0C	= (1<<USBS0) | (3<<UCSZ00);	//停止bit2bit、データビット長8bit
-	UCSR0B	= (1<<RXCIE0) | (1<<RXEN0) | (1<<TXEN0);	//受信完了割込許可、受信許可、送信許可
-}
 //********************************************************************************
 // 動作確認用LED点滅
 //********************************************************************************

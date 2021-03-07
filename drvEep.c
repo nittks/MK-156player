@@ -83,7 +83,7 @@ static void eepRead( void )
 {
 	//EEPROMアクセス可能な間、読込続ける。アクセス不可でbreakする
 	while( 1 ){
-		if( eeprom_is_ready() == EEP_READY_FAIL ){
+		if( EEPROM_IS_READY == EEP_READY_FAIL ){
 			//EEPROMアクセス不可の場合抜ける
 			state = EEP_STATE_READ;
 			INT_EEP_ENABLE;		//EEPROMアクセス可能割込み許可
@@ -111,7 +111,7 @@ static void eepWrite( void )
 {
 	//EEPROMアクセス可能な間、読込続ける。アクセス不可でbreakする
 	while( 1 ){
-		if( eeprom_is_ready() == EEP_READY_FAIL ){
+		if( EEPROM_IS_READY == EEP_READY_FAIL ){
 			//EEPROMアクセス不可の場合抜ける
 			state = EEP_STATE_WRITE;
 			INT_EEP_ENABLE;		//EEPROMアクセス可能割込み許可

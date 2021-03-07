@@ -5,10 +5,10 @@
 #define	PUSH_SW_DEBTIME		(60)	//デバウンス待ち時間
 #define	PUSH_SW_LONGTIME	(100)	//長押し判定時間(10x100=1000ms
 
-#define	PORT_ROT_ENC0_A		((PORTB & (1<<PD5))>> PD5)
-#define	PORT_ROT_ENC0_B		((PORTB & (1<<PD6))>> PD6)
+#define	PORT_ROT_ENC0_A		((PORTD.IN & >> 0)& 0x01)
+#define	PORT_ROT_ENC0_B		((PORTD.IN & >> 1)& 0x01)
 
-#define	PORT_PUSHSW_0		((PORTC & (1<<PD7))>> PD7)
+#define	PORT_PUSHSW_0		((PORTD.IN & >> 2)& 0x01)
 
 
 #define	ROT_VECT_FORWARD	((signed char)(4))
@@ -47,19 +47,6 @@ typedef enum{
 }PUSH_SW_PORT_NO;
 
 #define		ROT_ENC_0_POS		(0x03)		//bit0,1より入力
-#define		ROT_ENC_1_POS		(0x0C)		//bit2,3より入力
 
-//ピン変化割り込みPCINT8-11を使用する
-#define	REG_PCIE2	0		//PCINT16-23pinの割り込み許可設定
-#define	REG_PCIE1	1		//PCINT08-14pinの割り込み許可設定
-#define	REG_PCIE0	1		//PCINT00-07pinの割り込み許可設定
-
-
-//ピン変化割り込み制御レジスタ
-#define	SET_PCICR	(PCICR | (REG_PCIE2<<PCIE2) | (REG_PCIE1<<PCIE1) | (REG_PCIE0<<PCIE0))
-
-//ピン変化割り込みマスク
-#define	SET_PCMSK1	(PCMSK1 | 0x30)
-#define	SET_PCMSK0	(PCMSK0 | 0x30)
 
 #endif

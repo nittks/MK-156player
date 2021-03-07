@@ -7,7 +7,7 @@
 #include "drvEep.h"
 
 
-ISR(TIMER0_COMPA_vect)	//タイマ割り込み
+ISR(TCA0_OVF_LUNF)	//タイマ割り込み
 {
 	interTaskTime();
 }

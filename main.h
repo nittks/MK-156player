@@ -1,6 +1,8 @@
 #ifndef MAIN_H
 #define MAIN_H
 
+#define FOSC	((unsigned long)16000000)
+
 enum{
 	TASK_DRV_IN_MAIN,
 	TASK_LINK_IN,
