@@ -99,7 +99,7 @@ static void stateJudge( void )
 		}else if( inAplDataSw->pushSwSet == APL_DATA_PUSH_SW_LONGON ){
 			//通常->設定
 			aplCtrl.state = APL_CTRL_STATE_SETTING;
-			if( inAplDataCar->ill == ON ){
+			if( inAplDataCar->ill == APL_DATA_ILL_ON ){
 				aplCtrl.stateSet = APL_CTRL_STATE_SET_BRIGHT_DIM_7SEG;
 			}else{
 				aplCtrl.stateSet = APL_CTRL_STATE_SET_BRIGHT_7SEG;
@@ -149,14 +149,14 @@ static void stateJudge( void )
 		case APL_CTRL_STATE_SET_BRIGHT_7SEG:		//調光(7セグ
 			if( inAplDataSw->pushSwSet == APL_DATA_PUSH_SW_ON ){
 				aplCtrl.stateSet = APL_CTRL_STATE_SET_DISPCYC_7SEG;
-			}else if( inAplDataCar->ill == ON ){
+			}else if( inAplDataCar->ill == APL_DATA_ILL_ON ){
 				aplCtrl.stateSet = APL_CTRL_STATE_SET_BRIGHT_DIM_7SEG;
 			}
 			break;
 		case APL_CTRL_STATE_SET_BRIGHT_DIM_7SEG:	//調光減光(7セグ
 			if( inAplDataSw->pushSwSet == APL_DATA_PUSH_SW_ON ){
 				aplCtrl.stateSet = APL_CTRL_STATE_SET_DISPCYC_7SEG;
-			}else if( inAplDataCar->ill == OFF ){
+			}else if( inAplDataCar->ill == APL_DATA_ILL_OFF ){
 				aplCtrl.stateSet = APL_CTRL_STATE_SET_DISPCYC_7SEG;
 			}
 			break;
@@ -172,7 +172,7 @@ static void stateJudge( void )
 			break;
 		case APL_CTRL_STATE_SET_PALSE_REV:			//パルス仕様回転数 
 			if( inAplDataSw->pushSwSet == APL_DATA_PUSH_SW_ON ){
-				if( inAplDataCar->ill == ON ){
+				if( inAplDataCar->ill == APL_DATA_ILL_ON ){
 					aplCtrl.stateSet = APL_CTRL_STATE_SET_BRIGHT_DIM_7SEG;
 				}else{
 					aplCtrl.stateSet = APL_CTRL_STATE_SET_BRIGHT_7SEG;

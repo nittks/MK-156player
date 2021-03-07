@@ -13,9 +13,9 @@ static APL_DATA_EEP		aplDataEep;
 //********************************************************************************
 void initAplData( void )
 {
-	aplDataCar.ig				= OFF;
-	aplDataCar.acc				= OFF;
-	aplDataCar.ill				= OFF;
+	aplDataCar.ig				= APL_DATA_IG_OFF;
+	aplDataCar.acc				= APL_DATA_ACC_OFF;
+	aplDataCar.ill				= APL_DATA_ILL_OFF;
 	aplDataCar.speed			= 0;
 	aplDataCar.rev				= 0;
 	

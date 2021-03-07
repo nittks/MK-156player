@@ -12,6 +12,10 @@ enum{
 	APL_DATA_IG_OFF,
 	APL_DATA_IG_ON,
 };
+enum{
+	APL_DATA_ACC_OFF,
+	APL_DATA_ACC_ON,
+};
 
 typedef struct{
 	unsigned char	speed;

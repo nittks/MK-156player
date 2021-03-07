@@ -19,7 +19,7 @@
 #define	SER_POS		2
 
 //カソード側各ポート
-#define	SHIFT_REG_PORT	PORTC
+#define	SHIFT_REG_PORT	PORTC.IN
 #define	SRCLR_ON	(SHIFT_REG_PORT &= ~(1<<SRCLR_POS))	//Lowアクティブ
 #define	SRCLR_OFF	(SHIFT_REG_PORT |=  (1<<SRCLR_POS))
 #define	SRCLK_ON	(SHIFT_REG_PORT |=  (1<<SRCLK_POS))

@@ -40,9 +40,7 @@ void initDrvInSw( void )
 	}
 	
 	//割込みレジスタ設定(_inc.h内で定義
-	PCICR	= SET_PCICR;
-	PCMSK0	= SET_PCMSK0;
-	PCMSK1	= SET_PCMSK1;
+	PORTD.INTFLAGS	= 0x07;		//PD0-2
 	
 }
 
@@ -94,7 +92,7 @@ void drvInSwMain( void )
 	/****************************************/
 	// プッシュスイッチ入力検知処理
 	/****************************************/
-	portTmp	= ((~PINB)>>PB4) & 0x03;		//2ポート分保存,ONがLOWのため反転
+	portTmp	= ((~PORTB.IN)>>4) & 0x01;		//ONがLOWのため反転
 
 	for( i=0 ; i<PUSH_SW_NUM; i++ ){
 		if( pushSwState[i] == PUSH_SW_STATE_OFF ){
@@ -133,10 +131,10 @@ void interPcInt08_14( void )
 	unsigned char	portTmp;		//ロータリーエンコーダー全4入力一時保存
 
 	cli();
-	portTmp	= ((~PINC) >>PC4) & 0x03;		//4ポート分保存,ONがLOWのため反転
+	portTmp	= (~PORTD.IN) & 0x03;
 
-	if( (portTmp&ROT_ENC_0_POS) != (grayCode[NO_SET]&0x03)){	//ポート変化
-		grayCode[NO_SET]	= ((grayCode[NO_SET] << 2) | (portTmp & ROT_ENC_0_POS)) & 0x0F;	//4bitのみ使用
+	if( portTmp != (grayCode[NO_SET]&0x03)){	//ポート変化
+		grayCode[NO_SET]	= ((grayCode[NO_SET] << 2) | portTmp & 0x0F);
 		chkRotateVectCnt( NO_SET );
 	}
 
@@ -170,7 +168,7 @@ void interPcInt00_07( void )
 	unsigned char	i;
 
 	cli();
-	portTmp	= ((~PINB)>>PB4) & 0x03;		//2ポート分保存,ONがLOWのため反転
+	portTmp	= ((~PORTB.IN>>4) & 0x01);		//ONがLOWのため反転
 
 	for( i=0 ; i<PUSH_SW_NUM ; i++ ){
 		if((pushSwState[i] == PUSH_SW_STATE_OFF) &&
