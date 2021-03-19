@@ -1,13 +1,13 @@
 #include <avr/io.h>
 
-#include "drvOutShiftReg.h"
+#include "drvOutSerialLed.h"
 
 void initDrvOut( void )
 {
-	initDrvOutShiftReg();
+	initDrvOutSerialLed();
 }
 
 void drvOutMain( void )
 {
-	drvOutShiftRegMain();
+	drvOutSerialLedMain();
 }

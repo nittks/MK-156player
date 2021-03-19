@@ -5,6 +5,7 @@
 #include "drvUart.h"
 #include "drvInSw.h"
 #include "drvEep.h"
+#include "drvOutSerialLed.h"
 
 
 ISR(TCA0_OVF_LUNF)	//タイマ割り込み
@@ -15,10 +16,11 @@ ISR(USART_RX_vect)		//UART受信割込み
 {
 	interGetUartRxData();
 }
-ISR(USART_UDRE_vect)	//UART DataRegisterEmpty送信レジスタ空割込み
+ISR(USART0_DRE_vect)	//UART DataRegisterEmpty送信レジスタ空割込み
 {
-	interSetUartTxData();
+	interSetTxBuffer();
 }
+
 ISR(PCINT0_vect){		//ポート変化割り込み
 	interPcInt00_07();
 }

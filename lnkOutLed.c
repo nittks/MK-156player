@@ -2,7 +2,7 @@
 #include "hardware.h"
 #include "lnkOutLed_inc.h"
 #include "lnkOutLed.h"
-#include "drvOutShiftReg.h"
+#include "drvOutSerialLed.h"
 #include "aplDispData.h"
 
 //********************************************************************************
@@ -57,7 +57,7 @@ void lnkOutLedMain( void )
 	}
 
 	//drvÇ÷èoóÕ
-	setDrvOutShiftReg7seg( &outDrvLed7SegData );
+	setDrvOutSerialLed7seg( &outDrvLed7SegData );
 	
 }
 

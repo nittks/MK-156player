@@ -16,7 +16,7 @@ typedef enum{
 	SETTING_ITEM_MAX
 }SETTING_ITEM;
 
-typedef enum{
+enum{
 	COLOR_7SEG_RED,
 	COLOR_7SEG_GREEN,
 	COLOR_7SEG_BLUE,
