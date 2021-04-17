@@ -20,5 +20,6 @@ extern void initDrvOutSerialLed( void );
 extern void drvOutSerialLedMain( void );
 extern void setDrvOutSerialLed7seg( DRV_LED_7SEG_DATA *inP );
 extern void interSetTxBuffer( void );
+extern void interChangeNextCCLPort( void );
 
 #endif

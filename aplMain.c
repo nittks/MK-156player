@@ -13,7 +13,7 @@ void initApl( void )
 
 void aplMain( void )
 {
-	aplDataMain();
+   	aplDataMain();
 	aplCtrlMain();
 	aplDispDataMain();
 }

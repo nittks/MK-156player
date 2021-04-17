@@ -53,10 +53,10 @@ unsigned char setDrvEep( DRV_EEP_WRITE *inP )
 	unsigned char		ret;
 
 	if( state == EEP_STATE_READY ){
-		state = EEP_STATE_WRITE;
-		memcpy( drvEepWrite.val , inP->val , DRV_EEP_MAP_MAX );
-		eepAddrCnt=0;
-		eepWrite();
+		//state = EEP_STATE_WRITE;
+		//memcpy( drvEepWrite.val , inP->val , DRV_EEP_MAP_MAX );
+		//eepAddrCnt=0;
+		//eepWrite();
 
 		ret = true;
 	}else{
@@ -70,11 +70,11 @@ unsigned char setDrvEep( DRV_EEP_WRITE *inP )
 //********************************************************************************//
 void interEepRedy( void )
 {
-	if( state == EEP_STATE_READ ){		//読み込み途中
-		eepRead();
-	}else if( state == EEP_STATE_WRITE ){	//書込み途中
-		eepWrite();
-	}
+	//if( state == EEP_STATE_READ ){		//読み込み途中
+		//eepRead();
+	//}else if( state == EEP_STATE_WRITE ){	//書込み途中
+		//eepWrite();
+	//}
 }
 //********************************************************************************//
 // 読み込み
@@ -86,7 +86,7 @@ static void eepRead( void )
 		if( EEPROM_IS_READY == EEP_READY_FAIL ){
 			//EEPROMアクセス不可の場合抜ける
 			state = EEP_STATE_READ;
-			INT_EEP_ENABLE;		//EEPROMアクセス可能割込み許可
+			//INT_EEP_ENABLE;		//EEPROMアクセス可能割込み許可
 			break;
 		}else{
 			eepCache[ eepAddrCnt ] =  eeprom_read_byte( (uint8_t *)eepAddrCnt );
@@ -114,7 +114,7 @@ static void eepWrite( void )
 		if( EEPROM_IS_READY == EEP_READY_FAIL ){
 			//EEPROMアクセス不可の場合抜ける
 			state = EEP_STATE_WRITE;
-			INT_EEP_ENABLE;		//EEPROMアクセス可能割込み許可
+			//INT_EEP_ENABLE;		//EEPROMアクセス可能割込み許可
 			break;
 		}else{
 			//値が異なっていたら書込む

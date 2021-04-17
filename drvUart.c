@@ -1,4 +1,5 @@
 
+#include "main.h"
 #include <avr/io.h>
 #include <util/delay.h>
 #include <avr/interrupt.h>  //割り込みを使用するため
@@ -10,7 +11,7 @@
 #include "drvUart.h"
 #include "hardware.h"
 #include "timer.h"
-#include "main.h"
+
 
 
 static UART_STATE		uartState;
@@ -43,16 +44,16 @@ void initDrvUart( void )
 	/* 工場で格納された周波数誤差でのﾎﾞｰﾚｰﾄ補償 */
 	/* 自動ﾎﾞｰﾚｰﾄ(同期領域)なしでの非同期通信 */
 	int8_t sigrow_val = SIGROW.OSC16ERR5V; // 符号付き誤差取得
-	int32_t baud_reg_val = (64*(FOSC/8))/(16*USEBAUD);		//少数切り捨て (64*fCLK_PRE)/(S*fBAUD) 
+	int32_t baud_reg_val = (64*(F_CPU/8))/(16*USEBAUD);		//少数切り捨て (64*fCLK_PRE)/(S*fBAUD) 
 	assert (baud_reg_val >= 0x4A); // 負の最大比較で正当な最小BAUDﾚｼﾞｽﾀ値を確認
 	baud_reg_val *= (1024 + sigrow_val); // (分解能+誤差)で乗算
 	baud_reg_val /= 1024; // 分解能で除算
 	USART1.BAUD = (int16_t) baud_reg_val; // 補正したﾎﾞｰﾚｰﾄ設定
 
 	USART1.CTRLA	= SET_CTRLA( RS485_AUTO_XDIR_ON , RS485_AUTO_TX_OUTPUT_OFF );
-	USART1.CTRLB	= SET_CTRLB( RXMODE_NORMAL );
-	USART1.CTRLC	= SET_CTRLC( CMODE_ASYNCHRONOUS , PMODE_DISABLED , SBMODE_2BIT , CHSIZE_8BIT );
-
+	USART1.CTRLB	= USART_RXEN_bm | USART_TXEN_bm | USART_RXMODE_NORMAL_gc;
+	USART1.CTRLC	= USART_CMODE_ASYNCHRONOUS_gc | USART_PMODE_DISABLED_gc | 
+					  USART_SBMODE_2BIT_gc | USART_CHSIZE_8BIT_gc;
 	//送信
 	for( i=0 ; i<DRV_UART_RX_BUF_SIZE; i++ ){
 		drvUartTx.txData[i]	= 0;

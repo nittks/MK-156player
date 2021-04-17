@@ -41,6 +41,9 @@ void initAplDispData( void )
 	testCycSpeed	= 0;
 	testSpeed		= 0;
 	testStateSpeed	= TEST_STATE_UP;
+	
+	//debug
+	dispSpeed( &aplDispData.led7Seg[0] , 123);
 }
 //********************************************************************************
 // 取得
@@ -70,13 +73,13 @@ void aplDispDataMain( void )
 	//------------------------------
 	// 調色データ出力
 	//------------------------------
-	aplDispData.color7seg			= inAplCtrlSet->color7seg;
+	//aplDispData.color7seg			= inAplCtrlSet->color7seg;
 
 	//------------------------------
 	// 輝度データ出力
 	//------------------------------
 	if( inAplDataCar->ill == APL_DATA_ILL_OFF ){
-		aplDispData.bright7seg		= inAplCtrlSet->bright7seg;
+		aplDispData.bright7seg		= inAplCtrlSet->bright7seg/3;
 	}else{
 		aplDispData.bright7seg		= inAplCtrlSet->brightDim7seg;
 	}
@@ -94,7 +97,8 @@ void aplDispDataMain( void )
 	case APL_CTRL_STATE_NOMARL:		//通常
 		aplDispData.settingMode		= APL_DISP_SETTING_OFF;
 		
-		dispSpeed( &aplDispData.led7Seg[0] , inAplDataCar->speed );
+		//dispSpeed( &aplDispData.led7Seg[0] , inAplDataCar->speed );
+
 		break;
 
 	//****************************************

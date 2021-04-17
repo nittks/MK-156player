@@ -11,17 +11,20 @@ typedef struct{
 
 static void powerLed( void );
 #define	TASK_NUM	7
-TASK_PARAMETER	taskParameter[TASK_NUM]	={
+// main_inc.hに記述するとsim実行時に値がセットされなくなったため、.cへ移動
+// IEDverが変わったため？AtmelStudio6->7
+// また、変数を.hに定義するのは良くないとのこと。
+
+static TASK_PARAMETER	taskParameter[TASK_NUM]	={
 	//現在時間(開始時オフセット) , 周期 , 関数名
 	{	true,	0,	10,	drvInMain	},
 	{	true,	1,	10,	lnkInMain	},
 	{	true,	2,	10,	aplMain		},
 	{	true,	3,	10,	lnkOutMain	},
-	{	true,	4,	4,	drvOutMain	},
+	{	true,	4,	10,	drvOutMain	},
 	{	false,	5,	250,powerLed	},
 	{	false,	0,	2,	drvUartChangeTx}		//UARTドライバからの要求により有効化する
 };
-
 //CTRLA CLKSEL
 enum{
 	CLKSEL_DIV1		= 0x0,
@@ -49,13 +52,12 @@ enum{
 #define		OVF_EN		(1)
 
 //レジスタセット用
-#define		SET_CLKCTRL_MCLKCTRLB(pdiv)	((CLKCTRL.MCLKCTRLB & (~CLKCTRL_PDIV_gm)) | ( pdiv | 0x01) )
-#define		SET_TCA_CTRLESET( dir )		((TCA0.SINGLE.CTRLESET & (~TCA_SINGLE_DIR_bm)) | dir )
-#define		SET_TCA_CTRLA( clksel )		((TCA0.SINGLE.CTRLA & (~TCA_SINGLE_CLKSEL_gm)) | clksel )
-#define		SET_TCA_CTRLB( wgmode )		((TCA0.SINGLE.CTRLB & (~TCA_SINGLE_WGMODE_gm)) | wgmode )
-#define		SET_TCA_INTCTRL( ovf )		((TCA0.SINGLE.INTCTRL & (~TCA_SINGLE_OVF_bm)) | ovf )
-#define		CLEAR_OVF_ULAG		(( INTFLAGS | 0x01 ));
 #define		CTRLA_REG_START_TASK_TIMER		( TCA0.SINGLE.CTRLA = TCA0.SINGLE.CTRLA | 0x01 )
+
+enum{
+	FUSE_OSCCFG_FREQSEL_16MHZ	= 1,
+	FUSE_OSCCFG_FREQSEL_20MHZ	= 2
+};
 
 
 #endif

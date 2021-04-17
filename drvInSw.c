@@ -1,8 +1,8 @@
 
-#define F_CPU 1000000UL
 #include <avr/io.h>
 #include <avr/interrupt.h>  //割り込みを使用するため
 
+#include "main.h"
 #include "drvInSw_inc.h"
 #include "drvInSw.h"
 #include "hardware.h"
@@ -134,7 +134,7 @@ void interPcInt08_14( void )
 	portTmp	= (~PORTD.IN) & 0x03;
 
 	if( portTmp != (grayCode[NO_SET]&0x03)){	//ポート変化
-		grayCode[NO_SET]	= ((grayCode[NO_SET] << 2) | portTmp & 0x0F);
+		grayCode[NO_SET]	= (((grayCode[NO_SET] << 2) | portTmp) & 0x0F);
 		chkRotateVectCnt( NO_SET );
 	}
 

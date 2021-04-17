@@ -3,7 +3,7 @@
 
 // WS2812B parameters
 #define T0H_NS      400
-#define T1H_NS      800
+#define T1H_NS		800
 #define T_WIDTH_NS  1250
 #define T_RESET_US  50
 #define CNTMAX		((unsigned char)10)	//8bit

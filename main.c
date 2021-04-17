@@ -11,7 +11,7 @@ MPU		:ATmega328
 clock	:内蔵8MHz
 */
 
-
+#include "main.h"
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <util/delay.h>
@@ -24,18 +24,14 @@ clock	:内蔵8MHz
 #include "lnkInMain.h"
 #include "lnkOutMain.h"
 #include "aplMain.h"
-
 #include "drvUart.h"
 #include "main_inc.h"
-#include "main.h"
-
 
 #define INT_CNT_MAX	((unsigned char)125)	//8us*125=1ms毎割り込み
 
 static void mainTask( void );
 static void initReg( void );
-static void USART_Init( unsigned short baud );
-
+static void initTaskTimer( void );
 //********************************************************************************
 // メイン
 //********************************************************************************
@@ -64,6 +60,11 @@ void initMain( void )
 	initLnkOut();
 	initDrvOut();
 	
+	initTaskTimer();
+	
+//	for( i=0 ; i<TASK_NUM ; i++ ){
+//		taskParameter[i] = taskParameterDefault[i];
+//	}
 }
 static void mainTask( void )
 {
@@ -91,7 +92,13 @@ static void mainTask( void )
 void interTaskTime( void )
 {
 	unsigned char	i;
+
+	cli();
 	
+//	PORTF.OUTTGL	= (PIN4_bm);
+	
+	TCA0.SINGLE.INTFLAGS |= TCA_SINGLE_OVF_bm;
+
 	//処理タスク実行時間チェック
 	for( i=0; i<TASK_MAX ; i++){
 		if( taskParameter[i].regist == true ){	//登録有効タスクのみ
@@ -102,6 +109,7 @@ void interTaskTime( void )
 			}
 		}
 	}
+	sei();
 }
 //********************************************************************************//
 // タスク有効化
@@ -129,11 +137,20 @@ static void initReg(void)
 {
 	cli();
 
-	//I/O設定
-	PORTA.DIR	-= 0x00;
-	PORTC.DIR	-= 0x00;
-	PORTD.DIR	-= 0x00;
-	PORTE.DIR	-= 0x00;
+	//クロック設定
+	FUSE.OSCCFG			= FUSE_OSCCFG_FREQSEL_20MHZ;
+	// 20MHz -> (分周無し) -> CLK_PER=20MHz
+//	CLKCTRL.MCLKCTRLB	= CLKCTRL_PDIV_8X_gc | CLKCTRL_PEN_bm;
+	CPU_CCP				= CCP_IOREG_gc;
+	CLKCTRL.MCLKCTRLB	= 0;
+	CLKCTRL.MCLKCTRLA	= CLKCTRL_CLKSEL_OSC20M_gc;
+	
+	
+		//I/O設定
+	PORTA.DIR	= 0x00;
+	PORTC.DIR	= 0x00;
+	PORTD.DIR	= 0x00;
+	PORTE.DIR	= 0x00;
 
 	PORTA.PIN0CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
 	PORTA.PIN1CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
@@ -166,18 +183,26 @@ static void initReg(void)
 	PORTE.PIN5CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
 	PORTE.PIN6CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
 	PORTE.PIN7CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
-
-	//クロック設定
-	CLKCTRL.MCLKCTRLB	= SET_CLKCTRL_MCLKCTRLB( CLKCTRL_PDIV_64X_gc );
-
-	//タイマ設定
-	TCA0.SINGLE.CTRLESET	= SET_TCA_CTRLESET( TCA_SINGLE_DIR_UP_gc );
-	TCA0.SINGLE.CTRLA		= SET_TCA_CTRLA( TCA_SINGLE_CLKSEL_DIV2_gc );
-	TCA0.SINGLE.PER			= (double)0.001/((double)1/(FOSC/64/2));
-	TCA0.SINGLE.CTRLB		= SET_TCA_CTRLB( TCA_SINGLE_WGMODE_NORMAL_gc );
-	TCA0.SINGLE.INTCTRL		= SET_TCA_INTCTRL( OVF_EN );
 	
 	//割り込み許可
+	sei();
+}
+//********************************************************************************
+// タスク時間管理用タイマ、レジスタ設定
+//********************************************************************************
+static void initTaskTimer( void )
+{
+	cli();
+	
+	//タイマ設定
+	// 1msで割り込みしたい
+	// CLK_PER=20MHz -> (16分周) -> 1250kHz(0.8us周期) -> 1250カウントで1ms
+	TCA0.SINGLE.PER			= (F_CPU/F_PDIV/16)/1000;
+	TCA0.SINGLE.CTRLESET	= TCA_SINGLE_DIR_UP_gc;
+	TCA0.SINGLE.CTRLA		= TCA_SINGLE_CLKSEL_DIV16_gc | TCA_SINGLE_ENABLE_bm;
+	TCA0.SINGLE.CTRLB		= TCA_SINGLE_WGMODE_NORMAL_gc;
+	TCA0.SINGLE.INTCTRL		= TCA_SINGLE_OVF_bm;
+
 	sei();
 }
 

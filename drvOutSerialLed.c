@@ -1,4 +1,3 @@
-
 /*
 SerialLed:WS2812C-2020
 通信フレーム24bit
@@ -9,23 +8,22 @@ Configurable Custom Logic (CCL)によるシリアル通信
 参考資料 Microchip AN2387
 https://ww1.microchip.com/downloads/en/AppNotes/00002387B.pdf
 https://avr.jp/user/AN/PDF/AN2387.pdf
-
-
 */
-
+#include "main.h"
 #include <avr/io.h>
 #include <util/delay.h>
 #include <avr/interrupt.h>
 #include <stdbool.h>
 
-
 #include "drvOutSerialLed_inc.h"
 #include "drvOutSerialLed.h"
 #include "hardware.h"
 
+#define F_CLK_PER_MHZ		20.0F	//((uint8_t)(F_CPU / F_PDIV / 1000000))
+#define TIMER_DIV			((uint8_t)(8))
+
 //LINKよりセットされる
 static DRV_LED_7SEG_DATA	drvLed7SegData;
-
 static DRV_LED_7SEG_DATA	drvLed7SegDataPre;
 
 
@@ -33,9 +31,18 @@ static uint8_t	sendData[LED_7SEG_DIGIT_NUM][LED_7SEG_SEG_NUM * LED_7SEG_COLOR];
 static uint8_t	digitUpdateFlag;
 static uint8_t	idxTxDigit,idxTxData;
 
+static uint8_t	debugTimeCnt;
+static uint16_t	debugBaud;
+#define	TIME1SEC	(10)
+
+volatile	uint8_t		debugGreen	= 0x20;
+volatile	uint8_t		debugRed	= 0x10;
+volatile	uint8_t		debugBlue	= 0x05;
+
+
 unsigned long bitReverceSort( unsigned long inData , unsigned char size );
 static uint8_t isLedUpdate( void );
-
+static uint8_t serchNextDigitNo( void );
 //********************************************************************************
 // 初期化
 //********************************************************************************
@@ -63,6 +70,9 @@ void initDrvOutSerialLed( void )
 	idxTxDigit	= 0;
 	idxTxData	= 0;
 
+	debugTimeCnt	= 0;
+	debugBaud		= 0;
+
 	cli();
 	// 参考
 	// https://www.avrfreaks.net/forum/anyone-have-working-ws2812-library-das?
@@ -72,33 +82,36 @@ void initDrvOutSerialLed( void )
 	EVSYS.USERTCB1	= EVSYS_CHANNEL0_bm;
 	EVSYS.USERTCB2	= EVSYS_CHANNEL0_bm;
 	// USART0(MSPI mode)
-	USART0.BAUD		= (uint16_t)(F_CPU * T_WIDTH_NS * 4 / 125 + 32) & 0xFFC0;
+	USART0.BAUD		= (uint16_t)((uint32_t)F_CLK_PER_MHZ * T_WIDTH_NS * 4 / 125 + 32) & 0xFFC0;
+//	USART0.BAUD		= 0x40;
 	USART0.CTRLC	= USART_CMODE_MSPI_gc | USART_UCPHA_bm;
 	USART0.CTRLB	= USART_TXEN_bm;
 
-	// TCB1('1' bit generation)
-	TCB1.CNT	= TCB1.CCMP	= (uint16_t)(F_CPU * T1H_NS / 1000 + 0.5F);
+	// TCB1='1' , TBC2='0'
+	TCB1.CNT	= TCB1.CCMP		= (uint16_t)((F_CLK_PER_MHZ  * T1H_NS ) / 1000 + 0.5F);
+	TCB2.CNT	= TCB2.CCMP		= (uint16_t)((F_CLK_PER_MHZ  * T0H_NS ) / 1000 + 0.5F);
 	TCB1.EVCTRL	= TCB_CAPTEI_bm;
 	TCB1.CTRLB	= TCB_CNTMODE_SINGLE_gc;
 	TCB1.CTRLA	= TCB_ENABLE_bm;
-
-	// TCB1('0' bit generation)
-	TCB2.CNT	= TCB2.CCMP	= (uint16_t)(F_CPU * T1H_NS / 1000 + 0.5F);
+	
 	TCB2.EVCTRL	= TCB_CAPTEI_bm;
 	TCB2.CTRLB	= TCB_CNTMODE_SINGLE_gc;
 	TCB2.CTRLA	= TCB_ENABLE_bm;
 
 	// CCL-LUT0
-	CCL.TRUTH0		= 0b11011000;		//sel0=selector , if(sel0=0?sel1:sel2)  ,TRUTH:Datasheet CCl真理値表参照
-	CCL.LUT0CTRLC	= CCL_INSEL2_TCB2_gc;
-	CCL.LUT0CTRLB	= CCL_INSEL1_TCB1_gc | CCL_INSEL0_USART0_gc;
-	CCL.LUT0CTRLA	= CCL_OUTEN_bm | CCL_ENABLE_bm;
-	CCL.CTRLA		= CCL_ENABLE_bm;
-
+	CCL_TRUTH0		= CCL_TRUTH2	= CCL_TRUTH3	= 0b11011000;
+	CCL_LUT0CTRLC	= CCL_LUT2CTRLC	= CCL_LUT3CTRLC	= CCL_INSEL2_TCB2_gc;
+	CCL_LUT0CTRLB	= CCL_LUT2CTRLB	= CCL_LUT3CTRLB	= CCL_INSEL1_TCB1_gc | CCL_INSEL0_USART0_gc;
+	CCL_LUT0CTRLA	= CCL_LUT2CTRLA	= CCL_LUT3CTRLA	= CCL_ENABLE_bm;
+	PORTA.OUTSET	&= (~PIN3_bm);
+	PORTF.OUTSET	&= (~PIN3_bm);
+	PORTD.OUTSET	&= (~PIN3_bm);
+	PORTA.DIRSET	= PIN3_bm; 
+	PORTF.DIRSET	= PIN3_bm;
+	PORTD.DIRSET	= PIN3_bm;
+	
 	sei();
-
 }
-
 
 //********************************************************************************
 // Lnkからセット
@@ -115,18 +128,24 @@ void drvOutSerialLedMain( void )
 {
 	uint8_t		digitCnt,segCnt;
 	uint8_t		chkBit;
+	uint8_t		isLedUpdateChk;
 
 	//LED点灯指示に変化があれば、送信データを準備する
 	//ネストが少し嫌
-	if( isLedUpdate() == true ){
+	isLedUpdateChk = isLedUpdate();
+	if( isLedUpdateChk == true ){
 		for( digitCnt=0 ; digitCnt<LED_7SEG_DIGIT_NUM ; digitCnt++ ){
 			if( (digitUpdateFlag& (1<<digitCnt)) != 0 ){
 				chkBit = (1<<(LED_7SEG_SEG_NUM-1));		//上位から
 				for( segCnt=0 ; segCnt<LED_7SEG_SEG_NUM ; segCnt++ ){
-					if( (drvLed7SegData.val[segCnt] & chkBit) != 0 ){
-						sendData[digitCnt][segCnt]	= drvLed7SegData.brightGreen;
-						sendData[digitCnt][segCnt]	= drvLed7SegData.brightRed;
-						sendData[digitCnt][segCnt]	= drvLed7SegData.brightBlue;
+					if( (drvLed7SegData.val[digitCnt] & chkBit) == 0 ){
+						sendData[digitCnt][segCnt*LED_7SEG_COLOR+0]	= 0;
+						sendData[digitCnt][segCnt*LED_7SEG_COLOR+1]	= 0;
+						sendData[digitCnt][segCnt*LED_7SEG_COLOR+2]	= 0;
+					}else{
+						sendData[digitCnt][segCnt*LED_7SEG_COLOR+0]	= drvLed7SegData.brightGreen;
+						sendData[digitCnt][segCnt*LED_7SEG_COLOR+1]	= drvLed7SegData.brightRed;
+						sendData[digitCnt][segCnt*LED_7SEG_COLOR+2]	= drvLed7SegData.brightBlue;
 					}
 					chkBit >>= 1;
 				}
@@ -144,33 +163,36 @@ static uint8_t isLedUpdate( void )
 	uint8_t	i;
 	uint8_t	retUpdate;
 
+	cli();
+	
+	retUpdate = false;
 	digitUpdateFlag= 0;
-	//色が変更されていたら全て更新
 	if(	(drvLed7SegData.brightRed	!= drvLed7SegDataPre.brightRed) |
 		(drvLed7SegData.brightGreen	!= drvLed7SegDataPre.brightGreen) |
 		(drvLed7SegData.brightBlue	!= drvLed7SegDataPre.brightBlue)
 	){
-		for( i=0 ; i<LED_7SEG_DIGIT_NUM ; i++ ){
-			digitUpdateFlag|= (1<<i);
-		}
+		//色が変更されていたら全て更新
+		digitUpdateFlag	= 2^(LED_7SEG_DIGIT_NUM) - 1;
+
 		idxTxDigit	= 0;
 		idxTxData	= 0;
-		return true;
-	}
-
-	//表示値が変更されていたら、その桁だけ更新
-	retUpdate = false;
-	for( i=0 ; i<LED_7SEG_DIGIT_NUM ; i++ ){
-		if( drvLed7SegData.val[i] != drvLed7SegDataPre.val[i] ){
-			if( digitUpdateFlag== 0 ){
-				idxTxDigit	= i;
+		retUpdate = true;
+	}else{
+		//表示値が変更されていたら、その桁だけ更新
+		for( i=0 ; i<LED_7SEG_DIGIT_NUM ; i++ ){
+			if( drvLed7SegData.val[i] != drvLed7SegDataPre.val[i] ){
+				if( digitUpdateFlag== 0 ){
+					idxTxDigit	= i;
+				}
+				idxTxData	= 0;
+				digitUpdateFlag|= (1<<i);
+				retUpdate = true;
 			}
-			idxTxData	= 0;
-			digitUpdateFlag|= (1<<i);
-			retUpdate = true;
 		}
 	}
+	drvLed7SegDataPre = drvLed7SegData;
 
+	sei();
 	return retUpdate;
 }
 
@@ -180,63 +202,80 @@ static uint8_t isLedUpdate( void )
 // USART0_DRE_vect(Data Register Empty)
 void interSetTxBuffer(void)
 {
+	cli();
+	
+	if( idxTxData == 0 ){
+		CCL_CTRLA &= ~CCL_ENABLE_bm;	//CCL有効時はレジスタ変更ロックがかかるため、先に解除する
+		switch( idxTxDigit ){
+			case 0:	CCL.LUT0CTRLA |= (CCL_OUTEN_bm | CCL_ENABLE_bm);	break;
+			case 1:	CCL.LUT3CTRLA |= (CCL_OUTEN_bm | CCL_ENABLE_bm);	break;
+			case 2:	CCL.LUT2CTRLA |= (CCL_OUTEN_bm | CCL_ENABLE_bm);	break;
+			default:break;
+		}
+		CCL_CTRLA |= CCL_ENABLE_bm;
+	}
 	USART0.TXDATAL	= sendData[idxTxDigit][idxTxData];
+	idxTxData++;
+	if( idxTxData > (LED_7SEG_SEG_NUM * LED_7SEG_COLOR) ){
+		USART0.CTRLA	&= (~USART_DREIE_bm);
+		USART0.STATUS	|= USART_TXCIF_bm;
+		USART0.CTRLA	|= USART_TXCIE_bm;
+	}
+	sei();
+}
 
-	if( idxTxData <= (LED_7SEG_SEG_NUM * LED_7SEG_COLOR)-1 ){
-		idxTxData++;
-	}else{
-		digitUpdateFlag &= (1<<idxTxDigit);
-		if( idxTxDigit >= (LED_7SEG_DIGIT_NUM -1) ){
-			USART0.CTRLA &= (~USART_DREIE_bm);
+//********************************************************************************
+// CCL出力ポートを次のポートへ変更する
+//********************************************************************************
+void interChangeNextCCLPort( void ){
+	
+	cli();
 
-		}else{
-			idxTxDigit++;
+	//現在出力中のCCLポートを止める
+	CCL_CTRLA &= ~CCL_ENABLE_bm;		//CCL有効時はレジスタ変更ロックがかかるため、先に解除する
+	switch( idxTxDigit ){	//off
+		case 0:	
+			CCL.LUT0CTRLA &= (~CCL_ENABLE_bm);		//LUT0のレジスタにロックがかかるため、先に解除
+			CCL.LUT0CTRLA &= (~CCL_OUTEN_bm);
+		break;
+		case 1:	
+			CCL.LUT3CTRLA &= (~CCL_ENABLE_bm);
+			CCL.LUT3CTRLA &= (~CCL_OUTEN_bm);
+		break;
+		case 2:	
+			CCL.LUT2CTRLA &= (~CCL_ENABLE_bm);
+			CCL.LUT2CTRLA &= (~CCL_OUTEN_bm);
+		break;
+		default:
+			break;
+	}
+	CCL_CTRLA |= CCL_ENABLE_bm;
+
+
+	idxTxData	= 0;			
+	digitUpdateFlag &= (~(1<<idxTxDigit));
+	if( digitUpdateFlag != 0 ){
+		idxTxDigit	= serchNextDigitNo();
+		USART0.CTRLA |= USART_DREIE_bm;
+	}
+	USART0.CTRLA &= (~USART_TXCIE_bm);
+	
+	sei();
+}
+//********************************************************************************
+//	次に出力する桁Noを調べる
+//********************************************************************************
+static uint8_t serchNextDigitNo( void ){
+	uint8_t	digitNo;
+	
+	digitNo = 0;
+	while( (digitUpdateFlag & (1<<digitNo)) == 0 ){
+		digitNo++;
+		if( digitNo >= LED_7SEG_DIGIT_NUM ){
+			// 取りえない。
 		}
 	}
+	return digitNo;
 }
 
 
-// USART0_TXC_vect
-/*
-interUsartDataRegisterEmpty()
-{
-	CCL.LUT0CTRLA	= 0;
-	TCB1.CTRLA		= 0;
-	TCB1.CCMP		= (unit16_t)(F_CPU * T_RESET_US) - 1;
-	TCB1.CNT		= 0;
-	TCB1.INTFLAGS	= TCB_CAPT_bm;
-	TCB1.INTCTRL	= TCB_CAPT_bm;
-	TCB1.CTRLB		= TCB_CNTMODE_INT_gc;
-	TCB1.CTRLA		= TCB_CLKSEL_DIV1_gc | TCB_ENABLE_bm;
-
-}
-*/
-
-// TCB1_INT_vect
-// TCB2_INT_vect
-/*
- * void interStopWaveTimer( TIMER_NO timerNo )
-{
-	TCB_t*	tcb;
-	uint_16	highTime;
-
-	if( timerNo == NO_TCB1 ){
-		tcb			= TCB1;
-		highTime	= T1H_NS;
-	}else{
-		tcb = TCB2;
-		highTime	= T2H_NS;
-	}
-
-	tcb.CTRLA		= 0;
-	tcb.CNT = tcb.CCMP	= (uint16_t)(F_CPU_MHZ * highTime / 1000 + 0.5F);
-	tcb.EVCTRL		= TCB_CAPTEI_bm;
-	tcb.INTCTRL	= 0;
-	tcb.CTRLB		= TCB_CNTMODE_SINGLE_gc;
-	tcb.CTRLA		= TCB_ENABLE_bm;
-	CCL.LUT0CTRLA	= CCL_OUTEN_bm | CCL_ENABLE_bm;
-
-	buf_ptr = buf_org;
-	USART0.CTRLA	= USART_DREIE_bm;
-}
-*/
