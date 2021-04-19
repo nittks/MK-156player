@@ -1,51 +1,51 @@
 
 #include <avr/io.h>
-#include <avr/interrupt.h>  //Š„‚è‚İ‚ğg—p‚·‚é‚½‚ß
+#include <avr/interrupt.h>  //å‰²ã‚Šè¾¼ã¿ã‚’ä½¿ç”¨ã™ã‚‹ãŸã‚
 
 #include "main.h"
 #include "drvInSw_inc.h"
 #include "drvInSw.h"
 #include "hardware.h"
 
-//o—Íƒf[ƒ^
-static DRV_IN_SW		drvInSwData;		//ƒXƒCƒbƒ`“ü—Íƒf[ƒ^
+//å‡ºåŠ›ãƒ‡ãƒ¼ã‚¿
+static DRV_IN_SW		drvInSwData;		//ã‚¹ã‚¤ãƒƒãƒå…¥åŠ›ãƒ‡ãƒ¼ã‚¿
 
-//“à•”ó‘Ô
-static ROT_ENC_STATE	rotEncState[ROT_ENC_NUM];		//ƒ[ƒ^ƒŠ[ƒGƒ“ƒR[ƒ_[ó‘Ô
-static PUSH_SW_STATE	pushSwState[PUSH_SW_NUM];		//ƒvƒbƒVƒ…ƒXƒCƒbƒ`ó‘Ô
-static unsigned char	rotEncDebTimeCnt[ROT_ENC_NUM];	//ƒfƒoƒEƒ“ƒXŒo‰ßŠÔƒJƒEƒ“ƒg
-static unsigned char	pushSwDebTimeCnt[PUSH_SW_NUM];	//ƒfƒoƒEƒ“ƒXŒo‰ßŠÔƒJƒEƒ“ƒg
-static unsigned char	grayCode[ROT_ENC_NUM];			//ROTENC“ü—ÍB‘O‰ñ’l‚ğ•Û‘¶‚µA¡‰ñ’l‚Æ‡‚í‚¹ƒOƒŒƒCƒR[ƒh‰»‚·‚é
-static signed char		rotateVect[ROT_ENC_NUM];		//ROTENCB‰ñ“]•ûŒü•Ï‰»—ÊƒJƒEƒ“ƒgB‹t•ûŒü‚Íƒ}ƒCƒiƒX’l‚Ì‚½‚ßsinged‚ğg—p
+//å†…éƒ¨çŠ¶æ…‹
+static ROT_ENC_STATE	rotEncState[ROT_ENC_NUM];		//ãƒ­ãƒ¼ã‚¿ãƒªãƒ¼ã‚¨ãƒ³ã‚³ãƒ¼ãƒ€ãƒ¼çŠ¶æ…‹
+static PUSH_SW_STATE	pushSwState[PUSH_SW_NUM];		//ãƒ—ãƒƒã‚·ãƒ¥ã‚¹ã‚¤ãƒƒãƒçŠ¶æ…‹
+static unsigned char	rotEncDebTimeCnt[ROT_ENC_NUM];	//ãƒ‡ãƒã‚¦ãƒ³ã‚¹çµŒéæ™‚é–“ã‚«ã‚¦ãƒ³ãƒˆ
+static unsigned char	pushSwDebTimeCnt[PUSH_SW_NUM];	//ãƒ‡ãƒã‚¦ãƒ³ã‚¹çµŒéæ™‚é–“ã‚«ã‚¦ãƒ³ãƒˆ
+static unsigned char	grayCode[ROT_ENC_NUM];			//ROTENCå…¥åŠ›ã€‚å‰å›å€¤ã‚’ä¿å­˜ã—ã€ä»Šå›å€¤ã¨åˆã‚ã›ã‚°ãƒ¬ã‚¤ã‚³ãƒ¼ãƒ‰åŒ–ã™ã‚‹
+static signed char		rotateVect[ROT_ENC_NUM];		//ROTENCã€‚å›è»¢æ–¹å‘å¤‰åŒ–é‡ã‚«ã‚¦ãƒ³ãƒˆã€‚é€†æ–¹å‘ã¯ãƒã‚¤ãƒŠã‚¹å€¤ã®ãŸã‚singedã‚’ä½¿ç”¨
 
 static void chkRotateVectCnt( unsigned char portNo );
 //********************************************************************************//
-// ‰Šú‰»
+// åˆæœŸåŒ–
 //********************************************************************************//
 void initDrvInSw( void )
 {
 	unsigned char	i;
 
-	//o—Í
+	//å‡ºåŠ›
 	for( i=0 ; i<ROT_ENC_NUM; i++ ){
-		drvInSwData.rotEncState[i]	= DRV_IN_ROT_ENC_STATE_STOP;	//“ü—Í–³‚µ
-		drvInSwData.pushSwState[i]	= DRV_IN_PUSH_SW_STATE_OFF;	//“ü—Í–³‚µ
+		drvInSwData.rotEncState[i]	= DRV_IN_ROT_ENC_STATE_STOP;	//å…¥åŠ›ç„¡ã—
+		drvInSwData.pushSwState[i]	= DRV_IN_PUSH_SW_STATE_OFF;	//å…¥åŠ›ç„¡ã—
 
-		rotEncState[i]	= ROT_ENC_STATE_WAIT;	//ŠÄ‹ŠJn
+		rotEncState[i]	= ROT_ENC_STATE_WAIT;	//ç›£è¦–é–‹å§‹
 		pushSwState[i]	= PUSH_SW_STATE_OFF;
-		rotEncDebTimeCnt[i]	= 0;		//ƒfƒoƒEƒ“ƒXŒo‰ßŠÔƒJƒEƒ“ƒg
-		pushSwDebTimeCnt[i]	= 0;		//ƒfƒoƒEƒ“ƒXŒo‰ßŠÔƒJƒEƒ“ƒg
+		rotEncDebTimeCnt[i]	= 0;		//ãƒ‡ãƒã‚¦ãƒ³ã‚¹çµŒéæ™‚é–“ã‚«ã‚¦ãƒ³ãƒˆ
+		pushSwDebTimeCnt[i]	= 0;		//ãƒ‡ãƒã‚¦ãƒ³ã‚¹çµŒéæ™‚é–“ã‚«ã‚¦ãƒ³ãƒˆ
 		grayCode[i]		= 0;
 		rotateVect[i]	= 0;
 	}
 	
-	//Š„‚İƒŒƒWƒXƒ^İ’è(_inc.h“à‚Å’è‹`
+	//å‰²è¾¼ã¿ãƒ¬ã‚¸ã‚¹ã‚¿è¨­å®š(_inc.hå†…ã§å®šç¾©
 	PORTD.INTFLAGS	= 0x07;		//PD0-2
 	
 }
 
 //********************************************************************************//
-// ƒf[ƒ^æ“¾
+// ãƒ‡ãƒ¼ã‚¿å–å¾—
 //********************************************************************************//
 DRV_IN_SW *getDrvInSw( void )
 {
@@ -53,7 +53,7 @@ DRV_IN_SW *getDrvInSw( void )
 }
 
 //********************************************************************************//
-// ƒƒCƒ“ˆ—
+// ãƒ¡ã‚¤ãƒ³å‡¦ç†
 //********************************************************************************//
 void drvInSwMain( void )
 {
@@ -62,25 +62,25 @@ void drvInSwMain( void )
 
 	cli();
 	/****************************************/
-	// ƒ[ƒ^ƒŠ[ƒGƒ“ƒR[ƒ_[“ü—ÍŒŸ’mˆ—
+	// ãƒ­ãƒ¼ã‚¿ãƒªãƒ¼ã‚¨ãƒ³ã‚³ãƒ¼ãƒ€ãƒ¼å…¥åŠ›æ¤œçŸ¥å‡¦ç†
 	/****************************************/
 	
 	for( i=0 ; i<ROT_ENC_NUM; i++ ){
-		//³“]
+		//æ­£è»¢
 		if( rotEncState[i] == ROT_ENC_STATE_FORWARD ){
 			rotEncState[i] = ROT_ENC_STATE_DEBOUNCE;
 			rotEncDebTimeCnt[i] = 0;
 			drvInSwData.rotEncState[i]	= DRV_IN_ROT_ENC_STATE_FORWARD;
-		//‹t“]
+		//é€†è»¢
 		}else if( rotEncState[i] == ROT_ENC_STATE_REVERCE ){
 			rotEncState[i] = ROT_ENC_STATE_DEBOUNCE;
 			rotEncDebTimeCnt[i] = 0;
 			drvInSwData.rotEncState[i]	= DRV_IN_ROT_ENC_STATE_REVERCE;
-		//ƒfƒoƒEƒ“ƒX‘Ò‹@
+		//ãƒ‡ãƒã‚¦ãƒ³ã‚¹å¾…æ©Ÿ
 		}else if( rotEncState[i] == ROT_ENC_STATE_DEBOUNCE ){
 			
 			drvInSwData.rotEncState[i]	= DRV_IN_ROT_ENC_STATE_STOP;
-			//ƒfƒoƒEƒ“ƒXŒo‰ß
+			//ãƒ‡ãƒã‚¦ãƒ³ã‚¹çµŒé
 			if( rotEncDebTimeCnt[i] >= ROT_ENC_DEBTIME ){
 				rotEncDebTimeCnt[i] = 0;
 				rotEncState[i] = ROT_ENC_STATE_WAIT;
@@ -90,30 +90,30 @@ void drvInSwMain( void )
 		}
 	}
 	/****************************************/
-	// ƒvƒbƒVƒ…ƒXƒCƒbƒ`“ü—ÍŒŸ’mˆ—
+	// ãƒ—ãƒƒã‚·ãƒ¥ã‚¹ã‚¤ãƒƒãƒå…¥åŠ›æ¤œçŸ¥å‡¦ç†
 	/****************************************/
-	portTmp	= ((~PORTB.IN)>>4) & 0x01;		//ON‚ªLOW‚Ì‚½‚ß”½“]
+	portTmp	= ((~PORTB.IN)>>4) & 0x01;		//ONãŒLOWã®ãŸã‚åè»¢
 
 	for( i=0 ; i<PUSH_SW_NUM; i++ ){
 		if( pushSwState[i] == PUSH_SW_STATE_OFF ){
-			//ƒIƒt
+			//ã‚ªãƒ•
 			drvInSwData.pushSwState[i] = DRV_IN_PUSH_SW_STATE_OFF;
 		}else if( pushSwState[i] == PUSH_SW_STATE_ON ){
-			//ƒIƒ“
+			//ã‚ªãƒ³
 			pushSwDebTimeCnt[i] = 0;
 			pushSwState[i] = PUSH_SW_STATE_DEBOUNCE;
 		}else if( pushSwState[i] == PUSH_SW_STATE_DEBOUNCE ){
-			//ƒfƒoƒEƒ“ƒX‘Ò‚¿
+			//ãƒ‡ãƒã‚¦ãƒ³ã‚¹å¾…ã¡
 			pushSwDebTimeCnt[i]++;
 			if( ((portTmp & (PORT_ON<<i))>>i) == PORT_OFF ){
 				if( pushSwDebTimeCnt[i] >= PUSH_SW_DEBTIME ){
-					//’Z‰Ÿ
+					//çŸ­æŠ¼
 					pushSwState[i] = PUSH_SW_STATE_OFF;
 					drvInSwData.pushSwState[i] = DRV_IN_PUSH_SW_STATE_ON;
 				}
 			}else{
 				if( pushSwDebTimeCnt[i] >= PUSH_SW_LONGTIME ){
-					//’·‰Ÿ‚µ
+					//é•·æŠ¼ã—
 					pushSwState[i] = PUSH_SW_STATE_OFF;
 					drvInSwData.pushSwState[i] = DRV_IN_PUSH_SW_STATE_LONGON;
 				}
@@ -124,16 +124,16 @@ void drvInSwMain( void )
 }
 
 //********************************************************************************//
-// ƒ|[ƒg•Ï‰»Š„‚è‚İ
+// ãƒãƒ¼ãƒˆå¤‰åŒ–å‰²ã‚Šè¾¼ã¿
 //********************************************************************************//
 void interPcInt08_14( void )
 {
-	unsigned char	portTmp;		//ƒ[ƒ^ƒŠ[ƒGƒ“ƒR[ƒ_[‘S4“ü—Íˆê•Û‘¶
+	unsigned char	portTmp;		//ãƒ­ãƒ¼ã‚¿ãƒªãƒ¼ã‚¨ãƒ³ã‚³ãƒ¼ãƒ€ãƒ¼å…¨4å…¥åŠ›ä¸€æ™‚ä¿å­˜
 
 	cli();
 	portTmp	= (~PORTD.IN) & 0x03;
 
-	if( portTmp != (grayCode[NO_SET]&0x03)){	//ƒ|[ƒg•Ï‰»
+	if( portTmp != (grayCode[NO_SET]&0x03)){	//ãƒãƒ¼ãƒˆå¤‰åŒ–
 		grayCode[NO_SET]	= (((grayCode[NO_SET] << 2) | portTmp) & 0x0F);
 		chkRotateVectCnt( NO_SET );
 	}
@@ -142,14 +142,14 @@ void interPcInt08_14( void )
 	sei();
 }
 //********************************************************************************//
-// ‰ñ“]•Ï‰»—Êƒ`ƒFƒbƒN
+// å›è»¢å¤‰åŒ–é‡ãƒã‚§ãƒƒã‚¯
 //********************************************************************************//
 static void chkRotateVectCnt( unsigned char portNo )
 {
-	//ƒOƒŒƒCƒR[ƒhƒe[ƒuƒ‹‚ğ‚à‚Æ‚ÉA‰ñ“]•ûŒü•Ï‰»—Ê‚ğ‰ÁZ‚µ‚Ä‚¢‚­
+	//ã‚°ãƒ¬ã‚¤ã‚³ãƒ¼ãƒ‰ãƒ†ãƒ¼ãƒ–ãƒ«ã‚’ã‚‚ã¨ã«ã€å›è»¢æ–¹å‘å¤‰åŒ–é‡ã‚’åŠ ç®—ã—ã¦ã„ã
 	rotateVect[portNo]		+=grayCodeTable[ grayCode[portNo] ];
 
-	//•Ï‰»—Ê‚ª4or-4‚Å‰ñ“]•ûŒüŒˆ’è
+	//å¤‰åŒ–é‡ãŒ4or-4ã§å›è»¢æ–¹å‘æ±ºå®š
 	if( rotateVect[portNo] >= ROT_VECT_FORWARD ){
 		rotEncState[portNo] = ROT_ENC_STATE_FORWARD;
 		rotateVect[portNo]	 = 0;
@@ -160,7 +160,7 @@ static void chkRotateVectCnt( unsigned char portNo )
 }
 
 //********************************************************************************//
-// ƒ|[ƒg•Ï‰»Š„‚è‚İ
+// ãƒãƒ¼ãƒˆå¤‰åŒ–å‰²ã‚Šè¾¼ã¿
 //********************************************************************************//
 void interPcInt00_07( void )
 {
@@ -168,7 +168,7 @@ void interPcInt00_07( void )
 	unsigned char	i;
 
 	cli();
-	portTmp	= ((~PORTB.IN>>4) & 0x01);		//ON‚ªLOW‚Ì‚½‚ß”½“]
+	portTmp	= ((~PORTB.IN>>4) & 0x01);		//ONãŒLOWã®ãŸã‚åè»¢
 
 	for( i=0 ; i<PUSH_SW_NUM ; i++ ){
 		if((pushSwState[i] == PUSH_SW_STATE_OFF) &&

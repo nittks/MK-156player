@@ -1,28 +1,28 @@
 #ifndef APL_CTRL_H
 #define APL_CTRL_H
 
-//ó‘Ô
+//çŠ¶æ…‹
 typedef enum{
-	APL_CTRL_STATE_BOOT,		//‹N“®‰‰ñ
-	APL_CTRL_STATE_NOMARL,		//’Êí
-	APL_CTRL_STATE_TESTDISP,	//ƒeƒXƒg•\Ž¦
-	APL_CTRL_STATE_SETTING		//Ý’è
+	APL_CTRL_STATE_BOOT,		//èµ·å‹•åˆå›ž
+	APL_CTRL_STATE_NOMARL,		//é€šå¸¸
+	APL_CTRL_STATE_TESTDISP,	//ãƒ†ã‚¹ãƒˆè¡¨ç¤º
+	APL_CTRL_STATE_SETTING		//è¨­å®š
 }APL_CTRL_STATE;
 
-//ó‘Ô(ƒeƒXƒg•\Ž¦“à
+//çŠ¶æ…‹(ãƒ†ã‚¹ãƒˆè¡¨ç¤ºå†…
 typedef enum{
 	APL_CTRL_STATE_TEST_AUTO,
 	APL_CTRL_STATE_TEST_SPEED,
 }APL_CTRL_STATE_TEST;
 
-//ó‘Ô(Ý’è“à
+//çŠ¶æ…‹(è¨­å®šå†…
 typedef enum{
-	APL_CTRL_STATE_SET_COLOR_7SEG,			//’²F
-	APL_CTRL_STATE_SET_BRIGHT_7SEG,			//’²Œõ(7ƒZƒO
-	APL_CTRL_STATE_SET_BRIGHT_DIM_7SEG,		//’²ŒõŒ¸Œõ(7ƒZƒO
-	APL_CTRL_STATE_SET_DISPCYC_7SEG,		//•\Ž¦XV‘¬“x(7ƒZƒO
-	APL_CTRL_STATE_SET_PALSE_SPEED,			//ƒpƒ‹ƒXŽd—lŽÔ‘¬
-	APL_CTRL_STATE_SET_PALSE_REV,			//ƒpƒ‹ƒXŽd—l‰ñ“]”
+	APL_CTRL_STATE_SET_COLOR_7SEG,			//èª¿è‰²
+	APL_CTRL_STATE_SET_BRIGHT_7SEG,			//èª¿å…‰(7ã‚»ã‚°
+	APL_CTRL_STATE_SET_BRIGHT_DIM_7SEG,		//èª¿å…‰æ¸›å…‰(7ã‚»ã‚°
+	APL_CTRL_STATE_SET_DISPCYC_7SEG,		//è¡¨ç¤ºæ›´æ–°é€Ÿåº¦(7ã‚»ã‚°
+	APL_CTRL_STATE_SET_PALSE_SPEED,			//ãƒ‘ãƒ«ã‚¹ä»•æ§˜è»Šé€Ÿ
+	APL_CTRL_STATE_SET_PALSE_REV,			//ãƒ‘ãƒ«ã‚¹ä»•æ§˜å›žè»¢æ•°
 	APL_CTRL_STATE_SET_MAX
 }APL_CTRL_STATE_SET;
 
@@ -34,18 +34,18 @@ typedef struct {
 }APL_CTRL;
 
 typedef struct {
-	unsigned char	color7seg;			//’²F
-	unsigned char	bright7seg;			//’²Œõ(7ƒZƒO
-	unsigned char	brightBarled;		//’²Œõ(ƒo[LED
-	unsigned char	brightDim7seg;		//’²ŒõŒ¸Œõ(7ƒZƒO
-	unsigned char	brightDimBarled;	//’²ŒõŒ¸Œõ(ƒo[LED
-	unsigned char	dispcyc7seg;		//•\Ž¦XV‘¬“x(7ƒZƒO
-	unsigned char	dispcycBarled;		//•\Ž¦XV‘¬“x(ƒo[LED
+	unsigned char	color7seg;			//èª¿è‰²
+	unsigned char	bright7seg;			//èª¿å…‰(7ã‚»ã‚°
+	unsigned char	brightBarled;		//èª¿å…‰(ãƒãƒ¼LED
+	unsigned char	brightDim7seg;		//èª¿å…‰æ¸›å…‰(7ã‚»ã‚°
+	unsigned char	brightDimBarled;	//èª¿å…‰æ¸›å…‰(ãƒãƒ¼LED
+	unsigned char	dispcyc7seg;		//è¡¨ç¤ºæ›´æ–°é€Ÿåº¦(7ã‚»ã‚°
+	unsigned char	dispcycBarled;		//è¡¨ç¤ºæ›´æ–°é€Ÿåº¦(ãƒãƒ¼LED
 }APL_CTRL_SET;
 
 typedef struct {
-	unsigned char	speed;			//ƒpƒ‹ƒXŽd—lŽÔ‘¬   
-	unsigned char	rev;			//ƒpƒ‹ƒXŽd—l‰ñ“]” 
+	unsigned char	speed;			//ãƒ‘ãƒ«ã‚¹ä»•æ§˜è»Šé€Ÿ   
+	unsigned char	rev;			//ãƒ‘ãƒ«ã‚¹ä»•æ§˜å›žè»¢æ•° 
 }APL_CTRL_SET_PALSE;
 
 
@@ -71,7 +71,7 @@ enum{
 	SETTING_PALSE_SPEED_16,
 	SETTING_PALSE_SPEED_20,
 	SETTING_PALSE_SPEED_25,
-	SETTING_PALSE_SPEED_MAX = SETTING_PALSE_SPEED_25	//1Žn‚Ü‚è‚Ì‚½‚ß-1
+	SETTING_PALSE_SPEED_MAX = SETTING_PALSE_SPEED_25	//1å§‹ã¾ã‚Šã®ãŸã‚-1
 };
 enum{
 	SETTING_PALSE_REV_01	= 1,
@@ -82,7 +82,7 @@ enum{
 	SETTING_PALSE_REV_06,
 	SETTING_PALSE_REV_08,
 	SETTING_PALSE_REV_10,
-	SETTING_PALSE_REV_MAX = SETTING_PALSE_REV_10	//1Žn‚Ü‚è‚Ì‚½‚ß-1
+	SETTING_PALSE_REV_MAX = SETTING_PALSE_REV_10	//1å§‹ã¾ã‚Šã®ãŸã‚-1
 };
 
 

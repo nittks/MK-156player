@@ -1,11 +1,11 @@
 /*
 SerialLed:WS2812C-2020
-’ÊMƒtƒŒ[ƒ€24bit
+é€šä¿¡ãƒ•ãƒ¬ãƒ¼ãƒ 24bit
 [First] Green8bit,Red8bit,Blue8bit [Last]
-ãˆÊbit‚©‚ç‘—M
+ä¸Šä½bitã‹ã‚‰é€ä¿¡
 
-Configurable Custom Logic (CCL)‚É‚æ‚éƒVƒŠƒAƒ‹’ÊM
-Ql‘—¿ Microchip AN2387
+Configurable Custom Logic (CCL)ã«ã‚ˆã‚‹ã‚·ãƒªã‚¢ãƒ«é€šä¿¡
+å‚è€ƒè³‡æ–™ Microchip AN2387
 https://ww1.microchip.com/downloads/en/AppNotes/00002387B.pdf
 https://avr.jp/user/AN/PDF/AN2387.pdf
 */
@@ -23,7 +23,7 @@ https://avr.jp/user/AN/PDF/AN2387.pdf
 #define F_CLK_PER_MHZ		((uint8_t)(F_CPU / F_PDIV / 1000000))
 #define TIMER_DIV			((uint8_t)(8))
 
-//LINK‚æ‚èƒZƒbƒg‚³‚ê‚é
+//LINKã‚ˆã‚Šã‚»ãƒƒãƒˆã•ã‚Œã‚‹
 static DRV_LED_7SEG_DATA	drvLed7SegData;
 static DRV_LED_7SEG_DATA	drvLed7SegDataPre;
 
@@ -46,7 +46,7 @@ unsigned long bitReverceSort( unsigned long inData , unsigned char size );
 static uint8_t isLedUpdate( void );
 static uint8_t serchNextDigitNo( void );
 //********************************************************************************
-// ‰Šú‰»
+// åˆæœŸåŒ–
 //********************************************************************************
 void initDrvOutSerialLed( void )
 {
@@ -65,7 +65,7 @@ void initDrvOutSerialLed( void )
 	drvLed7SegData.brightGreen	= 0;
 	drvLed7SegData.brightBlue	= 0;
 
-	drvLed7SegDataPre.brightRed		= 0xFF;		//‹N“®Œã‰‰ñ‘—M‚ğs‚¤‚½‚ßA’l‚É·‚ğ‚Â‚¯‚Ä‚¨‚­
+	drvLed7SegDataPre.brightRed		= 0xFF;		//èµ·å‹•å¾Œåˆå›é€ä¿¡ã‚’è¡Œã†ãŸã‚ã€å€¤ã«å·®ã‚’ã¤ã‘ã¦ãŠã
 	drvLed7SegDataPre.brightGreen	= 0xFF;
 	drvLed7SegDataPre.brightBlue	= 0xFF;
 
@@ -74,7 +74,7 @@ void initDrvOutSerialLed( void )
 	cntStartupTime	= 0;
 
 	cli();
-	// Ql
+	// å‚è€ƒ
 	// https://www.avrfreaks.net/forum/anyone-have-working-ws2812-library-das?
 
 	// EVENTS
@@ -114,7 +114,7 @@ void initDrvOutSerialLed( void )
 }
 
 //********************************************************************************
-// Lnk‚©‚çƒZƒbƒg
+// Lnkã‹ã‚‰ã‚»ãƒƒãƒˆ
 //********************************************************************************
 void setDrvOutSerialLed7seg( DRV_LED_7SEG_DATA *inP )
 {
@@ -122,7 +122,7 @@ void setDrvOutSerialLed7seg( DRV_LED_7SEG_DATA *inP )
 }
 
 //********************************************************************************
-// ƒƒCƒ“ˆ—
+// ãƒ¡ã‚¤ãƒ³å‡¦ç†
 //********************************************************************************
 void drvOutSerialLedMain( void )
 {
@@ -130,7 +130,7 @@ void drvOutSerialLedMain( void )
 	uint8_t		chkBit;
 	uint8_t		isLedUpdateChk;
 
-	//‹N“®Œãˆê’èŠÔ‚ÍAÁ“”w¦‚ğ‘—‚è‘±‚¯‚é
+	//èµ·å‹•å¾Œä¸€å®šæ™‚é–“ã¯ã€æ¶ˆç¯æŒ‡ç¤ºã‚’é€ã‚Šç¶šã‘ã‚‹
 	if( cntStartupTime <= LED_STARTUP_TIME ){
 		cntStartupTime++;
 			
@@ -142,13 +142,13 @@ void drvOutSerialLedMain( void )
 		return 0;
 	}
 	
-	//LED“_“”w¦‚É•Ï‰»‚ª‚ ‚ê‚ÎA‘—Mƒf[ƒ^‚ğ€”õ‚·‚é
-	//ƒlƒXƒg‚ª­‚µŒ™
+	//LEDç‚¹ç¯æŒ‡ç¤ºã«å¤‰åŒ–ãŒã‚ã‚Œã°ã€é€ä¿¡ãƒ‡ãƒ¼ã‚¿ã‚’æº–å‚™ã™ã‚‹
+	//ãƒã‚¹ãƒˆãŒå°‘ã—å«Œ
 	isLedUpdateChk = isLedUpdate();
 	if( isLedUpdateChk == true ){
 		for( digitCnt=0 ; digitCnt<LED_7SEG_DIGIT_NUM ; digitCnt++ ){
 			if( (digitUpdateFlag & (1<<digitCnt)) != 0 ){
-				chkBit = (1<<(LED_7SEG_SEG_NUM-1));		//ãˆÊ‚©‚ç
+				chkBit = (1<<(LED_7SEG_SEG_NUM-1));		//ä¸Šä½ã‹ã‚‰
 				for( segCnt=0 ; segCnt<LED_7SEG_SEG_NUM ; segCnt++ ){
 					if( (drvLed7SegData.val[digitCnt] & chkBit) == 0 ){
 						sendData[digitCnt][segCnt*LED_7SEG_COLOR+0]	= 0;
@@ -168,7 +168,7 @@ void drvOutSerialLedMain( void )
 }
 
 //********************************************************************************
-// LED•\¦XV”»’èB“_“”w¦‚É•Ï‰»‚ª‚ ‚ê‚ÎXV‚·‚é
+// LEDè¡¨ç¤ºæ›´æ–°åˆ¤å®šã€‚ç‚¹ç¯æŒ‡ç¤ºã«å¤‰åŒ–ãŒã‚ã‚Œã°æ›´æ–°ã™ã‚‹
 //********************************************************************************
 static uint8_t isLedUpdate( void )
 {
@@ -183,14 +183,14 @@ static uint8_t isLedUpdate( void )
 		(drvLed7SegData.brightGreen	!= drvLed7SegDataPre.brightGreen) |
 		(drvLed7SegData.brightBlue	!= drvLed7SegDataPre.brightBlue)
 	){
-		//F‚ª•ÏX‚³‚ê‚Ä‚¢‚½‚ç‘S‚ÄXV
+		//è‰²ãŒå¤‰æ›´ã•ã‚Œã¦ã„ãŸã‚‰å…¨ã¦æ›´æ–°
 		digitUpdateFlag	= (uint8_t)pow(2,LED_7SEG_DIGIT_NUM) -1;
 
 		idxTxDigit	= 0;
 		idxTxData	= 0;
 		retUpdate = true;
 	}else{
-		//•\¦’l‚ª•ÏX‚³‚ê‚Ä‚¢‚½‚çA‚»‚ÌŒ…‚¾‚¯XV
+		//è¡¨ç¤ºå€¤ãŒå¤‰æ›´ã•ã‚Œã¦ã„ãŸã‚‰ã€ãã®æ¡ã ã‘æ›´æ–°
 		for( i=0 ; i<LED_7SEG_DIGIT_NUM ; i++ ){
 			if( drvLed7SegData.val[i] != drvLed7SegDataPre.val[i] ){
 				if( digitUpdateFlag== 0 ){
@@ -209,7 +209,7 @@ static uint8_t isLedUpdate( void )
 }
 
 //********************************************************************************
-// ‘—Mƒf[ƒ^ƒZƒbƒg
+// é€ä¿¡ãƒ‡ãƒ¼ã‚¿ã‚»ãƒƒãƒˆ
 //********************************************************************************
 // USART0_DRE_vect(Data Register Empty)
 void interSetTxBuffer(void)
@@ -217,7 +217,7 @@ void interSetTxBuffer(void)
 	cli();
 	
 	if( idxTxData == 0 ){
-		CCL_CTRLA &= ~CCL_ENABLE_bm;	//CCL—LŒø‚ÍƒŒƒWƒXƒ^•ÏXƒƒbƒN‚ª‚©‚©‚é‚½‚ßAæ‚É‰ğœ‚·‚é
+		CCL_CTRLA &= ~CCL_ENABLE_bm;	//CCLæœ‰åŠ¹æ™‚ã¯ãƒ¬ã‚¸ã‚¹ã‚¿å¤‰æ›´ãƒ­ãƒƒã‚¯ãŒã‹ã‹ã‚‹ãŸã‚ã€å…ˆã«è§£é™¤ã™ã‚‹
 		switch( idxTxDigit ){
 			case 0:	CCL.LUT0CTRLA |= (CCL_OUTEN_bm | CCL_ENABLE_bm);	break;
 			case 1:	CCL.LUT3CTRLA |= (CCL_OUTEN_bm | CCL_ENABLE_bm);	break;
@@ -237,17 +237,17 @@ void interSetTxBuffer(void)
 }
 
 //********************************************************************************
-// CCLo—Íƒ|[ƒg‚ğŸ‚Ìƒ|[ƒg‚Ö•ÏX‚·‚é
+// CCLå‡ºåŠ›ãƒãƒ¼ãƒˆã‚’æ¬¡ã®ãƒãƒ¼ãƒˆã¸å¤‰æ›´ã™ã‚‹
 //********************************************************************************
 void interChangeNextCCLPort( void ){
 	
 	cli();
 
-	//Œ»İo—Í’†‚ÌCCLƒ|[ƒg‚ğ~‚ß‚é
-	CCL_CTRLA &= ~CCL_ENABLE_bm;		//CCL—LŒø‚ÍƒŒƒWƒXƒ^•ÏXƒƒbƒN‚ª‚©‚©‚é‚½‚ßAæ‚É‰ğœ‚·‚é
+	//ç¾åœ¨å‡ºåŠ›ä¸­ã®CCLãƒãƒ¼ãƒˆã‚’æ­¢ã‚ã‚‹
+	CCL_CTRLA &= ~CCL_ENABLE_bm;		//CCLæœ‰åŠ¹æ™‚ã¯ãƒ¬ã‚¸ã‚¹ã‚¿å¤‰æ›´ãƒ­ãƒƒã‚¯ãŒã‹ã‹ã‚‹ãŸã‚ã€å…ˆã«è§£é™¤ã™ã‚‹
 	switch( idxTxDigit ){	//off
 		case 0:	
-			CCL.LUT0CTRLA &= (~CCL_ENABLE_bm);		//LUT0‚ÌƒŒƒWƒXƒ^‚ÉƒƒbƒN‚ª‚©‚©‚é‚½‚ßAæ‚É‰ğœ
+			CCL.LUT0CTRLA &= (~CCL_ENABLE_bm);		//LUT0ã®ãƒ¬ã‚¸ã‚¹ã‚¿ã«ãƒ­ãƒƒã‚¯ãŒã‹ã‹ã‚‹ãŸã‚ã€å…ˆã«è§£é™¤
 			CCL.LUT0CTRLA &= (~CCL_OUTEN_bm);
 		break;
 		case 1:	
@@ -275,7 +275,7 @@ void interChangeNextCCLPort( void ){
 	sei();
 }
 //********************************************************************************
-//	Ÿ‚Éo—Í‚·‚éŒ…No‚ğ’²‚×‚é
+//	æ¬¡ã«å‡ºåŠ›ã™ã‚‹æ¡Noã‚’èª¿ã¹ã‚‹
 //********************************************************************************
 static uint8_t serchNextDigitNo( void ){
 	uint8_t	digitNo;
@@ -284,7 +284,7 @@ static uint8_t serchNextDigitNo( void ){
 	while( (digitUpdateFlag & (1<<digitNo)) == 0 ){
 		digitNo++;
 		if( digitNo >= LED_7SEG_DIGIT_NUM ){
-			// æ‚è‚¦‚È‚¢B
+			// å–ã‚Šãˆãªã„ã€‚
 		}
 	}
 	return digitNo;

@@ -9,7 +9,7 @@
 
 static APL_CTRL				aplCtrl;
 static APL_CTRL_SET			aplCtrlSet;
-static APL_CTRL_SET			aplCtrlSetBak;		//İ’è•Û‘¶‚¹‚¸”²‚¯‚éÕ‚É–ß‚·AŒ³‚Ì’l•Û—p
+static APL_CTRL_SET			aplCtrlSetBak;		//è¨­å®šä¿å­˜ã›ãšæŠœã‘ã‚‹ç¥­ã«æˆ»ã™ã€å…ƒã®å€¤ä¿æŒç”¨
 static APL_CTRL_SET_PALSE	aplCtrlSetPalse;
 static APL_CTRL_SET_PALSE	aplCtrlSetPalseBak;
 
@@ -20,7 +20,7 @@ static void changeSettingItem( unsigned char *setNo , SET_ITEM_NO no );
 static void chkSetPalse( void );
 static void apryEep( void );
 //********************************************************************************
-// ‰Šú‰»
+// åˆæœŸåŒ–
 //********************************************************************************
 void initAplCtrl( void )
 {
@@ -31,41 +31,41 @@ void initAplCtrl( void )
 	
 }
 //********************************************************************************
-// §Œäó‘Ôæ“¾
+// åˆ¶å¾¡çŠ¶æ…‹å–å¾—
 //********************************************************************************
 APL_CTRL *getAplCtrl( void )
 {
 	return( &aplCtrl );
 }
 //********************************************************************************
-// İ’è’læ“¾
+// è¨­å®šå€¤å–å¾—
 //********************************************************************************
 APL_CTRL_SET *getAplCtrlSet( void )
 {
 	return( &aplCtrlSet );
 }
 //********************************************************************************
-// ƒpƒ‹ƒXİ’è’læ“¾
+// ãƒ‘ãƒ«ã‚¹è¨­å®šå€¤å–å¾—
 //********************************************************************************
 APL_CTRL_SET_PALSE *getAplCtrlSetPalse( void )
 {
 	return( &aplCtrlSetPalse );
 }
 //********************************************************************************
-// ƒƒCƒ“ˆ—
+// ãƒ¡ã‚¤ãƒ³å‡¦ç†
 //********************************************************************************
 void aplCtrlMain( void )
 {
 //	PORTB = (PORTB & 0xFE) | (~(PORTB & 0x01) );
 
-	//ó‘Ô”»’èAó‘Ô‘JˆÚ
+	//çŠ¶æ…‹åˆ¤å®šã€çŠ¶æ…‹é·ç§»
 	stateJudge();
 
-	//İ’èˆ—
+	//è¨­å®šå‡¦ç†
 	procSetting();
 }
 //********************************************************************************
-// ó‘Ô”»’èAó‘Ô‘JˆÚ
+// çŠ¶æ…‹åˆ¤å®šã€çŠ¶æ…‹é·ç§»
 //********************************************************************************
 static void stateJudge( void )
 {
@@ -79,39 +79,39 @@ static void stateJudge( void )
 
 	switch( aplCtrl.state ){
 	//****************************************
-	// ‰‰ñ‹N“®
+	// åˆå›èµ·å‹•
 	//****************************************
-	case APL_CTRL_STATE_BOOT:		//‹N“®‰‰ñ
-		if( inAplDataEep->read != APL_DATA_EEP_STATE_UNREAD ){		//EEPROM“Ç‚İ‚İÏ‚İ
-			apryEep();		//‰‰ñ‚ÍEEPROM‚Ìƒf[ƒ^‚ğ“K—p‚·‚é
+	case APL_CTRL_STATE_BOOT:		//èµ·å‹•åˆå›
+		if( inAplDataEep->read != APL_DATA_EEP_STATE_UNREAD ){		//EEPROMèª­ã¿è¾¼ã¿æ¸ˆã¿
+			apryEep();		//åˆå›ã¯EEPROMã®ãƒ‡ãƒ¼ã‚¿ã‚’é©ç”¨ã™ã‚‹
 			aplCtrl.state = APL_CTRL_STATE_NOMARL;
 		}
 		break;
 
 	//****************************************
-	// ’Êí
+	// é€šå¸¸
 	//****************************************
-	case APL_CTRL_STATE_NOMARL:		//’Êí
+	case APL_CTRL_STATE_NOMARL:		//é€šå¸¸
 		if( inAplDataSw->pushSwTest == APL_DATA_PUSH_SW_LONGON ){
-			//’Êí->ƒeƒXƒg•\¦
+			//é€šå¸¸->ãƒ†ã‚¹ãƒˆè¡¨ç¤º
 			aplCtrl.state = APL_CTRL_STATE_TESTDISP;
 			aplCtrl.stateTest = APL_CTRL_STATE_TEST_AUTO;
 		}else if( inAplDataSw->pushSwSet == APL_DATA_PUSH_SW_LONGON ){
-			//’Êí->İ’è
+			//é€šå¸¸->è¨­å®š
 			aplCtrl.state = APL_CTRL_STATE_SETTING;
 			if( inAplDataCar->ill == APL_DATA_ILL_ON ){
 				aplCtrl.stateSet = APL_CTRL_STATE_SET_BRIGHT_DIM_7SEG;
 			}else{
 				aplCtrl.stateSet = APL_CTRL_STATE_SET_BRIGHT_7SEG;
 			}
-			//“ü—Íƒ†ƒjƒbƒg‚©‚çóM‚µ‚Ä‚¢‚éƒpƒ‹ƒXİ’è’l‚ğŒ»İİ’è’l‚Æ‚µ‚Äæ“¾
+			//å…¥åŠ›ãƒ¦ãƒ‹ãƒƒãƒˆã‹ã‚‰å—ä¿¡ã—ã¦ã„ã‚‹ãƒ‘ãƒ«ã‚¹è¨­å®šå€¤ã‚’ç¾åœ¨è¨­å®šå€¤ã¨ã—ã¦å–å¾—
 			aplCtrlSetPalse.speed	= inAplDataCar->palseSetSpeed;
 			aplCtrlSetPalse.rev		= inAplDataCar->palseSetRev;
 
-			//•ÏX‘O‚Ì’l‚ğ•Û‘¶(ƒLƒƒƒ“ƒZƒ‹–ß‚·‚½‚ß
-			//İ’è
+			//å¤‰æ›´å‰ã®å€¤ã‚’ä¿å­˜(ã‚­ãƒ£ãƒ³ã‚»ãƒ«æ™‚æˆ»ã™ãŸã‚
+			//è¨­å®š
 			aplCtrlSetBak = aplCtrlSet;
-			//ƒpƒ‹ƒXİ’è
+			//ãƒ‘ãƒ«ã‚¹è¨­å®š
 			aplCtrlSetPalse.speed		= inAplDataCar->palseSetSpeed;
 			aplCtrlSetPalse.rev			= inAplDataCar->palseSetRev;
 			aplCtrlSetPalseBak.speed	= inAplDataCar->palseSetSpeed;
@@ -121,9 +121,9 @@ static void stateJudge( void )
 		break;
 
 	//****************************************
-	// ƒeƒXƒg•\¦
+	// ãƒ†ã‚¹ãƒˆè¡¨ç¤º
 	//****************************************
-	case APL_CTRL_STATE_TESTDISP:		//ƒeƒXƒgƒ‚[ƒh
+	case APL_CTRL_STATE_TESTDISP:		//ãƒ†ã‚¹ãƒˆãƒ¢ãƒ¼ãƒ‰
 		if( inAplDataSw->pushSwTest == APL_DATA_PUSH_SW_LONGON ){
 			aplCtrl.state = APL_CTRL_STATE_NOMARL;
 		}
@@ -142,35 +142,35 @@ static void stateJudge( void )
 		break;
 		
 	//****************************************
-	// İ’è
+	// è¨­å®š
 	//****************************************
-	case APL_CTRL_STATE_SETTING:		//İ’è
+	case APL_CTRL_STATE_SETTING:		//è¨­å®š
 		switch( aplCtrl.stateSet ){
-		case APL_CTRL_STATE_SET_BRIGHT_7SEG:		//’²Œõ(7ƒZƒO
+		case APL_CTRL_STATE_SET_BRIGHT_7SEG:		//èª¿å…‰(7ã‚»ã‚°
 			if( inAplDataSw->pushSwSet == APL_DATA_PUSH_SW_ON ){
 				aplCtrl.stateSet = APL_CTRL_STATE_SET_DISPCYC_7SEG;
 			}else if( inAplDataCar->ill == APL_DATA_ILL_ON ){
 				aplCtrl.stateSet = APL_CTRL_STATE_SET_BRIGHT_DIM_7SEG;
 			}
 			break;
-		case APL_CTRL_STATE_SET_BRIGHT_DIM_7SEG:	//’²ŒõŒ¸Œõ(7ƒZƒO
+		case APL_CTRL_STATE_SET_BRIGHT_DIM_7SEG:	//èª¿å…‰æ¸›å…‰(7ã‚»ã‚°
 			if( inAplDataSw->pushSwSet == APL_DATA_PUSH_SW_ON ){
 				aplCtrl.stateSet = APL_CTRL_STATE_SET_DISPCYC_7SEG;
 			}else if( inAplDataCar->ill == APL_DATA_ILL_OFF ){
 				aplCtrl.stateSet = APL_CTRL_STATE_SET_DISPCYC_7SEG;
 			}
 			break;
-		case APL_CTRL_STATE_SET_DISPCYC_7SEG:		//•\¦XV‘¬“x(7ƒZƒO
+		case APL_CTRL_STATE_SET_DISPCYC_7SEG:		//è¡¨ç¤ºæ›´æ–°é€Ÿåº¦(7ã‚»ã‚°
 			if( inAplDataSw->pushSwSet == APL_DATA_PUSH_SW_ON ){
 				aplCtrl.stateSet = APL_CTRL_STATE_SET_PALSE_SPEED;
 			}
 			break;
-		case APL_CTRL_STATE_SET_PALSE_SPEED:		//ƒpƒ‹ƒXd—lÔ‘¬ 
+		case APL_CTRL_STATE_SET_PALSE_SPEED:		//ãƒ‘ãƒ«ã‚¹ä»•æ§˜è»Šé€Ÿ 
 			if( inAplDataSw->pushSwSet == APL_DATA_PUSH_SW_ON ){
 				aplCtrl.stateSet = APL_CTRL_STATE_SET_PALSE_REV;
 			}
 			break;
-		case APL_CTRL_STATE_SET_PALSE_REV:			//ƒpƒ‹ƒXd—l‰ñ“]” 
+		case APL_CTRL_STATE_SET_PALSE_REV:			//ãƒ‘ãƒ«ã‚¹ä»•æ§˜å›è»¢æ•° 
 			if( inAplDataSw->pushSwSet == APL_DATA_PUSH_SW_ON ){
 				if( inAplDataCar->ill == APL_DATA_ILL_ON ){
 					aplCtrl.stateSet = APL_CTRL_STATE_SET_BRIGHT_DIM_7SEG;
@@ -183,54 +183,54 @@ static void stateJudge( void )
 			break;
 		}
 
-		//İ’è‚©‚ço‚é
+		//è¨­å®šã‹ã‚‰å‡ºã‚‹
 		if( inAplDataSw->pushSwSet == APL_DATA_PUSH_SW_LONGON ){
-			setLnkOutEep();	//EEPROM‘‚İ—v‹
-			chkSetPalse();	//ƒpƒ‹ƒXİ’è•ÏX—L–³ƒ`ƒFƒbƒN
+			setLnkOutEep();	//EEPROMæ›¸è¾¼ã¿è¦æ±‚
+			chkSetPalse();	//ãƒ‘ãƒ«ã‚¹è¨­å®šå¤‰æ›´æœ‰ç„¡ãƒã‚§ãƒƒã‚¯
 			aplCtrl.state	= APL_CTRL_STATE_NOMARL;
 		}else if( inAplDataSw->pushSwTest == APL_DATA_PUSH_SW_LONGON ){
 			aplCtrl.state	= APL_CTRL_STATE_NOMARL;
-			aplCtrlSet		= aplCtrlSetBak;		//•ÏX‘O‚Ì’l‚É–ß‚·
+			aplCtrlSet		= aplCtrlSetBak;		//å¤‰æ›´å‰ã®å€¤ã«æˆ»ã™
 		}
 		break;
 	}
 }
 //********************************************************************************
-// İ’èƒTƒuƒ‹[ƒ`ƒ“
+// è¨­å®šã‚µãƒ–ãƒ«ãƒ¼ãƒãƒ³
 //********************************************************************************
 static void procSetting( void )
 {
 	switch( aplCtrl.state ){
-	case APL_CTRL_STATE_BOOT:		//‹N“®‰‰ñ
-		//–³ˆ—
+	case APL_CTRL_STATE_BOOT:		//èµ·å‹•åˆå›
+		//ç„¡å‡¦ç†
 		break;
 
-	case APL_CTRL_STATE_NOMARL:		//’Êí
-		//–³ˆ—
+	case APL_CTRL_STATE_NOMARL:		//é€šå¸¸
+		//ç„¡å‡¦ç†
 		break;
 
-	case APL_CTRL_STATE_TESTDISP:		//ƒeƒXƒgƒ‚[ƒh
-		//–³ˆ—
+	case APL_CTRL_STATE_TESTDISP:		//ãƒ†ã‚¹ãƒˆãƒ¢ãƒ¼ãƒ‰
+		//ç„¡å‡¦ç†
 		break;
 		
-	case APL_CTRL_STATE_SETTING:		//İ’è
+	case APL_CTRL_STATE_SETTING:		//è¨­å®š
 		switch( aplCtrl.stateSet ){
-		case APL_CTRL_STATE_SET_COLOR_7SEG:			//’²F
+		case APL_CTRL_STATE_SET_COLOR_7SEG:			//èª¿è‰²
 			changeSettingItem( &aplCtrlSet.color7seg ,SET_COLOR);
 			break;
-		case APL_CTRL_STATE_SET_BRIGHT_7SEG:			//’²Œõ(7ƒZƒO
+		case APL_CTRL_STATE_SET_BRIGHT_7SEG:			//èª¿å…‰(7ã‚»ã‚°
 			changeSettingVal( &aplCtrlSet.bright7seg );
 			break;
-		case APL_CTRL_STATE_SET_BRIGHT_DIM_7SEG:		//’²ŒõŒ¸Œõ(7ƒZƒO
+		case APL_CTRL_STATE_SET_BRIGHT_DIM_7SEG:		//èª¿å…‰æ¸›å…‰(7ã‚»ã‚°
 			changeSettingVal( &aplCtrlSet.brightDim7seg );
 			break;
-		case APL_CTRL_STATE_SET_DISPCYC_7SEG:		//•\¦XV‘¬“x(7ƒZƒO
+		case APL_CTRL_STATE_SET_DISPCYC_7SEG:		//è¡¨ç¤ºæ›´æ–°é€Ÿåº¦(7ã‚»ã‚°
 			changeSettingVal( &aplCtrlSet.dispcyc7seg );
 			break;
-		case APL_CTRL_STATE_SET_PALSE_SPEED:			//ƒpƒ‹ƒXd—lÔ‘¬ 
+		case APL_CTRL_STATE_SET_PALSE_SPEED:			//ãƒ‘ãƒ«ã‚¹ä»•æ§˜è»Šé€Ÿ 
 			changeSettingItem(	&aplCtrlSetPalse.speed ,SET_PALSE_SPEED);
 			break;
-		case APL_CTRL_STATE_SET_PALSE_REV:			//ƒpƒ‹ƒXd—l‰ñ“]” 
+		case APL_CTRL_STATE_SET_PALSE_REV:			//ãƒ‘ãƒ«ã‚¹ä»•æ§˜å›è»¢æ•° 
 			changeSettingItem(	&aplCtrlSetPalse.rev,SET_PALSE_REV);
 			break;
 		default:
@@ -241,7 +241,7 @@ static void procSetting( void )
 }
 
 //********************************************************************************
-// İ’è’l•ÏX
+// è¨­å®šå€¤å¤‰æ›´
 //********************************************************************************
 void changeSettingVal( unsigned char *val )
 {
@@ -249,14 +249,14 @@ void changeSettingVal( unsigned char *val )
 	inAplDataSw		= getAplDataSw();
 
 	if( inAplDataSw->rotEncSet == APL_DATA_ROT_ENC_UP ){
-		//ãŒÀƒuƒƒbƒN
+		//ä¸Šé™ãƒ–ãƒ­ãƒƒã‚¯
 		if( *val < ( SETTING_VAL_MAX - SETTING_VAL_INTERVAL ) ){
 			*val += SETTING_VAL_INTERVAL;
 		}else{
 			*val = SETTING_VAL_MAX;
 		}
 	}else if( inAplDataSw->rotEncSet == APL_DATA_ROT_ENC_DOWN ){
-		//‰ºŒÀƒuƒƒbƒN
+		//ä¸‹é™ãƒ–ãƒ­ãƒƒã‚¯
 		if( *val > ( SETTING_VAL_MIN + SETTING_VAL_INTERVAL ) ){
 			*val -= SETTING_VAL_INTERVAL;
 		}else{
@@ -265,7 +265,7 @@ void changeSettingVal( unsigned char *val )
 	}
 }
 //********************************************************************************
-// ƒpƒ‹ƒXİ’è’l•ÏX
+// ãƒ‘ãƒ«ã‚¹è¨­å®šå€¤å¤‰æ›´
 //********************************************************************************
 void changeSettingItem( unsigned char *setNo , SET_ITEM_NO no )
 {
@@ -273,14 +273,14 @@ void changeSettingItem( unsigned char *setNo , SET_ITEM_NO no )
 	inAplDataSw		= getAplDataSw();
 
 	if( inAplDataSw->rotEncSet == APL_DATA_ROT_ENC_UP ){
-		//ãŒÀƒuƒƒbƒN
+		//ä¸Šé™ãƒ–ãƒ­ãƒƒã‚¯
 		if( *setNo < PALSE_ITEM_MAX[no] ){
 			*setNo += 1;
 		}else{
 			*setNo = PALSE_ITEM_MIN[no];
 		}
 	}else if( inAplDataSw->rotEncSet == APL_DATA_ROT_ENC_DOWN ){
-		//‰ºŒÀƒuƒƒbƒN
+		//ä¸‹é™ãƒ–ãƒ­ãƒƒã‚¯
 		if( *setNo > PALSE_ITEM_MIN[no] ){
 			*setNo -= 1;
 		}else{
@@ -290,21 +290,21 @@ void changeSettingItem( unsigned char *setNo , SET_ITEM_NO no )
 }
 
 //********************************************************************************
-// ƒpƒ‹ƒXd—lİ’è•ÏXƒ`ƒFƒbƒN&•ÏX—v‹
+// ãƒ‘ãƒ«ã‚¹ä»•æ§˜è¨­å®šå¤‰æ›´ãƒã‚§ãƒƒã‚¯&å¤‰æ›´è¦æ±‚
 //********************************************************************************
 static void chkSetPalse( void )
 {
-	//•ÏX’lƒ`ƒFƒbƒN
+	//å¤‰æ›´å€¤ãƒã‚§ãƒƒã‚¯
 	if(( aplCtrlSetPalse.speed != aplCtrlSetPalseBak.speed ) ||
 	   ( aplCtrlSetPalse.rev != aplCtrlSetPalseBak.rev ))
 	{
-		//“ü—Íƒ†ƒjƒbƒg‚Öİ’è’l•ÏX’ÊM‘—M
+		//å…¥åŠ›ãƒ¦ãƒ‹ãƒƒãƒˆã¸è¨­å®šå€¤å¤‰æ›´é€šä¿¡é€ä¿¡
 		setLnkOutCom();
 	}
 }
 		
 //********************************************************************************
-// EEPROMƒf[ƒ^“K—p
+// EEPROMãƒ‡ãƒ¼ã‚¿é©ç”¨
 //********************************************************************************
 static void apryEep( void )
 {
@@ -313,17 +313,17 @@ static void apryEep( void )
 	inAplDataEep	= getAplDataEep();
 
 	if( inAplDataEep->read == APL_DATA_EEP_STATE_READED){
-		//“ÇÏ‚İ‚È‚ç”½‰f
+		//èª­è¾¼æ¸ˆã¿ãªã‚‰åæ˜ 
 		aplCtrlSet.color7seg			= inAplDataEep->color7seg;
 		aplCtrlSet.bright7seg			= inAplDataEep->bright7seg;
 		aplCtrlSet.brightDim7seg		= inAplDataEep->brightDim7seg;
 		aplCtrlSet.dispcyc7seg			= inAplDataEep->dispcyc7seg;
 	}else if( inAplDataEep->read == APL_DATA_EEP_STATE_SUMERROR){
-		//SUMƒGƒ‰[‚ÍƒfƒtƒHƒ‹ƒg’l“Ç
+		//SUMã‚¨ãƒ©ãƒ¼æ™‚ã¯ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆå€¤èª­è¾¼
 		aplCtrlSet.color7seg			= eepDefault[COLOR_7SEG];
 		aplCtrlSet.bright7seg			= eepDefault[BRIGHT_7SEG];
 		aplCtrlSet.brightDim7seg		= eepDefault[BRIGHT_DIM_7SEG];
 		aplCtrlSet.dispcyc7seg			= eepDefault[DISPCYC_7SEG];
-		setLnkOutEep();	//EEPROM‘‚İ—v‹
+		setLnkOutEep();	//EEPROMæ›¸è¾¼ã¿è¦æ±‚
 	}
 }

@@ -1,19 +1,19 @@
 #include <avr/io.h>
-#include <avr/interrupt.h>  //Š„‚è‚İ‚ğg—p‚·‚é‚½‚ß
+#include <avr/interrupt.h>  //å‰²ã‚Šè¾¼ã¿ã‚’ä½¿ç”¨ã™ã‚‹ãŸã‚
 #include "aplDispData_inc.h"
 #include "aplDispData.h"
 #include "aplData.h"
 #include "aplCtrl.h"
 #include "hardware.h"
 
-//ŒöŠJ—p
+//å…¬é–‹ç”¨
 static APL_DISP_DATA	aplDispData;
 
-//“à•”ˆ——p
-//’Êí
+//å†…éƒ¨å‡¦ç†ç”¨
+//é€šå¸¸æ™‚
 static unsigned short	dispCycSpeed;
 
-//ƒeƒXƒgƒf[ƒ^
+//ãƒ†ã‚¹ãƒˆãƒ‡ãƒ¼ã‚¿
 static unsigned char	testCycSpeed;
 static unsigned char	testSpeed;
 static TEST_STATE		testStateSpeed;
@@ -24,7 +24,7 @@ static void disp7seg(	unsigned char *retSpeed	, const unsigned char  inSpeed	);
 static unsigned char	makeTestDataSpeed( void );
 static unsigned char	makeTestDataSpeedManual( void );
 //********************************************************************************
-// ‰Šú‰»
+// åˆæœŸåŒ–
 //********************************************************************************
 void initAplDispData( void )
 {
@@ -46,14 +46,14 @@ void initAplDispData( void )
 	dispSpeed( &aplDispData.led7Seg[0] , 123);
 }
 //********************************************************************************
-// æ“¾
+// å–å¾—
 //********************************************************************************
 APL_DISP_DATA *getAplDispData( void )
 {
 	return( &aplDispData );
 }
 //********************************************************************************
-// ƒƒCƒ“ˆ—
+// ãƒ¡ã‚¤ãƒ³å‡¦ç†
 //********************************************************************************
 void aplDispDataMain( void )
 {
@@ -71,12 +71,12 @@ void aplDispDataMain( void )
 	
 
 	//------------------------------
-	// ’²Fƒf[ƒ^o—Í
+	// èª¿è‰²ãƒ‡ãƒ¼ã‚¿å‡ºåŠ›
 	//------------------------------
 	//aplDispData.color7seg			= inAplCtrlSet->color7seg;
 
 	//------------------------------
-	// ‹P“xƒf[ƒ^o—Í
+	// è¼åº¦ãƒ‡ãƒ¼ã‚¿å‡ºåŠ›
 	//------------------------------
 	if( inAplDataCar->ill == APL_DATA_ILL_OFF ){
 		aplDispData.bright7seg		= inAplCtrlSet->bright7seg/3;
@@ -86,15 +86,15 @@ void aplDispDataMain( void )
 
 	switch( inAplCtrl->state ){
 	//****************************************
-	// ‰‰ñ‹N“®
+	// åˆå›èµ·å‹•
 	//****************************************
 	case APL_CTRL_STATE_BOOT:
-		//–³ˆ—
+		//ç„¡å‡¦ç†
 		break;
 	//****************************************
-	// ’Êí
+	// é€šå¸¸
 	//****************************************
-	case APL_CTRL_STATE_NOMARL:		//’Êí
+	case APL_CTRL_STATE_NOMARL:		//é€šå¸¸
 		aplDispData.settingMode		= APL_DISP_SETTING_OFF;
 		
 		//dispSpeed( &aplDispData.led7Seg[0] , inAplDataCar->speed );
@@ -102,9 +102,9 @@ void aplDispDataMain( void )
 		break;
 
 	//****************************************
-	// ƒeƒXƒgƒ‚[ƒh
+	// ãƒ†ã‚¹ãƒˆãƒ¢ãƒ¼ãƒ‰
 	//****************************************
-	case APL_CTRL_STATE_TESTDISP:		//ƒeƒXƒgƒ‚[ƒh
+	case APL_CTRL_STATE_TESTDISP:		//ãƒ†ã‚¹ãƒˆãƒ¢ãƒ¼ãƒ‰
 		aplDispData.settingMode		= APL_DISP_SETTING_OFF;
 		
 		switch( inAplCtrl->stateTest ){
@@ -119,29 +119,29 @@ void aplDispDataMain( void )
 		}
 		break;
 	//****************************************
-	// İ’è
+	// è¨­å®š
 	//****************************************
-	case APL_CTRL_STATE_SETTING:		//İ’è
-		//İ’èƒ‚[ƒh•\¦ON
+	case APL_CTRL_STATE_SETTING:		//è¨­å®š
+		//è¨­å®šãƒ¢ãƒ¼ãƒ‰è¡¨ç¤ºON
 		aplDispData.settingMode		= APL_DISP_SETTING_ON;
 
 		switch( inAplCtrl->stateSet){
-		case APL_CTRL_STATE_SET_COLOR_7SEG:		//’²F
+		case APL_CTRL_STATE_SET_COLOR_7SEG:		//èª¿è‰²
 			disp7seg( &aplDispData.led7Seg[0] , SET_BRIGHT_7SEG_DISP );
 			break;
-		case APL_CTRL_STATE_SET_BRIGHT_7SEG:		//’²Œõ(7ƒZƒO
+		case APL_CTRL_STATE_SET_BRIGHT_7SEG:		//èª¿å…‰(7ã‚»ã‚°
 			disp7seg( &aplDispData.led7Seg[0] , SET_BRIGHT_7SEG_DISP );
 			break;
-		case APL_CTRL_STATE_SET_BRIGHT_DIM_7SEG:		//’²ŒõŒ¸Œõ(7ƒZƒO
+		case APL_CTRL_STATE_SET_BRIGHT_DIM_7SEG:		//èª¿å…‰æ¸›å…‰(7ã‚»ã‚°
 			disp7seg( &aplDispData.led7Seg[0] , SET_BRIGHT_7SEG_DISP );
 			break;
-		case APL_CTRL_STATE_SET_DISPCYC_7SEG:		//•\¦XV‘¬“x(7ƒZƒO
+		case APL_CTRL_STATE_SET_DISPCYC_7SEG:		//è¡¨ç¤ºæ›´æ–°é€Ÿåº¦(7ã‚»ã‚°
 			disp7seg( &aplDispData.led7Seg[0], inAplCtrlSet->dispcyc7seg * SPEED_DIGIT );
 			break;
-		case APL_CTRL_STATE_SET_PALSE_SPEED:			//ƒpƒ‹ƒXd—lÔ‘¬ 
+		case APL_CTRL_STATE_SET_PALSE_SPEED:			//ãƒ‘ãƒ«ã‚¹ä»•æ§˜è»Šé€Ÿ 
 			disp7seg( &aplDispData.led7Seg[0] , SETTING_PALSE_SPEED[inAplCtrlSetPalse->speed] );
 			break;
-		case APL_CTRL_STATE_SET_PALSE_REV:			//ƒpƒ‹ƒXd—l‰ñ“]” 
+		case APL_CTRL_STATE_SET_PALSE_REV:			//ãƒ‘ãƒ«ã‚¹ä»•æ§˜å›è»¢æ•° 
 			disp7seg( &aplDispData.led7Seg[0] , SETTING_PALSE_REV[inAplCtrlSetPalse->rev] );
 			break;
 		default:
@@ -152,7 +152,7 @@ void aplDispDataMain( void )
 }
 
 //********************************************************************************
-// Ô‘¬•\¦
+// è»Šé€Ÿè¡¨ç¤º
 //********************************************************************************
 static void dispSpeed( unsigned char *retSpeed , const unsigned char inSpeed )
 {
@@ -160,7 +160,7 @@ static void dispSpeed( unsigned char *retSpeed , const unsigned char inSpeed )
 
 	inAplCtrlSet	= getAplCtrlSet();
 
-	//•\¦XVüŠú‘Ò‹@(İ’è’l[100%]’PˆÊ*1%•Ó‚è‚ÌŠÔ¨ŠÔ‚ğo‚µA”äŠr
+	//è¡¨ç¤ºæ›´æ–°å‘¨æœŸå¾…æ©Ÿ(è¨­å®šå€¤[100%]å˜ä½*1%è¾ºã‚Šã®æ™‚é–“â†’æ™‚é–“ã‚’å‡ºã—ã€æ¯”è¼ƒ
 	if( dispCycSpeed < ( inAplCtrlSet->dispcyc7seg * DISPCYC_7SEG_DIGIT ) ){
 		dispCycSpeed++;
 	}else{
@@ -171,34 +171,34 @@ static void dispSpeed( unsigned char *retSpeed , const unsigned char inSpeed )
 	
 }
 //********************************************************************************
-// 7seg•\¦
+// 7segè¡¨ç¤º
 //********************************************************************************
 static void disp7seg( unsigned char *retSpeed , const unsigned char inSpeed )
 {
 	unsigned char	i;
 	unsigned char	tmpSpeed;
 
-	//ƒXƒs[ƒh•\¦ˆ—
-	tmpSpeed = inSpeed;	// /=‚Å‘ã“ü‚µ‚Ä‚¢‚­‚½‚ßƒ[ƒN‚ÖƒRƒs[
+	//ã‚¹ãƒ”ãƒ¼ãƒ‰è¡¨ç¤ºå‡¦ç†
+	tmpSpeed = inSpeed;	// /=ã§ä»£å…¥ã—ã¦ã„ããŸã‚ãƒ¯ãƒ¼ã‚¯ã¸ã‚³ãƒ”ãƒ¼
 	for( i=0 ; i<LED_7SEG_DIGIT_NUM ; i++ ){
-		//1Œ…’Šo
+		//1æ¡æŠ½å‡º
 		if( tmpSpeed > 0 ){
-			//‰º‚ÌŒ…‚©‚çŒvZ
+			//ä¸‹ã®æ¡ã‹ã‚‰è¨ˆç®—
 			retSpeed[i]	= tmpSpeed % 10;
 			tmpSpeed	/= 10;
 		}else{
 			if( i==0 ){
-				//1‚ÌˆÊ‚ª0‚Ì‚Í0•\¦
+				//1ã®ä½ãŒ0ã®æ™‚ã¯0è¡¨ç¤º
 				retSpeed[i]	= 0;
 			}else{
-				//10A100‚ÌˆÊ‚ª0‚Ì‚Í”ñ•\¦
+				//10ã€100ã®ä½ãŒ0ã®æ™‚ã¯éè¡¨ç¤º
 				retSpeed[i]	= APL_DSP_DATA_7SEG_BLANK;
 			}
 		}
 	}	
 }
 //********************************************************************************
-// Ô‘¬ƒeƒXƒgƒf[ƒ^
+// è»Šé€Ÿãƒ†ã‚¹ãƒˆãƒ‡ãƒ¼ã‚¿
 //********************************************************************************
 static unsigned char makeTestDataSpeed( void )
 {
@@ -208,19 +208,19 @@ static unsigned char makeTestDataSpeed( void )
 		testCycSpeed = 0;
 		if( testStateSpeed == TEST_STATE_UP ){
 			if( testSpeed < (SPEED_MAX-CHG_VAL_SPEED)){
-				//1ms‚É1rpm‘‰Á
+				//1msã«1rpmå¢—åŠ 
 				testSpeed += CHG_VAL_SPEED;
 			}else{
-				//ó‘Ô‚ğŒ¸­•ûŒü‚Ö
+				//çŠ¶æ…‹ã‚’æ¸›å°‘æ–¹å‘ã¸
 				testSpeed = SPEED_MAX;
 				testStateSpeed	= TEST_STATE_DOWN;
 			}
 		}else if( testStateSpeed == TEST_STATE_DOWN ){
 			if( testSpeed > (SPEED_MIN+CHG_VAL_SPEED)){
-				//1ms‚É1rpm‘‰Á
+				//1msã«1rpmå¢—åŠ 
 				testSpeed -= CHG_VAL_SPEED;
 			}else{
-				//ó‘Ô‚ğŒ¸­•ûŒü‚Ö
+				//çŠ¶æ…‹ã‚’æ¸›å°‘æ–¹å‘ã¸
 				testSpeed = SPEED_MIN;
 				testStateSpeed	= TEST_STATE_UP;
 			}
@@ -229,7 +229,7 @@ static unsigned char makeTestDataSpeed( void )
 	return( testSpeed );
 }
 //********************************************************************************
-// Ô‘¬ƒeƒXƒgƒf[ƒ^(è“®
+// è»Šé€Ÿãƒ†ã‚¹ãƒˆãƒ‡ãƒ¼ã‚¿(æ‰‹å‹•
 //********************************************************************************
 static unsigned char makeTestDataSpeedManual( void )
 {
@@ -238,14 +238,14 @@ static unsigned char makeTestDataSpeedManual( void )
 
 	if( inAplDataSw->rotEncSet == APL_DATA_ROT_ENC_UP ){
 		if( testSpeed < (SPEED_MAX-CHG_VAL_SPEED_MANUAL) ){
-			//1ms‚É1rpm‘‰Á
+			//1msã«1rpmå¢—åŠ 
 			testSpeed += CHG_VAL_SPEED_MANUAL;
 		}else{
 			testSpeed = SPEED_MAX;
 		}
 	}else if( inAplDataSw->rotEncSet == APL_DATA_ROT_ENC_DOWN ){
 		if( testSpeed > (SPEED_MIN+CHG_VAL_SPEED_MANUAL)){
-			//1ms‚É1rpm‘‰Á
+			//1msã«1rpmå¢—åŠ 
 			testSpeed -= CHG_VAL_SPEED_MANUAL;
 		}else{
 			testSpeed = SPEED_MIN;

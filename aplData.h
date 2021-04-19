@@ -2,7 +2,7 @@
 #define APL_DATA_H
 
 //********************************************************************************
-// UARTŽÔ—¼î•ñ
+// UARTè»Šä¸¡æƒ…å ±
 //********************************************************************************
 enum{
 	APL_DATA_ILL_OFF,
@@ -29,16 +29,16 @@ typedef struct{
 }APL_DATA_CAR;
 
 //********************************************************************************
-// ƒXƒCƒbƒ`“ü—Í
+// ã‚¹ã‚¤ãƒƒãƒå…¥åŠ›
 //********************************************************************************
-//ƒpƒ‹ƒXŠÔŠu•ÏX“ü—Í
+//ãƒ‘ãƒ«ã‚¹é–“éš”å¤‰æ›´å…¥åŠ›
 typedef enum{
-	APL_DATA_ROT_ENC_STOP,		//’âŽ~
-	APL_DATA_ROT_ENC_UP,		//‘
-	APL_DATA_ROT_ENC_DOWN		//Œ¸
+	APL_DATA_ROT_ENC_STOP,		//åœæ­¢
+	APL_DATA_ROT_ENC_UP,		//å¢—
+	APL_DATA_ROT_ENC_DOWN		//æ¸›
 }APL_DATA_ROT_ENC;
 
-//ƒvƒbƒVƒ…ƒXƒCƒbƒ`“ü—Í
+//ãƒ—ãƒƒã‚·ãƒ¥ã‚¹ã‚¤ãƒƒãƒå…¥åŠ›
 typedef enum{
 	APL_DATA_PUSH_SW_OFF,
 	APL_DATA_PUSH_SW_ON,

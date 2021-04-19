@@ -5,8 +5,8 @@
 
 #define		SETTING_VAL_MAX			((unsigned char)100)
 #define		SETTING_VAL_MIN			((unsigned char)0)
-#define		SETTING_VAL_DEF			((unsigned char)50)		//ƒfƒtƒHƒ‹ƒg’l(EEPROM“Ç‚İ‚İƒGƒ‰[
-#define		SETTING_VAL_INTERVAL	((unsigned char)5)	//•Ï‰»ŠÔŠu(%)
+#define		SETTING_VAL_DEF			((unsigned char)50)		//ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆå€¤(EEPROMèª­ã¿è¾¼ã¿ã‚¨ãƒ©ãƒ¼æ™‚
+#define		SETTING_VAL_INTERVAL	((unsigned char)5)	//å¤‰åŒ–é–“éš”(%)
 
 typedef enum{
 	COLOR_7SEG,
@@ -26,9 +26,9 @@ enum{
 
 unsigned char eepDefault[SETTING_ITEM_MAX] = {
 	COLOR_7SEG_WHITE,
-	80,		//7ƒZƒO‹P“x
-	20,		//7ƒZƒO‹P“x(Œ¸Œõ
-	20,		//7ƒZƒO•\¦XV‘¬“x
+	80,		//7ã‚»ã‚°è¼åº¦
+	20,		//7ã‚»ã‚°è¼åº¦(æ¸›å…‰
+	20,		//7ã‚»ã‚°è¡¨ç¤ºæ›´æ–°é€Ÿåº¦
 };
 
 const unsigned char PALSE_ITEM_MIN[]={SETTING_COLOR_RED,SETTING_PALSE_SPEED_04,SETTING_PALSE_REV_01};

@@ -6,9 +6,9 @@
  */ 
 
 /*
-’èŠúƒ^ƒXƒN
+å®šæœŸã‚¿ã‚¹ã‚¯
 MPU		:ATmega328
-clock	:“à‘ 8MHz
+clock	:å†…è”µ8MHz
 */
 
 #include "main.h"
@@ -27,13 +27,13 @@ clock	:“à‘ 8MHz
 #include "drvUart.h"
 #include "main_inc.h"
 
-#define INT_CNT_MAX	((unsigned char)125)	//8us*125=1ms–ˆŠ„‚è‚İ
+#define INT_CNT_MAX	((unsigned char)125)	//8us*125=1msæ¯å‰²ã‚Šè¾¼ã¿
 
 static void mainTask( void );
 static void initReg( void );
 static void initTaskTimer( void );
 //********************************************************************************
-// ƒƒCƒ“
+// ãƒ¡ã‚¤ãƒ³
 //********************************************************************************
 int main(void)
 {
@@ -41,14 +41,14 @@ int main(void)
 
 	while(1)
 	{
-		//ˆ—‚µ‚½‚çƒXƒŠ[ƒvBƒ^ƒCƒ}Š„‚è‚İ‚Å‹N‚«‚½‚çÄ“xƒ‹[ƒvŠJn
+		//å‡¦ç†ã—ãŸã‚‰ã‚¹ãƒªãƒ¼ãƒ—ã€‚ã‚¿ã‚¤ãƒå‰²ã‚Šè¾¼ã¿ã§èµ·ããŸã‚‰å†åº¦ãƒ«ãƒ¼ãƒ—é–‹å§‹
 		mainTask();
 		set_sleep_mode(SLEEP_MODE_IDLE);
 	}
 }
 
 //********************************************************************************
-// ‰Šú‰»
+// åˆæœŸåŒ–
 //********************************************************************************
 void initMain( void )
 {
@@ -70,15 +70,15 @@ static void mainTask( void )
 {
 	unsigned char	i;
 	
-	//ˆ—ƒ^ƒXƒNÀsŠÔƒ`ƒFƒbƒN
+	//å‡¦ç†ã‚¿ã‚¹ã‚¯å®Ÿè¡Œæ™‚é–“ãƒã‚§ãƒƒã‚¯
 	for( i=0; i<TASK_MAX ; i++){
-		if( taskParameter[i].regist == true ){	//ƒ^ƒXƒN—LŒø
+		if( taskParameter[i].regist == true ){	//ã‚¿ã‚¹ã‚¯æœ‰åŠ¹
 
-			//üŠúŠÔŒo‰ß‚µ‚Ä‚¢‚½‚çˆ—
+			//å‘¨æœŸæ™‚é–“çµŒéã—ã¦ã„ãŸã‚‰å‡¦ç†
 			if( taskParameter[i].currentTime <= 0 ){
-				//ƒŠƒZƒbƒg
+				//ãƒªã‚»ãƒƒãƒˆ
 				taskParameter[i].currentTime = taskParameter[i].cycleTime; 
-				//ƒ^ƒXƒNÀs
+				//ã‚¿ã‚¹ã‚¯å®Ÿè¡Œ
 				taskParameter[i].func();
 			}
 		}
@@ -87,7 +87,7 @@ static void mainTask( void )
 
 
 //********************************************************************************
-// ƒ^ƒXƒNŠÔƒJƒEƒ“ƒg
+// ã‚¿ã‚¹ã‚¯æ™‚é–“ã‚«ã‚¦ãƒ³ãƒˆ
 //********************************************************************************
 void interTaskTime( void )
 {
@@ -99,11 +99,11 @@ void interTaskTime( void )
 	
 	TCA0.SINGLE.INTFLAGS |= TCA_SINGLE_OVF_bm;
 
-	//ˆ—ƒ^ƒXƒNÀsŠÔƒ`ƒFƒbƒN
+	//å‡¦ç†ã‚¿ã‚¹ã‚¯å®Ÿè¡Œæ™‚é–“ãƒã‚§ãƒƒã‚¯
 	for( i=0; i<TASK_MAX ; i++){
-		if( taskParameter[i].regist == true ){	//“o˜^—LŒøƒ^ƒXƒN‚Ì‚İ
+		if( taskParameter[i].regist == true ){	//ç™»éŒ²æœ‰åŠ¹ã‚¿ã‚¹ã‚¯ã®ã¿
 
-			//10ms‚Å1ƒJƒEƒ“ƒgƒ_ƒEƒ“B
+			//10msã§1ã‚«ã‚¦ãƒ³ãƒˆãƒ€ã‚¦ãƒ³ã€‚
 			if( taskParameter[i].currentTime > 0 ){
 				taskParameter[i].currentTime--;
 			}
@@ -112,41 +112,41 @@ void interTaskTime( void )
 	sei();
 }
 //********************************************************************************//
-// ƒ^ƒXƒN—LŒø‰»
+// ã‚¿ã‚¹ã‚¯æœ‰åŠ¹åŒ–
 //********************************************************************************//
 void enableTask( unsigned char taskNo )
 {
-	//ƒ^ƒXƒN—LŒø‰»
+	//ã‚¿ã‚¹ã‚¯æœ‰åŠ¹åŒ–
 	taskParameter[taskNo].regist	= true;
-	//üŠúƒZƒbƒg
+	//å‘¨æœŸã‚»ãƒƒãƒˆ
 	taskParameter[taskNo].currentTime	= taskParameter[taskNo].cycleTime;
 }
 //********************************************************************************//
-// ƒ^ƒXƒN–³Œø‰»
+// ã‚¿ã‚¹ã‚¯ç„¡åŠ¹åŒ–
 //********************************************************************************//
 void disableTask( unsigned char taskNo )
 {
-	//ƒ^ƒXƒN—LŒø‰»
+	//ã‚¿ã‚¹ã‚¯æœ‰åŠ¹åŒ–
 	taskParameter[taskNo].regist	= false;
 }
 
 //********************************************************************************
-// ƒŒƒWƒXƒ^‰Šú‰»
+// ãƒ¬ã‚¸ã‚¹ã‚¿åˆæœŸåŒ–
 //********************************************************************************
 static void initReg(void)
 {
 	cli();
 
-	//ƒNƒƒbƒNİ’è
+	//ã‚¯ãƒ­ãƒƒã‚¯è¨­å®š
 	FUSE.OSCCFG			= FUSE_OSCCFG_FREQSEL_20MHZ;
-	// 20MHz -> (•ªü–³‚µ) -> CLK_PER=20MHz
+	// 20MHz -> (åˆ†å‘¨ç„¡ã—) -> CLK_PER=20MHz
 //	CLKCTRL.MCLKCTRLB	= CLKCTRL_PDIV_8X_gc | CLKCTRL_PEN_bm;
 	CPU_CCP				= CCP_IOREG_gc;
 	CLKCTRL.MCLKCTRLB	= 0;
 	CLKCTRL.MCLKCTRLA	= CLKCTRL_CLKSEL_OSC20M_gc;
 	
 	
-		//I/Oİ’è
+		//I/Oè¨­å®š
 	PORTA.DIR	= 0x00;
 	PORTC.DIR	= 0x00;
 	PORTD.DIR	= 0x00;
@@ -184,19 +184,19 @@ static void initReg(void)
 	PORTE.PIN6CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
 	PORTE.PIN7CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
 	
-	//Š„‚è‚İ‹–‰Â
+	//å‰²ã‚Šè¾¼ã¿è¨±å¯
 	sei();
 }
 //********************************************************************************
-// ƒ^ƒXƒNŠÔŠÇ——pƒ^ƒCƒ}AƒŒƒWƒXƒ^İ’è
+// ã‚¿ã‚¹ã‚¯æ™‚é–“ç®¡ç†ç”¨ã‚¿ã‚¤ãƒã€ãƒ¬ã‚¸ã‚¹ã‚¿è¨­å®š
 //********************************************************************************
 static void initTaskTimer( void )
 {
 	cli();
 	
-	//ƒ^ƒCƒ}İ’è
-	// 1ms‚ÅŠ„‚è‚İ‚µ‚½‚¢
-	// CLK_PER=20MHz -> (16•ªü) -> 1250kHz(0.8usüŠú) -> 1250ƒJƒEƒ“ƒg‚Å1ms
+	//ã‚¿ã‚¤ãƒè¨­å®š
+	// 1msã§å‰²ã‚Šè¾¼ã¿ã—ãŸã„
+	// CLK_PER=20MHz -> (16åˆ†å‘¨) -> 1250kHz(0.8uså‘¨æœŸ) -> 1250ã‚«ã‚¦ãƒ³ãƒˆã§1ms
 	TCA0.SINGLE.PER			= (F_CPU/F_PDIV/16)/1000;
 	TCA0.SINGLE.CTRLESET	= TCA_SINGLE_DIR_UP_gc;
 	TCA0.SINGLE.CTRLA		= TCA_SINGLE_CLKSEL_DIV16_gc | TCA_SINGLE_ENABLE_bm;
@@ -207,7 +207,7 @@ static void initTaskTimer( void )
 }
 
 //********************************************************************************
-// “®ìŠm”F—pLED“_–Å
+// å‹•ä½œç¢ºèªç”¨LEDç‚¹æ»…
 //********************************************************************************
 static void powerLed( void )
 {

@@ -2,7 +2,7 @@
 #define DRV_UART_H
 
 //----------------------------------------
-// ‘—M
+// é€ä¿¡
 //----------------------------------------
 #define DRV_UART_TX_BUF_SIZE	8
 typedef struct{
@@ -11,7 +11,7 @@ typedef struct{
 }DRV_UART_TX;
 
 //----------------------------------------
-// óM
+// å—ä¿¡
 //----------------------------------------
 #define DRV_UART_RX_BUF_SIZE	8
 #define UART_RX_ID			(0x11)
@@ -23,7 +23,7 @@ typedef struct{
 
 
 //----------------------------------------
-// ŒöŠJŠÖ”
+// å…¬é–‹é–¢æ•°
 //----------------------------------------
 extern void initDrvUart( void );
 extern void drvUartMain( void );

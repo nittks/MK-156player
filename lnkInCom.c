@@ -6,11 +6,11 @@
 #include "aplData.h"
 #include "drvUart.h"
 
-//‰Šú‰»
+//åˆæœŸåŒ–
 void initLnkInCom( void )
 {
 }
-//ƒƒCƒ“ˆ—
+//ãƒ¡ã‚¤ãƒ³å‡¦ç†
 void lnkInComMain( void )
 {
 	DRV_UART_RX		*inDrvUartRx;
@@ -26,7 +26,7 @@ void lnkInComMain( void )
 	}
 	
 	if( sum != inDrvUartRx->rxData[inDrvUartRx->rxDataNum-1]){
-		//SUMƒGƒ‰[Bˆ—–³‚µ
+		//SUMã‚¨ãƒ©ãƒ¼ã€‚å‡¦ç†ç„¡ã—
 	}else{
 
 		aplDataCar.speed	= inDrvUartRx->rxData[UART_NO_SPEED];
@@ -41,7 +41,7 @@ void lnkInComMain( void )
 		aplDataCar.vtc	= (inDrvUartRx->rxData[UART_NO_CAR_SIG] & (1<<POS_VTC)) >> POS_VTC;
 		
 		
-		//”ÍˆÍƒuƒƒbƒN
+		//ç¯„å›²ãƒ–ãƒ­ãƒƒã‚¯
 		if( (aplDataCar.palseSetSpeed < UART_PALSE_SET_SPEED_MIN ) || 
 			(UART_PALSE_SET_SPEED_MAX < aplDataCar.palseSetSpeed) )
 		{

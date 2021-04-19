@@ -2,21 +2,21 @@
 #define APL_DISP_DATA_INC_H
 
 //********************************************************************************
-// •W€“®ì—p’è”
+// æ¨™æº–å‹•ä½œç”¨å®šæ•°
 //********************************************************************************
 #define		SPEED_MAX		((unsigned char)200)
 #define		SPEED_MIN		((unsigned char)0)
-#define		DISPCYC_7SEG_DIGIT			((unsigned short)1)	//1%•Ó‚è‚ÌüŠú[10ms](100%‚Å1000ms)
-#define		SPEED_DIGIT		((unsigned char)1)		//1%•Ó‚è‚Ì•\¦’l
+#define		DISPCYC_7SEG_DIGIT			((unsigned short)1)	//1%è¾ºã‚Šã®å‘¨æœŸ[10ms](100%ã§1000ms)
+#define		SPEED_DIGIT		((unsigned char)1)		//1%è¾ºã‚Šã®è¡¨ç¤ºå€¤
 
 //********************************************************************************
-// ƒeƒXƒgƒ‚[ƒh
+// ãƒ†ã‚¹ãƒˆãƒ¢ãƒ¼ãƒ‰
 //********************************************************************************
-//ƒeƒXƒgƒf[ƒ^ŒvZüŠú
-#define		TEST_CYC_SPEED	((unsigned char)10-1)	//10x10ms=100ms–ˆˆ—
-//ŒvZ–ˆ‚Ì•Ï‰»’l
+//ãƒ†ã‚¹ãƒˆãƒ‡ãƒ¼ã‚¿è¨ˆç®—å‘¨æœŸ
+#define		TEST_CYC_SPEED	((unsigned char)10-1)	//10x10ms=100msæ¯å‡¦ç†
+//è¨ˆç®—æ¯ã®å¤‰åŒ–å€¤
 #define		CHG_VAL_SPEED	((unsigned char)2)
-//ƒ[ƒ^ƒŠ[ƒNƒŠƒbƒN–ˆ‚Ì•Ï‰»’l
+//ãƒ­ãƒ¼ã‚¿ãƒªãƒ¼ã‚¯ãƒªãƒƒã‚¯æ¯ã®å¤‰åŒ–å€¤
 #define		CHG_VAL_SPEED_MANUAL	((unsigned char)5)
 
 
@@ -27,10 +27,10 @@ typedef enum{
 
 
 //********************************************************************************
-// İ’è@ƒpƒ‹ƒXİ’è@•\¦’l
+// è¨­å®šã€€ãƒ‘ãƒ«ã‚¹è¨­å®šã€€è¡¨ç¤ºå€¤
 //********************************************************************************
-const unsigned char SETTING_PALSE_SPEED[]=	{0,4,8,16,20,25};		//Ô‘¬ƒpƒ‹ƒXd—l
-const unsigned char SETTING_PALSE_REV[]={0,1,2,3,4,5,6,8,10,12};	//‰ñ“]”ƒpƒ‹ƒXd—l(‹C“›”
+const unsigned char SETTING_PALSE_SPEED[]=	{0,4,8,16,20,25};		//è»Šé€Ÿãƒ‘ãƒ«ã‚¹ä»•æ§˜
+const unsigned char SETTING_PALSE_REV[]={0,1,2,3,4,5,6,8,10,12};	//å›è»¢æ•°ãƒ‘ãƒ«ã‚¹ä»•æ§˜(æ°—ç­’æ•°
 
 #define SET_BRIGHT_7SEG_DISP	((unsigned char)180)
 

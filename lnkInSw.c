@@ -8,25 +8,25 @@
 static APL_DATA_ROT_ENC judgeRotEnc( DRV_IN_ROT_ENC_STATE rotEncState );
 static APL_DATA_PUSH_SW judgePushSw( DRV_IN_PUSH_SW_STATE pushSwState );
 //********************************************************************************
-// ‰Šú‰»
+// åˆæœŸåŒ–
 //********************************************************************************
 void initLnkInSw( void )
 {
 }
 //********************************************************************************
-// ƒƒCƒ“ˆ—
+// ãƒ¡ã‚¤ãƒ³å‡¦ç†
 //********************************************************************************
 void lnkInSwMain( void )
 {
 	DRV_IN_SW		*inDrvInSw;
 	APL_DATA_SW		aplDataSw;
 
-	//SW“ü—Íƒhƒ‰ƒCƒoƒf[ƒ^Žæ“¾
+	//SWå…¥åŠ›ãƒ‰ãƒ©ã‚¤ãƒãƒ‡ãƒ¼ã‚¿å–å¾—
 	inDrvInSw = getDrvInSw();
 
-	//ƒ[ƒ^ƒŠ[ƒGƒ“ƒR[ƒ_[”»’è
+	//ãƒ­ãƒ¼ã‚¿ãƒªãƒ¼ã‚¨ãƒ³ã‚³ãƒ¼ãƒ€ãƒ¼åˆ¤å®š
 	aplDataSw.rotEncSet		= judgeRotEnc( inDrvInSw->rotEncState[ROT_ENC_SET] );
-	//ƒvƒbƒVƒ…ƒXƒCƒbƒ`”»’è
+	//ãƒ—ãƒƒã‚·ãƒ¥ã‚¹ã‚¤ãƒƒãƒåˆ¤å®š
 	aplDataSw.pushSwSet		= judgePushSw( inDrvInSw->pushSwState[PUSH_SW_SET] );
 	aplDataSw.pushSwTest	= judgePushSw( inDrvInSw->pushSwState[PUSH_SW_TEST] );
 
@@ -34,13 +34,13 @@ void lnkInSwMain( void )
 }
 
 //********************************************************************************
-// ƒ[ƒ^ƒŠ[ƒGƒ“ƒR[ƒ_[“ü—Í”»’è
+// ãƒ­ãƒ¼ã‚¿ãƒªãƒ¼ã‚¨ãƒ³ã‚³ãƒ¼ãƒ€ãƒ¼å…¥åŠ›åˆ¤å®š
 //********************************************************************************
 static APL_DATA_ROT_ENC judgeRotEnc( DRV_IN_ROT_ENC_STATE rotEncState )
 {
 	APL_DATA_ROT_ENC	ret;
 
-	//ƒ[ƒ^ƒŠ[ƒGƒ“ƒR[ƒ_[”»’è
+	//ãƒ­ãƒ¼ã‚¿ãƒªãƒ¼ã‚¨ãƒ³ã‚³ãƒ¼ãƒ€ãƒ¼åˆ¤å®š
 	if( rotEncState == DRV_IN_ROT_ENC_STATE_FORWARD ){
 		ret	= APL_DATA_ROT_ENC_UP;	
 	}else if( rotEncState == DRV_IN_ROT_ENC_STATE_REVERCE ){
@@ -51,7 +51,7 @@ static APL_DATA_ROT_ENC judgeRotEnc( DRV_IN_ROT_ENC_STATE rotEncState )
 	return( ret );
 }
 //********************************************************************************
-// ƒvƒbƒVƒ…ƒXƒCƒbƒ`“ü—Í”»’è
+// ãƒ—ãƒƒã‚·ãƒ¥ã‚¹ã‚¤ãƒƒãƒå…¥åŠ›åˆ¤å®š
 //********************************************************************************
 static APL_DATA_PUSH_SW judgePushSw( DRV_IN_PUSH_SW_STATE pushSwState )
 {

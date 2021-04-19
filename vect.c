@@ -8,15 +8,15 @@
 #include "drvOutSerialLed.h"
 
 
-ISR(TCA0_OVF_vect)	//タイマ割り込み
+ISR(TCA0_OVF_vect)	//繧ｿ繧､繝槫牡繧願ｾｼ縺ｿ
 {
 	interTaskTime();
 }
-ISR(USART0_RXC_vect)		//UART受信割込み
+ISR(USART0_RXC_vect)		//UART蜿嶺ｿ｡蜑ｲ霎ｼ縺ｿ
 {
 	interGetUartRxData();
 }
-ISR(USART0_DRE_vect)	//UART DataRegisterEmpty送信レジスタ空割込み
+ISR(USART0_DRE_vect)	//UART DataRegisterEmpty騾∽ｿ｡繝ｬ繧ｸ繧ｹ繧ｿ遨ｺ蜑ｲ霎ｼ縺ｿ
 {
 	interSetTxBuffer();
 }
@@ -25,12 +25,12 @@ ISR(USART0_TXC_vect)
 	interChangeNextCCLPort();
 }
 
-ISR(PCINT0_vect){		//ポート変化割り込み
+ISR(PCINT0_vect){		//繝昴�ｼ繝亥､牙喧蜑ｲ繧願ｾｼ縺ｿ
 	interPcInt00_07();
 }
-ISR(PCINT1_vect){		//ポート変化割り込み
+ISR(PCINT1_vect){		//繝昴�ｼ繝亥､牙喧蜑ｲ繧願ｾｼ縺ｿ
 	interPcInt08_14();
 }
-ISR(NVMCTRL_EE_vect){		//EEPROMアクセス可能割込み
+ISR(NVMCTRL_EE_vect){		//EEPROM繧｢繧ｯ繧ｻ繧ｹ蜿ｯ閭ｽ蜑ｲ霎ｼ縺ｿ
 	interEepRedy();
 }

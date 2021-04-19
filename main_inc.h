@@ -2,28 +2,28 @@
 #define MAIN_INC_H
 
 typedef struct{
-	unsigned char	regist;			//“o˜^ó‘ÔBƒ^ƒXƒN‚ª—LŒø‚©–³Œø‚©
-	unsigned short	currentTime;	//Œ»İŠÔB0‚É‚È‚Á‚½‚çƒ^ƒXƒN‹N“®
-	unsigned short	cycleTime;		//ƒ^ƒXƒNüŠúB
+	unsigned char	regist;			//ç™»éŒ²çŠ¶æ…‹ã€‚ã‚¿ã‚¹ã‚¯ãŒæœ‰åŠ¹ã‹ç„¡åŠ¹ã‹
+	unsigned short	currentTime;	//ç¾åœ¨æ™‚é–“ã€‚0ã«ãªã£ãŸã‚‰ã‚¿ã‚¹ã‚¯èµ·å‹•
+	unsigned short	cycleTime;		//ã‚¿ã‚¹ã‚¯å‘¨æœŸã€‚
 	void			(*func)(void);
 }TASK_PARAMETER;
 
 
 static void powerLed( void );
 #define	TASK_NUM	7
-// main_inc.h‚É‹Lq‚·‚é‚ÆsimÀs‚É’l‚ªƒZƒbƒg‚³‚ê‚È‚­‚È‚Á‚½‚½‚ßA.c‚ÖˆÚ“®
-// IEDver‚ª•Ï‚í‚Á‚½‚½‚ßHAtmelStudio6->7
-// ‚Ü‚½A•Ï”‚ğ.h‚É’è‹`‚·‚é‚Ì‚Í—Ç‚­‚È‚¢‚Æ‚Ì‚±‚ÆB
+// main_inc.hã«è¨˜è¿°ã™ã‚‹ã¨simå®Ÿè¡Œæ™‚ã«å€¤ãŒã‚»ãƒƒãƒˆã•ã‚Œãªããªã£ãŸãŸã‚ã€.cã¸ç§»å‹•
+// IEDverãŒå¤‰ã‚ã£ãŸãŸã‚ï¼ŸAtmelStudio6->7
+// ã¾ãŸã€å¤‰æ•°ã‚’.hã«å®šç¾©ã™ã‚‹ã®ã¯è‰¯ããªã„ã¨ã®ã“ã¨ã€‚
 
 static TASK_PARAMETER	taskParameter[TASK_NUM]	={
-	//Œ»İŠÔ(ŠJnƒIƒtƒZƒbƒg) , üŠú , ŠÖ”–¼
+	//ç¾åœ¨æ™‚é–“(é–‹å§‹æ™‚ã‚ªãƒ•ã‚»ãƒƒãƒˆ) , å‘¨æœŸ , é–¢æ•°å
 	{	true,	0,	10,	drvInMain	},
 	{	true,	1,	10,	lnkInMain	},
 	{	true,	2,	10,	aplMain		},
 	{	true,	3,	10,	lnkOutMain	},
 	{	true,	4,	10,	drvOutMain	},
 	{	false,	5,	250,powerLed	},
-	{	false,	0,	2,	drvUartChangeTx}		//UARTƒhƒ‰ƒCƒo‚©‚ç‚Ì—v‹‚É‚æ‚è—LŒø‰»‚·‚é
+	{	false,	0,	2,	drvUartChangeTx}		//UARTãƒ‰ãƒ©ã‚¤ãƒã‹ã‚‰ã®è¦æ±‚ã«ã‚ˆã‚Šæœ‰åŠ¹åŒ–ã™ã‚‹
 };
 //CTRLA CLKSEL
 enum{
@@ -47,11 +47,11 @@ enum{
 	WGMODE_DSBOTTOM		= 0x7,
 };
 
-//ƒŒƒWƒXƒ^İ’è
+//ãƒ¬ã‚¸ã‚¹ã‚¿è¨­å®š
 #define		OVF_DI		(0)
 #define		OVF_EN		(1)
 
-//ƒŒƒWƒXƒ^ƒZƒbƒg—p
+//ãƒ¬ã‚¸ã‚¹ã‚¿ã‚»ãƒƒãƒˆç”¨
 #define		CTRLA_REG_START_TASK_TIMER		( TCA0.SINGLE.CTRLA = TCA0.SINGLE.CTRLA | 0x01 )
 
 enum{

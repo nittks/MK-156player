@@ -1,17 +1,17 @@
 #ifndef DRV_IN_SW_H
 #define DRV_IN_SW_H
 
-#define	ROT_ENC_NUM	1		//ƒ[ƒ^ƒŠ[ƒGƒ“ƒR[ƒ_[”
-#define	PUSH_SW_NUM	1		//ƒvƒbƒVƒ…ƒXƒCƒbƒ`”
+#define	ROT_ENC_NUM	1		//ãƒ­ãƒ¼ã‚¿ãƒªãƒ¼ã‚¨ãƒ³ã‚³ãƒ¼ãƒ€ãƒ¼æ•°
+#define	PUSH_SW_NUM	1		//ãƒ—ãƒƒã‚·ãƒ¥ã‚¹ã‚¤ãƒƒãƒæ•°
 
-//ƒ[ƒ^ƒŠ[ƒGƒ“ƒR[ƒ_[ó‘Ô
+//ãƒ­ãƒ¼ã‚¿ãƒªãƒ¼ã‚¨ãƒ³ã‚³ãƒ¼ãƒ€ãƒ¼çŠ¶æ…‹
 typedef enum{
-	DRV_IN_ROT_ENC_STATE_STOP,	//’âŽ~A•Ï‰»‚È‚µ
-	DRV_IN_ROT_ENC_STATE_FORWARD,	//³“]
-	DRV_IN_ROT_ENC_STATE_REVERCE	//‹t“]
+	DRV_IN_ROT_ENC_STATE_STOP,	//åœæ­¢ã€å¤‰åŒ–ãªã—
+	DRV_IN_ROT_ENC_STATE_FORWARD,	//æ­£è»¢
+	DRV_IN_ROT_ENC_STATE_REVERCE	//é€†è»¢
 }DRV_IN_ROT_ENC_STATE;
 
-//ƒvƒbƒVƒ…ƒXƒCƒbƒ`ó‘Ô
+//ãƒ—ãƒƒã‚·ãƒ¥ã‚¹ã‚¤ãƒƒãƒçŠ¶æ…‹
 typedef enum{
 	DRV_IN_PUSH_SW_STATE_OFF,
 	DRV_IN_PUSH_SW_STATE_ON,

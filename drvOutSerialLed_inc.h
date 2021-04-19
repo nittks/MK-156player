@@ -2,64 +2,64 @@
 #define DRV_OUT_SERIAL_LED_INC_H
 
 
-#define LED_STARTUP_TIME	(1000/10)	// 1sec/1üŠú	, 1sec:ª‹’–³‚µ
+#define LED_STARTUP_TIME	(1000/10)	// 1sec/1å‘¨æœŸ	, 1sec:æ ¹æ‹ ç„¡ã—
 // WS2812B parameters
 #define T0H_NS      400
 #define T1H_NS		800
 #define T_WIDTH_NS  1250
 #define T_RESET_US  50
 #define CNTMAX		((unsigned char)10)	//8bit
-#define CNT100MSMAX	((unsigned char)20)	//5msŠ„‚è‚İ20‰ñ‚Å100ms
+#define CNT100MSMAX	((unsigned char)20)	//5mså‰²ã‚Šè¾¼ã¿20å›ã§100ms
 
 //bitPos 0-7
 //********************************************************************************
-// ƒVƒtƒgƒŒƒWƒXƒ^
+// ã‚·ãƒ•ãƒˆãƒ¬ã‚¸ã‚¹ã‚¿
 //********************************************************************************
 #define	CPLD_SEND_DATA_NUM	6
 
 
-//o—Íbitƒ|ƒWƒVƒ‡ƒ“
+//å‡ºåŠ›bitãƒã‚¸ã‚·ãƒ§ãƒ³
 #define	SRCLR_POS	3
 #define	SRCLK_POS	4
 #define	RCLK_POS	5
 #define	OE_POS		1
 #define	SER_POS		2
 
-//ƒJƒ\[ƒh‘¤Šeƒ|[ƒg
+//ã‚«ã‚½ãƒ¼ãƒ‰å´å„ãƒãƒ¼ãƒˆ
 #define	SERIAL_LED_PORT	PORTC.IN
-#define	SRCLR_ON	(SERIAL_LED_PORT &= ~(1<<SRCLR_POS))	//LowƒAƒNƒeƒBƒu
+#define	SRCLR_ON	(SERIAL_LED_PORT &= ~(1<<SRCLR_POS))	//Lowã‚¢ã‚¯ãƒ†ã‚£ãƒ–
 #define	SRCLR_OFF	(SERIAL_LED_PORT |=  (1<<SRCLR_POS))
 #define	SRCLK_ON	(SERIAL_LED_PORT |=  (1<<SRCLK_POS))
 #define	SRCLK_OFF	(SERIAL_LED_PORT &= ~(1<<SRCLK_POS))
 #define	RCLK_ON		(SERIAL_LED_PORT |=  (1<<RCLK_POS))
 #define	RCLK_OFF	(SERIAL_LED_PORT &= ~(1<<RCLK_POS))
-#define	OE_ON		(SERIAL_LED_PORT &= ~(1<<OE_POS))	//LowƒAƒNƒeƒBƒu
+#define	OE_ON		(SERIAL_LED_PORT &= ~(1<<OE_POS))	//Lowã‚¢ã‚¯ãƒ†ã‚£ãƒ–
 #define	OE_OFF		(SERIAL_LED_PORT |=  (1<<OE_POS))
 #define	SER_ON		(SERIAL_LED_PORT |=  (1<<SER_POS))
 #define	SER_OFF		(SERIAL_LED_PORT &= ~(1<<SER_POS))
-#define	SER_DATA_NUM	((unsigned char)18)		//1ƒtƒŒ[ƒ€‚ÅƒVƒtƒgƒŒƒWƒXƒ^‚ÖƒZƒbƒg‚·‚éƒf[ƒ^bit”
+#define	SER_DATA_NUM	((unsigned char)18)		//1ãƒ•ãƒ¬ãƒ¼ãƒ ã§ã‚·ãƒ•ãƒˆãƒ¬ã‚¸ã‚¹ã‚¿ã¸ã‚»ãƒƒãƒˆã™ã‚‹ãƒ‡ãƒ¼ã‚¿bitæ•°
 #define	SER_SET( data )	(SERIAL_LED_PORT = ((SERIAL_LED_PORT & (~(1<<SER_POS))) | ((data&0x01)<<SER_POS)))
-												//SERIAL_LED_PORT-SER_POS bit‚Édata‚ğƒZƒbƒg‚·‚é
-//ƒAƒm[ƒh‘¤
+												//SERIAL_LED_PORT-SER_POS bitã«dataã‚’ã‚»ãƒƒãƒˆã™ã‚‹
+//ã‚¢ãƒãƒ¼ãƒ‰å´
 #define	ANODE_PORT	PORTC
-#define	ANODE_PORT_MASK		0xF0		//PORTCãˆÊ‚Í“ü—ÍA“à•”ƒvƒ‹ƒAƒbƒv‚Ì‚½‚ß1İ’è‚ğˆÛ
+#define	ANODE_PORT_MASK		0xF0		//PORTCä¸Šä½ã¯å…¥åŠ›ã€å†…éƒ¨ãƒ—ãƒ«ã‚¢ãƒƒãƒ—ã®ãŸã‚1è¨­å®šã‚’ç¶­æŒ
 #define	ANODE_POS	0
 #define	ANODE_SET( data )	(ANODE_PORT = (ANODE_PORT_MASK | (data << ANODE_POS)))
-#define	ALL_OFF				(ANODE_PORT &= (ANODE_PORT_MASK & 0xF0))		//ƒAƒm[ƒh‘¤‚ğLow‚É‚·‚é(PB4-7
+#define	ALL_OFF				(ANODE_PORT &= (ANODE_PORT_MASK & 0xF0))		//ã‚¢ãƒãƒ¼ãƒ‰å´ã‚’Lowã«ã™ã‚‹(PB4-7
 
-#define	WAIT_SREG	(_delay_us( 1 ))	//M†•Ï‰»Œã‚ÌƒEƒFƒCƒg
+#define	WAIT_SREG	(_delay_us( 1 ))	//ä¿¡å·å¤‰åŒ–å¾Œã®ã‚¦ã‚§ã‚¤ãƒˆ
 
 
 //********************************************************************************
 // PWM
 //********************************************************************************
-//‹¤’Ê
-#define	TOP				0xFF	//TOP’l=255
+//å…±é€š
+#define	TOP				0xFF	//TOPå€¤=255
 
-//7ƒZƒO—pPWMİ’è ƒ^ƒCƒ}1B
-#define	REG_WGM1		0x5		//8bit‚‘¬PWM“®ì
-#define	REG_COM1B		0x2		//”ñ”½“]“®ì
-#define	REG_CS1			0x3		//8•ªü(8MHz/8=1Mhz
+//7ã‚»ã‚°ç”¨PWMè¨­å®š ã‚¿ã‚¤ãƒ1B
+#define	REG_WGM1		0x5		//8bité«˜é€ŸPWMå‹•ä½œ
+#define	REG_COM1B		0x2		//éåè»¢å‹•ä½œ
+#define	REG_CS1			0x3		//8åˆ†å‘¨(8MHz/8=1Mhz
 #define	REG_ICR1		TOP
 #define	OCR1B_MAX		TOP
 
@@ -73,10 +73,10 @@
 #define	SET_OCR1B( data )	(OCR1B = (((unsigned short)data*OCR1B_MAX)/100))
 
 
-//ƒo[LED—pPWMİ’è ƒ^ƒCƒ}2A
-#define	REG_WGM2		0x3		//8bit‚‘¬PWM“®ì
-#define	REG_COM2A		0x2		//”ñ”½“]“®ì
-#define	REG_CS2			0x3		//8•ªü(8MHz/8=1Mhz
+//ãƒãƒ¼LEDç”¨PWMè¨­å®š ã‚¿ã‚¤ãƒ2A
+#define	REG_WGM2		0x3		//8bité«˜é€ŸPWMå‹•ä½œ
+#define	REG_COM2A		0x2		//éåè»¢å‹•ä½œ
+#define	REG_CS2			0x3		//8åˆ†å‘¨(8MHz/8=1Mhz
 #define REG_ICR2		TOP
 #define	OCR2A_MAX		TOP
 

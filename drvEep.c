@@ -8,7 +8,7 @@
 #include "drvEep.h"
 #include "hardware.h"
 
-//o—Íƒf[ƒ^
+//å‡ºåŠ›ãƒ‡ãƒ¼ã‚¿
 static DRV_EEP_READ		drvEepRead;
 static DRV_EEP_WRITE	drvEepWrite;
 static unsigned char	eepAddrCnt;
@@ -19,7 +19,7 @@ static EEP_STATE		state;
 static void eepRead( void );
 static void eepWrite( void );
 //********************************************************************************//
-// ‰Šú‰»
+// åˆæœŸåŒ–
 //********************************************************************************//
 void initDrvEep( void )
 {
@@ -30,23 +30,23 @@ void initDrvEep( void )
 		drvEepRead.val[i] = 50;
 	}
 
-	drvEepRead.readState = DRV_EEP_READ_STATE_UNREAD;	//–¢“Ç‚İ‚İ
+	drvEepRead.readState = DRV_EEP_READ_STATE_UNREAD;	//æœªèª­ã¿è¾¼ã¿
 	state = EEP_STATE_BOOT;
-	//‹N“®“Ç
+	//èµ·å‹•æ™‚èª­è¾¼
 	eepAddrCnt = 0;
 	eepRead();
 
 }
 
 //********************************************************************************//
-// ƒf[ƒ^æ“¾
+// ãƒ‡ãƒ¼ã‚¿å–å¾—
 //********************************************************************************//
 DRV_EEP_READ *getDrvEep( void )
 {
 	return( &drvEepRead );
 }
 //********************************************************************************//
-// ƒf[ƒ^‘‚İ
+// ãƒ‡ãƒ¼ã‚¿æ›¸è¾¼ã¿
 //********************************************************************************//
 unsigned char setDrvEep( DRV_EEP_WRITE *inP )
 {
@@ -66,38 +66,38 @@ unsigned char setDrvEep( DRV_EEP_WRITE *inP )
 	return( ret );
 }
 //********************************************************************************//
-// EEPROMƒAƒNƒZƒX‰Â”\Š„‚è‚İ
+// EEPROMã‚¢ã‚¯ã‚»ã‚¹å¯èƒ½å‰²ã‚Šè¾¼ã¿
 //********************************************************************************//
 void interEepRedy( void )
 {
-	//if( state == EEP_STATE_READ ){		//“Ç‚İ‚İ“r’†
+	//if( state == EEP_STATE_READ ){		//èª­ã¿è¾¼ã¿é€”ä¸­
 		//eepRead();
-	//}else if( state == EEP_STATE_WRITE ){	//‘‚İ“r’†
+	//}else if( state == EEP_STATE_WRITE ){	//æ›¸è¾¼ã¿é€”ä¸­
 		//eepWrite();
 	//}
 }
 //********************************************************************************//
-// “Ç‚İ‚İ
+// èª­ã¿è¾¼ã¿
 //********************************************************************************//
 static void eepRead( void )
 {
-	//EEPROMƒAƒNƒZƒX‰Â”\‚ÈŠÔA“Ç‘±‚¯‚éBƒAƒNƒZƒX•s‰Â‚Åbreak‚·‚é
+	//EEPROMã‚¢ã‚¯ã‚»ã‚¹å¯èƒ½ãªé–“ã€èª­è¾¼ç¶šã‘ã‚‹ã€‚ã‚¢ã‚¯ã‚»ã‚¹ä¸å¯ã§breakã™ã‚‹
 	while( 1 ){
 		if( EEPROM_IS_READY == EEP_READY_FAIL ){
-			//EEPROMƒAƒNƒZƒX•s‰Â‚Ìê‡”²‚¯‚é
+			//EEPROMã‚¢ã‚¯ã‚»ã‚¹ä¸å¯ã®å ´åˆæŠœã‘ã‚‹
 			state = EEP_STATE_READ;
-			//INT_EEP_ENABLE;		//EEPROMƒAƒNƒZƒX‰Â”\Š„‚İ‹–‰Â
+			//INT_EEP_ENABLE;		//EEPROMã‚¢ã‚¯ã‚»ã‚¹å¯èƒ½å‰²è¾¼ã¿è¨±å¯
 			break;
 		}else{
 			eepCache[ eepAddrCnt ] =  eeprom_read_byte( (uint8_t *)eepAddrCnt );
 			if( eepAddrCnt < DRV_EEP_MAP_MAX ){
 				eepAddrCnt++;
 			}else{
-				//‘Sƒf[ƒ^“Ç‚İ‚İŠ®
+				//å…¨ãƒ‡ãƒ¼ã‚¿èª­ã¿è¾¼ã¿å®Œ
 				state = EEP_STATE_READY;
 				drvEepRead.readState = DRV_EEP_READ_STATE_READED;
-				INT_EEP_DISABLE;		//EEPROMƒAƒNƒZƒX‰Â”\Š„‚İ‹Ö~
-				memcpy( drvEepRead.val ,eepCache , DRV_EEP_MAP_MAX );	//LNK“Ç—p•Ï”‚ÖƒRƒs[
+				INT_EEP_DISABLE;		//EEPROMã‚¢ã‚¯ã‚»ã‚¹å¯èƒ½å‰²è¾¼ã¿ç¦æ­¢
+				memcpy( drvEepRead.val ,eepCache , DRV_EEP_MAP_MAX );	//LNKèª­è¾¼ç”¨å¤‰æ•°ã¸ã‚³ãƒ”ãƒ¼
 
 				break;
 			}
@@ -105,19 +105,19 @@ static void eepRead( void )
 	}
 }
 //********************************************************************************//
-// ‘‚İ
+// æ›¸è¾¼ã¿
 //********************************************************************************//
 static void eepWrite( void )
 {
-	//EEPROMƒAƒNƒZƒX‰Â”\‚ÈŠÔA“Ç‘±‚¯‚éBƒAƒNƒZƒX•s‰Â‚Åbreak‚·‚é
+	//EEPROMã‚¢ã‚¯ã‚»ã‚¹å¯èƒ½ãªé–“ã€èª­è¾¼ç¶šã‘ã‚‹ã€‚ã‚¢ã‚¯ã‚»ã‚¹ä¸å¯ã§breakã™ã‚‹
 	while( 1 ){
 		if( EEPROM_IS_READY == EEP_READY_FAIL ){
-			//EEPROMƒAƒNƒZƒX•s‰Â‚Ìê‡”²‚¯‚é
+			//EEPROMã‚¢ã‚¯ã‚»ã‚¹ä¸å¯ã®å ´åˆæŠœã‘ã‚‹
 			state = EEP_STATE_WRITE;
-			//INT_EEP_ENABLE;		//EEPROMƒAƒNƒZƒX‰Â”\Š„‚İ‹–‰Â
+			//INT_EEP_ENABLE;		//EEPROMã‚¢ã‚¯ã‚»ã‚¹å¯èƒ½å‰²è¾¼ã¿è¨±å¯
 			break;
 		}else{
-			//’l‚ªˆÙ‚È‚Á‚Ä‚¢‚½‚ç‘‚Ş
+			//å€¤ãŒç•°ãªã£ã¦ã„ãŸã‚‰æ›¸è¾¼ã‚€
 			if( drvEepWrite.val[ eepAddrCnt ] != eepCache[ eepAddrCnt ] ){
 				eeprom_write_byte( (uint8_t*)eepAddrCnt ,drvEepWrite.val[eepAddrCnt] );
 				eepCache[ eepAddrCnt ] =  drvEepWrite.val[ eepAddrCnt ];
@@ -125,9 +125,9 @@ static void eepWrite( void )
 			
 			eepAddrCnt++;
 			if( eepAddrCnt >= DRV_EEP_MAP_MAX ){
-				//‘Sƒf[ƒ^‘‚İŠ®
+				//å…¨ãƒ‡ãƒ¼ã‚¿æ›¸è¾¼ã¿å®Œ
 				state = EEP_STATE_READY;
-				INT_EEP_DISABLE;		//EEPROMƒAƒNƒZƒX‰Â”\Š„‚İ‹Ö~
+				INT_EEP_DISABLE;		//EEPROMã‚¢ã‚¯ã‚»ã‚¹å¯èƒ½å‰²è¾¼ã¿ç¦æ­¢
 				break;
 			}
 		}

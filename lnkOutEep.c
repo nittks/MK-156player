@@ -7,21 +7,21 @@
 static unsigned char	eepReq;
 
 //********************************************************************************
-// ‰Šú‰»
+// åˆæœŸåŒ–
 //********************************************************************************
 void initLnkOutEep( void )
 {
 	eepReq = false;
 }
 //********************************************************************************
-// APL‚æ‚èƒZƒbƒg
+// APLã‚ˆã‚Šã‚»ãƒƒãƒˆ
 //********************************************************************************
 void setLnkOutEep( void )
 {
 	eepReq = true;
 }
 //********************************************************************************
-// ƒƒCƒ“ˆ—
+// ãƒ¡ã‚¤ãƒ³å‡¦ç†
 //********************************************************************************
 void lnkOutEepMain( void )
 {
@@ -31,7 +31,7 @@ void lnkOutEepMain( void )
 	
 	inAplCtrlSet = getAplCtrlSet();
 
-	//‘ž‚Ý—v‹—L
+	//æ›¸è¾¼ã¿è¦æ±‚æœ‰
 	if( eepReq == true ){
 		eepReq = false;
 
@@ -41,7 +41,7 @@ void lnkOutEepMain( void )
 		outDrvEepWrite.val[i++]	= inAplCtrlSet->brightDim7seg;
 		outDrvEepWrite.val[i++]	= inAplCtrlSet->dispcyc7seg;
 		
-		//sum’lŒvŽZ
+		//sumå€¤è¨ˆç®—
 		outDrvEepWrite.val[DRV_EEP_MAP_SUM] = 0;
 		for( i=0 ; i<DRV_EEP_MAP_SUM ; i++ ){
 			outDrvEepWrite.val[DRV_EEP_MAP_SUM] += outDrvEepWrite.val[i];

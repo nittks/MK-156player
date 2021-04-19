@@ -6,13 +6,13 @@
 #include "aplDispData.h"
 
 //********************************************************************************
-// ‰Šú‰»
+// åˆæœŸåŒ–
 //********************************************************************************
 void initLnkOutLed( void )
 {
 }
 //********************************************************************************
-// ƒƒCƒ“ˆ—
+// ãƒ¡ã‚¤ãƒ³å‡¦ç†
 //********************************************************************************
 void lnkOutLedMain( void )
 {
@@ -24,14 +24,14 @@ void lnkOutLedMain( void )
 	
 	
 	//----------------------------------
-	// 7ƒZƒO•\¦ˆ—
+	// 7ã‚»ã‚°è¡¨ç¤ºå‡¦ç†
 	//----------------------------------
-	//1‚ÌˆÊ‚©‚ç1Œ…–ˆAƒZƒOƒƒ“ƒgƒpƒ^[ƒ“‚ğƒZƒbƒg
+	//1ã®ä½ã‹ã‚‰1æ¡æ¯ã€ã‚»ã‚°ãƒ¡ãƒ³ãƒˆãƒ‘ã‚¿ãƒ¼ãƒ³ã‚’ã‚»ãƒƒãƒˆ
 	for( i=0 ; i<LED_7SEG_DIGIT_NUM ; i++ ){
 		outDrvLed7SegData.val[i] = led7SegBit[ inAplDispData->led7Seg[i] ];
 	}
 	
-	//F
+	//è‰²
 	outDrvLed7SegData.brightRed		= 0;
 	outDrvLed7SegData.brightGreen	= 0;
 	outDrvLed7SegData.brightBlue	= 0;
@@ -56,7 +56,7 @@ void lnkOutLedMain( void )
 		break;
 	}
 
-	//drv‚Öo—Í
+	//drvã¸å‡ºåŠ›
 	setDrvOutSerialLed7seg( &outDrvLed7SegData );
 	
 }

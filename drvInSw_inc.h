@@ -1,9 +1,9 @@
 #ifndef DRV_IN_SW_INC_H
 #define DRV_IN_SW_INC_H
 
-#define	ROT_ENC_DEBTIME	(1)	//1ŽüŠú‘Ò‚¿(—‚ŽüŠú‚Ü‚Å‘Ò‚Â¨10+10x1ms
-#define	PUSH_SW_DEBTIME		(60)	//ƒfƒoƒEƒ“ƒX‘Ò‚¿ŽžŠÔ
-#define	PUSH_SW_LONGTIME	(100)	//’·‰Ÿ‚µ”»’èŽžŠÔ(10x100=1000ms
+#define	ROT_ENC_DEBTIME	(1)	//1å‘¨æœŸå¾…ã¡(ç¿Œå‘¨æœŸã¾ã§å¾…ã¤â†’10+10x1ms
+#define	PUSH_SW_DEBTIME		(60)	//ãƒ‡ãƒã‚¦ãƒ³ã‚¹å¾…ã¡æ™‚é–“
+#define	PUSH_SW_LONGTIME	(100)	//é•·æŠ¼ã—åˆ¤å®šæ™‚é–“(10x100=1000ms
 
 #define	PORT_ROT_ENC0_A		((PORTD.IN & >> 0)& 0x01)
 #define	PORT_ROT_ENC0_B		((PORTD.IN & >> 1)& 0x01)
@@ -16,22 +16,22 @@
 
 static const signed char grayCodeTable[0xF+1] = {0,-1,1,0,1,0,0,-1,-1,0,0,1,0,1,-1,0};
 
-//ƒ[ƒ^ƒŠ[ƒGƒ“ƒR[ƒ_[“à•”ó‘Ô
+//ãƒ­ãƒ¼ã‚¿ãƒªãƒ¼ã‚¨ãƒ³ã‚³ãƒ¼ãƒ€ãƒ¼å†…éƒ¨çŠ¶æ…‹
 typedef enum{
-	ROT_ENC_STATE_WAIT,		//“ü—ÍŠÄŽ‹’†
-	ROT_ENC_STATE_FORWARD,	//³“]ŒŸ’m
-	ROT_ENC_STATE_REVERCE,	//‹t“]ŒŸ’m
-	ROT_ENC_STATE_DEBOUNCE	//ƒfƒoƒEƒ“ƒXƒ^ƒCƒ€ƒEƒFƒCƒg
+	ROT_ENC_STATE_WAIT,		//å…¥åŠ›ç›£è¦–ä¸­
+	ROT_ENC_STATE_FORWARD,	//æ­£è»¢æ¤œçŸ¥
+	ROT_ENC_STATE_REVERCE,	//é€†è»¢æ¤œçŸ¥
+	ROT_ENC_STATE_DEBOUNCE	//ãƒ‡ãƒã‚¦ãƒ³ã‚¹ã‚¿ã‚¤ãƒ ã‚¦ã‚§ã‚¤ãƒˆ
 }ROT_ENC_STATE;
 
-//ƒvƒbƒVƒ…ƒXƒCƒbƒ`“à•”ó‘Ô
+//ãƒ—ãƒƒã‚·ãƒ¥ã‚¹ã‚¤ãƒƒãƒå†…éƒ¨çŠ¶æ…‹
 typedef enum{
 	PUSH_SW_STATE_OFF,
 	PUSH_SW_STATE_ON,
-	PUSH_SW_STATE_DEBOUNCE	//ƒfƒoƒEƒ“ƒXƒ^ƒCƒ€ƒEƒFƒCƒg
+	PUSH_SW_STATE_DEBOUNCE	//ãƒ‡ãƒã‚¦ãƒ³ã‚¹ã‚¿ã‚¤ãƒ ã‚¦ã‚§ã‚¤ãƒˆ
 }PUSH_SW_STATE;
 
-//ƒ|[ƒgó‘Ô
+//ãƒãƒ¼ãƒˆçŠ¶æ…‹
 typedef enum{
 	PORT_OFF	= 0,
 	PORT_ON		= 1
@@ -46,7 +46,7 @@ typedef enum{
 	NO_1
 }PUSH_SW_PORT_NO;
 
-#define		ROT_ENC_0_POS		(0x03)		//bit0,1‚æ‚è“ü—Í
+#define		ROT_ENC_0_POS		(0x03)		//bit0,1ã‚ˆã‚Šå…¥åŠ›
 
 
 #endif

@@ -2,9 +2,9 @@
 #define LNK_OUT_LED_INC_H
 
 #define CNTMAX		((unsigned char)10)	//8bit
-#define CNT100MSMAX	((unsigned char)20)	//5msŠ„‚è‚İ20‰ñ‚Å100ms
+#define CNT100MSMAX	((unsigned char)20)	//5mså‰²ã‚Šè¾¼ã¿20å›ã§100ms
 
-#define DOT_ON( inData )	( inData|0x01)		//7ƒZƒO‚Ì“_(dot)‚ğ•\¦‚·‚é
+#define DOT_ON( inData )	( inData|0x01)		//7ã‚»ã‚°ã®ç‚¹(dot)ã‚’è¡¨ç¤ºã™ã‚‹
 
 enum{
 	LED_7SEG_0,
@@ -21,10 +21,10 @@ enum{
 	LED_7SEG_MAX
 };
 
-//7ƒZƒOAƒZƒOƒƒ“ƒgƒpƒ^[ƒ“
-// Œ‹ü‡˜ 3,4,5,0,1,2,6
+//7ã‚»ã‚°ã€ã‚»ã‚°ãƒ¡ãƒ³ãƒˆãƒ‘ã‚¿ãƒ¼ãƒ³
+// çµç·šé †åº 3,4,5,0,1,2,6
 static const unsigned char	led7SegBit[LED_7SEG_MAX]={
-//ãˆÊ=a,‰ºˆÊ=.
+//ä¸Šä½=a,ä¸‹ä½=.
 	0b01111110,
 	0b00000110,
 	0b01101101,

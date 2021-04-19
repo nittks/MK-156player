@@ -1,9 +1,9 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-#define F_CPU	((uint32_t)20000000)		// delay.h���g�p����ꍇ�́A���main.h��include����
+#define F_CPU	((uint32_t)20000000)		// delay.hを使用する場合は、先にmain.hをincludeする
 #define F_PDIV	((uint8_t)1)
-	// ��SerialLed�̐M������400ns���^�C�}�ō�邽�߁A�J�E���g���������ɂȂ镪���l�ōł��ᑬ�ɂȂ�{����I���B
+	// ↑SerialLedの信号幅の400nsをタイマで作るため、カウント数が整数になる分周値で最も低速になる倍率を選択。
 
 enum{
 	TASK_DRV_IN_MAIN,
