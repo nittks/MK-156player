@@ -1,6 +1,8 @@
 #ifndef DRV_OUT_SERIAL_LED_INC_H
 #define DRV_OUT_SERIAL_LED_INC_H
 
+
+#define LED_STARTUP_TIME	(1000/10)	// 1sec/1üŠú	, 1sec:ª‹’–³‚µ
 // WS2812B parameters
 #define T0H_NS      400
 #define T1H_NS		800

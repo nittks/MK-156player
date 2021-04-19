@@ -14,12 +14,13 @@ https://avr.jp/user/AN/PDF/AN2387.pdf
 #include <util/delay.h>
 #include <avr/interrupt.h>
 #include <stdbool.h>
+#include <math.h>
 
 #include "drvOutSerialLed_inc.h"
 #include "drvOutSerialLed.h"
 #include "hardware.h"
 
-#define F_CLK_PER_MHZ		20.0F	//((uint8_t)(F_CPU / F_PDIV / 1000000))
+#define F_CLK_PER_MHZ		((uint8_t)(F_CPU / F_PDIV / 1000000))
 #define TIMER_DIV			((uint8_t)(8))
 
 //LINKよりセットされる
@@ -30,8 +31,9 @@ static DRV_LED_7SEG_DATA	drvLed7SegDataPre;
 static uint8_t	sendData[LED_7SEG_DIGIT_NUM][LED_7SEG_SEG_NUM * LED_7SEG_COLOR];
 static uint8_t	digitUpdateFlag;
 static uint8_t	idxTxDigit,idxTxData;
+static uint8_t	cntStartupTime;
 
-static uint8_t	debugTimeCnt;
+static uint16_t	debugTimeCnt;
 static uint16_t	debugBaud;
 #define	TIME1SEC	(10)
 
@@ -63,15 +65,13 @@ void initDrvOutSerialLed( void )
 	drvLed7SegData.brightGreen	= 0;
 	drvLed7SegData.brightBlue	= 0;
 
-	drvLed7SegDataPre.brightRed		= 0;
-	drvLed7SegDataPre.brightGreen	= 0;
-	drvLed7SegDataPre.brightBlue	= 0;
+	drvLed7SegDataPre.brightRed		= 0xFF;		//起動後初回送信を行うため、値に差をつけておく
+	drvLed7SegDataPre.brightGreen	= 0xFF;
+	drvLed7SegDataPre.brightBlue	= 0xFF;
 
 	idxTxDigit	= 0;
 	idxTxData	= 0;
-
-	debugTimeCnt	= 0;
-	debugBaud		= 0;
+	cntStartupTime	= 0;
 
 	cli();
 	// 参考
@@ -130,12 +130,24 @@ void drvOutSerialLedMain( void )
 	uint8_t		chkBit;
 	uint8_t		isLedUpdateChk;
 
+	//起動後一定時間は、消灯指示を送り続ける
+	if( cntStartupTime <= LED_STARTUP_TIME ){
+		cntStartupTime++;
+			
+		digitUpdateFlag	= (uint8_t)pow(2,LED_7SEG_DIGIT_NUM) -1;
+		idxTxDigit	= 0;
+		idxTxData	= 0;
+		USART0.CTRLA |= USART_DREIE_bm;
+			
+		return 0;
+	}
+	
 	//LED点灯指示に変化があれば、送信データを準備する
 	//ネストが少し嫌
 	isLedUpdateChk = isLedUpdate();
 	if( isLedUpdateChk == true ){
 		for( digitCnt=0 ; digitCnt<LED_7SEG_DIGIT_NUM ; digitCnt++ ){
-			if( (digitUpdateFlag& (1<<digitCnt)) != 0 ){
+			if( (digitUpdateFlag & (1<<digitCnt)) != 0 ){
 				chkBit = (1<<(LED_7SEG_SEG_NUM-1));		//上位から
 				for( segCnt=0 ; segCnt<LED_7SEG_SEG_NUM ; segCnt++ ){
 					if( (drvLed7SegData.val[digitCnt] & chkBit) == 0 ){
@@ -172,7 +184,7 @@ static uint8_t isLedUpdate( void )
 		(drvLed7SegData.brightBlue	!= drvLed7SegDataPre.brightBlue)
 	){
 		//色が変更されていたら全て更新
-		digitUpdateFlag	= 2^(LED_7SEG_DIGIT_NUM) - 1;
+		digitUpdateFlag	= (uint8_t)pow(2,LED_7SEG_DIGIT_NUM) -1;
 
 		idxTxDigit	= 0;
 		idxTxData	= 0;
@@ -216,7 +228,7 @@ void interSetTxBuffer(void)
 	}
 	USART0.TXDATAL	= sendData[idxTxDigit][idxTxData];
 	idxTxData++;
-	if( idxTxData > (LED_7SEG_SEG_NUM * LED_7SEG_COLOR) ){
+	if( idxTxData >= (LED_7SEG_SEG_NUM * LED_7SEG_COLOR) ){
 		USART0.CTRLA	&= (~USART_DREIE_bm);
 		USART0.STATUS	|= USART_TXCIF_bm;
 		USART0.CTRLA	|= USART_TXCIE_bm;
