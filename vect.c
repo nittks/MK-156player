@@ -25,11 +25,8 @@ ISR(USART0_TXC_vect)
 	interChangeNextCCLPort();
 }
 
-ISR(PCINT0_vect){		//ポート変化割り込み
-	interPcInt00_07();
-}
-ISR(PCINT1_vect){		//ポート変化割り込み
-	interPcInt08_14();
+ISR(PORTD_PORT_vect){		//ポート変化割り込み
+	interPortD();
 }
 ISR(NVMCTRL_EE_vect){		//EEPROMアクセス可能割込み
 	interEepRedy();

@@ -5,10 +5,15 @@
 #define	PUSH_SW_DEBTIME		(60)	//デバウンス待ち時間
 #define	PUSH_SW_LONGTIME	(100)	//長押し判定時間(10x100=1000ms
 
-#define	PORT_ROT_ENC0_A		((PORTD.IN & >> 0)& 0x01)
-#define	PORT_ROT_ENC0_B		((PORTD.IN & >> 1)& 0x01)
+#define	PORT_ROT_ENC0_A		((PORTD.IN & >> PIN0_bp)& 0x01)
+#define	PORT_ROT_ENC0_B		((PORTD.IN & >> PIN1_bp)& 0x01)
 
-#define	PORT_PUSHSW_0		((PORTD.IN & >> 2)& 0x01)
+#define	PORT_PUSHSW_0		((~(PORTD.IN & >> PIN2_bp)) & 0x01)		//Lowアクティブ反転
+
+//時間設定。なんとなく。
+#define	PUSH_SW_DEBOUNCE_10MS		((uint8_t)( 100/10))	//  100ms/10[ms/cyc]
+#define	PUSH_SW_LONGON_10MS			((uint8_t)(1000/10))	// 1000ms/10[ms/cyc]
+#define	PUSH_SW_DOUBLE_TIMEOUT_10MS	((uint8_t)( 500/10))	//  500ms/10[ms/cyc]
 
 
 #define	ROT_VECT_FORWARD	((signed char)(4))
@@ -28,7 +33,8 @@ typedef enum{
 typedef enum{
 	PUSH_SW_STATE_OFF,
 	PUSH_SW_STATE_ON,
-	PUSH_SW_STATE_DEBOUNCE	//デバウンスタイムウェイト
+	PUSH_SW_STATE_WAIT_DOUBLE,
+	PUSH_SW_STATE_DOUBLE,
 }PUSH_SW_STATE;
 
 //ポート状態
@@ -48,5 +54,12 @@ typedef enum{
 
 #define		ROT_ENC_0_POS		(0x03)		//bit0,1より入力
 
+typedef struct{
+	uint8_t			portIn;
+	uint8_t			portInLatch;
+	PUSH_SW_STATE	state	;
+	uint8_t			cntTimeDebounce;
+	uint8_t			cntTimeJudge;
+}PORT_PUSH_SW;
 
 #endif

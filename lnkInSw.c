@@ -28,7 +28,6 @@ void lnkInSwMain( void )
 	aplDataSw.rotEncSet		= judgeRotEnc( inDrvInSw->rotEncState[ROT_ENC_SET] );
 	//プッシュスイッチ判定
 	aplDataSw.pushSwSet		= judgePushSw( inDrvInSw->pushSwState[PUSH_SW_SET] );
-	aplDataSw.pushSwTest	= judgePushSw( inDrvInSw->pushSwState[PUSH_SW_TEST] );
 
 	setAplDataSw( &aplDataSw );
 }
@@ -61,6 +60,8 @@ static APL_DATA_PUSH_SW judgePushSw( DRV_IN_PUSH_SW_STATE pushSwState )
 		ret	= APL_DATA_PUSH_SW_ON;
 	}else if( pushSwState == DRV_IN_PUSH_SW_STATE_LONGON ){
 		ret	= APL_DATA_PUSH_SW_LONGON;
+	}else if( pushSwState == DRV_IN_PUSH_SW_STATE_DOUBLEON ){
+		ret	= APL_DATA_PUSH_SW_DOUBLEON;
 	}else{
 		ret	= APL_DATA_PUSH_SW_OFF;
 	}

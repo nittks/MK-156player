@@ -21,7 +21,6 @@ void initAplData( void )
 	
 	aplDataSw.rotEncSet			= APL_DATA_ROT_ENC_STOP;
 	aplDataSw.pushSwSet			= APL_DATA_PUSH_SW_OFF;
-	aplDataSw.pushSwTest		= APL_DATA_PUSH_SW_OFF;
 
 	aplDataEep.read				= APL_DATA_EEP_STATE_UNREAD;
 	aplDataEep.bright7seg		= 0;

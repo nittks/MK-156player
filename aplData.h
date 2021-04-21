@@ -42,7 +42,8 @@ typedef enum{
 typedef enum{
 	APL_DATA_PUSH_SW_OFF,
 	APL_DATA_PUSH_SW_ON,
-	APL_DATA_PUSH_SW_LONGON
+	APL_DATA_PUSH_SW_LONGON,
+	APL_DATA_PUSH_SW_DOUBLEON
 }APL_DATA_PUSH_SW;
 
 enum{
@@ -58,7 +59,6 @@ enum{
 typedef struct{
 	APL_DATA_ROT_ENC	rotEncSet;
 	APL_DATA_PUSH_SW	pushSwSet;
-	APL_DATA_PUSH_SW	pushSwTest;
 }APL_DATA_SW;
 
 //********************************************************************************

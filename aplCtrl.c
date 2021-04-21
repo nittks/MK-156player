@@ -92,10 +92,10 @@ static void stateJudge( void )
 	// 通常
 	//****************************************
 	case APL_CTRL_STATE_NOMARL:		//通常
-		if( inAplDataSw->pushSwTest == APL_DATA_PUSH_SW_LONGON ){
+		if( inAplDataSw->pushSwSet == APL_DATA_PUSH_SW_DOUBLEON ){
 			//通常->テスト表示
-			aplCtrl.state = APL_CTRL_STATE_TESTDISP;
-			aplCtrl.stateTest = APL_CTRL_STATE_TEST_AUTO;
+			aplCtrl.state		= APL_CTRL_STATE_TESTDISP;
+			aplCtrl.stateTest	= APL_CTRL_STATE_TEST_AUTO;
 		}else if( inAplDataSw->pushSwSet == APL_DATA_PUSH_SW_LONGON ){
 			//通常->設定
 			aplCtrl.state = APL_CTRL_STATE_SETTING;
@@ -124,17 +124,17 @@ static void stateJudge( void )
 	// テスト表示
 	//****************************************
 	case APL_CTRL_STATE_TESTDISP:		//テストモード
-		if( inAplDataSw->pushSwTest == APL_DATA_PUSH_SW_LONGON ){
+		if( inAplDataSw->pushSwSet == APL_DATA_PUSH_SW_DOUBLEON ){
 			aplCtrl.state = APL_CTRL_STATE_NOMARL;
 		}
 		switch( aplCtrl.stateTest ){
 		case APL_CTRL_STATE_TEST_AUTO:
-			if( inAplDataSw->pushSwTest == APL_DATA_PUSH_SW_ON ){
+			if( inAplDataSw->pushSwSet == APL_DATA_PUSH_SW_ON ){
 				aplCtrl.stateTest = APL_CTRL_STATE_TEST_SPEED;
 			}
 			break;
 		case APL_CTRL_STATE_TEST_SPEED:
-			if( inAplDataSw->pushSwTest == APL_DATA_PUSH_SW_ON ){
+			if( inAplDataSw->pushSwSet == APL_DATA_PUSH_SW_ON ){
 				aplCtrl.stateTest = APL_CTRL_STATE_TEST_AUTO;
 			}
 			break;
@@ -188,7 +188,7 @@ static void stateJudge( void )
 			setLnkOutEep();	//EEPROM書込み要求
 			chkSetPalse();	//パルス設定変更有無チェック
 			aplCtrl.state	= APL_CTRL_STATE_NOMARL;
-		}else if( inAplDataSw->pushSwTest == APL_DATA_PUSH_SW_LONGON ){
+		}else if( inAplDataSw->pushSwSet == APL_DATA_PUSH_SW_DOUBLEON ){
 			aplCtrl.state	= APL_CTRL_STATE_NOMARL;
 			aplCtrlSet		= aplCtrlSetBak;		//変更前の値に戻す
 		}
