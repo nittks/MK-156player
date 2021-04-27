@@ -1,6 +1,8 @@
 #ifndef APL_DISP_DATA_H
 #define APL_DISP_DATA_H
 
+#include <avr/io.h>
+#include <stdbool.h>
 #include "hardware.h"
 #include "aplCtrl.h"
 
@@ -26,18 +28,22 @@ enum{
 	APL_DSP_DATA_7SEG_9,
 	APL_DSP_DATA_7SEG_BLANK
 };
-
-typedef enum{
-	APL_DISP_SETTING_OFF,
-	APL_DISP_SETTING_ON
-}APL_DISP_SETTING;
+typedef struct{
+	uint8_t		digitBit;
+	uint8_t		segBit;
+	uint8_t		red;
+	uint8_t		green;
+	uint8_t		blue;
+}VALVE_CHK;
 
 typedef struct {
 	unsigned char	led7Seg[LED_7SEG_DIGIT_NUM];
 	unsigned char	bright7seg;
 	unsigned char	color7seg;
-	APL_DISP_SETTING	settingMode;
+	bool			valveChkMode;
+	VALVE_CHK		valveChk;
 }APL_DISP_DATA;
+
 
 
 extern void initAplDispData( void );

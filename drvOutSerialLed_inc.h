@@ -2,7 +2,7 @@
 #define DRV_OUT_SERIAL_LED_INC_H
 
 
-#define LED_STARTUP_TIME	(1000/10)	// 1sec/1周期	, 1sec:根拠無し
+#define LED_STARTUP_TIME	(100/10)	// Xmsec/1周期	, 時間：根拠無し
 // WS2812B parameters
 #define T0H_NS      400
 #define T1H_NS		800
