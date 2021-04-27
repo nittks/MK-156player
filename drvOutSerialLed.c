@@ -139,7 +139,7 @@ void drvOutSerialLedMain( void )
 		idxTxData	= 0;
 		USART0.CTRLA |= USART_DREIE_bm;
 			
-		return 0;
+		return;
 	}
 	
 	//LED点灯指示に変化があれば、送信データを準備する

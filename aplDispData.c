@@ -1,5 +1,8 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>  //割り込みを使用するため
+#include <stdbool.h>
+#include <stdlib.h>
+#include <math.h>
 #include "aplDispData_inc.h"
 #include "aplDispData.h"
 #include "aplData.h"
@@ -17,12 +20,22 @@ static unsigned short	dispCycSpeed;
 static unsigned char	testCycSpeed;
 static unsigned char	testSpeed;
 static TEST_STATE		testStateSpeed;
-
+static DISP_STATE		dispState;
 
 static void dispSpeed(	unsigned char *retSpeed	, const unsigned char  inSpeed	);
 static void disp7seg(	unsigned char *retSpeed	, const unsigned char  inSpeed	);
 static unsigned char	makeTestDataSpeed( void );
 static unsigned char	makeTestDataSpeedManual( void );
+static bool valveChk( void );
+static bool segRGBsequential( void );
+static bool allSegRGBGradation( void );
+static void convertHSVtoRGB(float h,float s,float v,float* r,float* g,float* b);
+static void setRgb(float* r,float* g,float* b,float	val_0,float val_1,float val_2);
+static void alloff( void );
+static void firstPosDigitSeg( void );
+static void firstColor( void );
+static bool nextColor( void );
+
 //********************************************************************************
 // 初期化
 //********************************************************************************
@@ -31,19 +44,19 @@ void initAplDispData( void )
 	unsigned char	i;
 	
 	for( i=0 ; i<LED_7SEG_DIGIT_NUM ; i++ ){
-		aplDispData.led7Seg[i]	= APL_DSP_DATA_7SEG_0;
+		aplDispData.led7Seg[i]	= APL_DSP_DATA_7SEG_BLANK;
 	}
-	aplDispData.settingMode	= APL_DISP_SETTING_OFF;
+	
 	aplDispData.color7seg	= APL_DISP_DATA_WHITE;
+	aplDispData.valveChkMode	= true;
 
 	dispCycSpeed	= 0;
 
 	testCycSpeed	= 0;
 	testSpeed		= 0;
 	testStateSpeed	= TEST_STATE_UP;
+	dispState		= DISP_STATE_VALVE_CHK;
 	
-	//debug
-	dispSpeed( &aplDispData.led7Seg[0] , 123);
 }
 //********************************************************************************
 // 取得
@@ -95,17 +108,25 @@ void aplDispDataMain( void )
 	// 通常
 	//****************************************
 	case APL_CTRL_STATE_NOMARL:		//通常
-		aplDispData.settingMode		= APL_DISP_SETTING_OFF;
-		
-		//dispSpeed( &aplDispData.led7Seg[0] , inAplDataCar->speed );
-
+		switch( dispState ){
+		case DISP_STATE_VALVE_CHK:
+			if( valveChk() == VALVE_CHK_END ){		//valveChk()が値取得のみのように見えそう
+				aplDispData.valveChkMode = false;
+				dispState	= DISP_STATE_NORMAL;
+			}
+			break;
+		case DISP_STATE_NORMAL:
+			dispSpeed( &aplDispData.led7Seg[0] , inAplDataCar->speed );
+			break;
+		default:
+			break;
+		}
 		break;
 
 	//****************************************
 	// テストモード
 	//****************************************
 	case APL_CTRL_STATE_TESTDISP:		//テストモード
-		aplDispData.settingMode		= APL_DISP_SETTING_OFF;
 		
 		switch( inAplCtrl->stateTest ){
 		case APL_CTRL_STATE_TEST_AUTO:
@@ -123,7 +144,6 @@ void aplDispDataMain( void )
 	//****************************************
 	case APL_CTRL_STATE_SETTING:		//設定
 		//設定モード表示ON
-		aplDispData.settingMode		= APL_DISP_SETTING_ON;
 
 		switch( inAplCtrl->stateSet){
 		case APL_CTRL_STATE_SET_COLOR_7SEG:		//調色
@@ -252,4 +272,254 @@ static unsigned char makeTestDataSpeedManual( void )
 		}
 	}
 	return( testSpeed );
+}
+//********************************************************************************
+// バルブチェック
+//********************************************************************************
+static bool valveChk( void )
+{
+	static uint8_t	step=0;
+	static bool		endFlag = false;	
+	
+	switch( step ){
+		case 0:if( segRGBsequential()	== VALVE_CHK_END )	step++;			break;
+		case 1:if( allSegRGBGradation()	== VALVE_CHK_END )	endFlag = true;	break;
+		default:	break;
+	}
+	return( endFlag );
+}
+
+//********************************************************************************
+// 1セグメントずつ順に点消灯させる
+// 直書きだと何をしているか分かりにくかったので関数化したが、
+// 余計に分かりにくかったりしないか？
+//********************************************************************************
+static bool segRGBsequential( void )
+{
+	static	uint16_t	cntTimeMs = 0;
+	bool	endFlag = false;
+
+	if( cntTimeMs < VALVE_CHK_OFFTIME_MS ){
+		alloff();
+	}else if( cntTimeMs == VALVE_CHK_OFFTIME_MS ){
+		firstPosDigitSeg();
+		firstColor();
+	}else if( cntTimeMs % VALVE_CHK_STEPTIME_MS == 0 ){
+		endFlag = nextSegDigitColor();
+	}
+	cntTimeMs += CYC_TIME_MS;
+	
+	return( endFlag );
+}
+
+static void alloff( void )
+{
+	aplDispData.valveChk.digitBit	= 0;
+	aplDispData.valveChk.segBit		= 0;
+	aplDispData.valveChk.red		= 0;
+	aplDispData.valveChk.green		= 0;
+	aplDispData.valveChk.blue		= 0;
+}
+
+static void firstPosDigitSeg( void )
+{
+	aplDispData.valveChk.segBit		= 1;
+	aplDispData.valveChk.digitBit	= (1 << (LED_7SEG_DIGIT_NUM-1));
+}
+static void firstColor( void )
+{
+	aplDispData.valveChk.red		= VALVE_CHK_BRIGHTNESS;
+	aplDispData.valveChk.green		=   0;
+	aplDispData.valveChk.blue		=   0;
+}
+static bool nextSegDigitColor( void )
+{
+	bool	endFlag = false;
+	
+	if( aplDispData.valveChk.segBit != (1 << LED_7SEG_SEG_NUM)){
+		aplDispData.valveChk.segBit <<= 1;
+	}else{
+		if( aplDispData.valveChk.digitBit != 1 ){
+			aplDispData.valveChk.segBit		= 1;
+			aplDispData.valveChk.digitBit	>>= 1;
+		}else{
+			aplDispData.valveChk.segBit		= 1;
+			aplDispData.valveChk.digitBit	= (1 << (LED_7SEG_DIGIT_NUM-1));
+			endFlag = nextColor();
+		}
+	}
+	return( endFlag );
+}
+static bool nextColor( void )
+{
+	bool	endFlag = false;
+	
+	if( aplDispData.valveChk.red == VALVE_CHK_BRIGHTNESS ){
+		aplDispData.valveChk.red		=   0;
+		aplDispData.valveChk.green		= VALVE_CHK_BRIGHTNESS;
+		aplDispData.valveChk.blue		=   0;
+	}else if( aplDispData.valveChk.green == VALVE_CHK_BRIGHTNESS ){
+		aplDispData.valveChk.red		=   0;
+		aplDispData.valveChk.green		=   0;
+		aplDispData.valveChk.blue		= VALVE_CHK_BRIGHTNESS;
+	}else if( aplDispData.valveChk.blue == VALVE_CHK_BRIGHTNESS ){
+		aplDispData.valveChk.red		=   0;
+		aplDispData.valveChk.green		=   0;
+		aplDispData.valveChk.blue		=   0;
+		endFlag = true;
+	}
+	return( endFlag );
+}
+//********************************************************************************
+// 全セグメントをRGBグラデーションアニメーションする
+// 元ネタはHSVで作り、RGB変換する。
+// floatでは誤差が発生するが、表示で目に見える問題が確認されなかったのでこのまま。
+//********************************************************************************
+static bool allSegRGBGradation( void )
+{	
+	static float	h = 0;	// 0.00~1.00 
+	static float	s = 0;
+	static float	v = 0;
+//	static uint16_t	hsvCnt = 0;
+	float	r,g,b;
+	static	uint16_t	cntTimeMs = 0;
+	
+	////ぱっと見わからなくて良くなさそう。下の分岐方法とどちらが良いか？
+	//hsvCnt += HSV_CYC_ADD_VAL;
+	////hsvCntの0~100をv、100~200をs、200~300をhに割当てる。
+	////100の桁引きと、最大値ブロック。
+	//v = ( (hsvCnt - HSV_MAX*0) > HSV_MAX )? HSV_MAX : (hsvCnt - HSV_MAX*0);
+	//s = ( (hsvCnt - HSV_MAX*1) > HSV_MAX )? HSV_MAX : (hsvCnt - HSV_MAX*1);
+	//h = ( (hsvCnt - HSV_MAX*2) > HSV_MAX )? HSV_MAX : (hsvCnt - HSV_MAX*2);
+	
+	// vshの順で0.00~1.00まで加算する
+	if( v < HSV_MAX ){
+		v += HSV_CYC_ADD_V;
+		v = ( v > HSV_MAX )? HSV_MAX : v;
+	}else if( s < HSV_MAX ){
+		s += HSV_CYC_ADD_S;
+		s = ( s > HSV_MAX )? HSV_MAX : s;
+	}else if( h < HSV_MAX ){
+		h += HSV_CYC_ADD_H;
+		h = ( h > HSV_MAX )? HSV_MAX : h;
+	}
+	
+	convertHSVtoRGB( h,s,v,&r,&g,&b );
+	
+	aplDispData.valveChk.red	= r * RGB_MAX;		// 0~1.00 -> 0~100
+	aplDispData.valveChk.green	= g * RGB_MAX;
+	aplDispData.valveChk.blue	= b * RGB_MAX;
+	aplDispData.valveChk.segBit		= pow(2,LED_7SEG_SEG_NUM)-1;		//全ON
+	aplDispData.valveChk.digitBit	= pow(2,LED_7SEG_DIGIT_NUM)-1;		//全ON
+	
+	if( h >= HSV_MAX ){
+		return( VALVE_CHK_END );
+	}else{
+		return( VALVE_CHK_RUN );	
+	}
+}
+//********************************************************************************
+// 参考：検索ヒットした複数サイト。最終的にはwikiベース
+// https://ja.wikipedia.org/wiki/HSV%E8%89%B2%E7%A9%BA%E9%96%93
+//********************************************************************************
+static void convertHSVtoRGB(
+	float  h,float	s,float  v,
+	float* r,float*	g,float* b
+){
+	float	f,calcA,calcB,calcC,calcD;
+	int		i;
+	
+	if( s <= 0 ){
+		*r = *g = *b = v;
+	}else{
+		h	*= 6;
+		i	= (int)h;
+		f	= h - (float)i;
+		
+		calcA	= v;
+		calcB	= v * (1-s);
+		calcC	= v * (1-s*f);
+		calcD	= v * (1-s*(1-f));	
+		
+		switch(i){
+			case 0:	setRgb( r,g,b,  calcA,calcD,calcB );	break;
+			case 1:	setRgb( r,g,b,  calcC,calcA,calcB );	break;
+			case 2:	setRgb( r,g,b,  calcB,calcA,calcD );	break;
+			case 3:	setRgb( r,g,b,  calcB,calcC,calcA );	break;
+			case 4:	setRgb( r,g,b,  calcD,calcB,calcA );	break;
+			case 5:	setRgb( r,g,b,  calcA,calcB,calcC );	break;
+			default:break;
+		}
+	}
+}
+//********************************************************************************
+//********************************************************************************
+//static void convertHSVtoRGB(
+	//float  h,float	s,float  v,
+	//float* r,float*	g,float* b
+//){
+	//float	calcA,calcB,calcC,calcD,h_d;
+	//
+	//if( s <= 0 ){
+		//*r = *g = *b = v;
+	//}else{
+		////h_d	= (h * 360/60) % 2;
+		//h_d		= h * 360/60;		// float % 1だとinvalid operands to binaryなので一度100倍する
+		//calcA	= v;
+		//calcB	= v * (1-s);
+		//calcC	= v * (1-s*h_d);
+		//calcD	= v * (1-s*(1-h_d));
+		//
+		//switch((int)h_d){
+			//case 0:	setRgb( r,g,b,  calcA,calcD,calcB );	break;
+			//case 1:	setRgb( r,g,b,  calcC,calcA,calcB );	break;
+			//case 2:	setRgb( r,g,b,  calcB,calcA,calcD );	break;
+			//case 3:	setRgb( r,g,b,  calcB,calcC,calcA );	break;
+			//case 4:	setRgb( r,g,b,  calcD,calcB,calcA );	break;
+			//case 5:	setRgb( r,g,b,  calcA,calcB,calcC );	break;
+			//default:break;
+		//}
+	//}
+//}
+//********************************************************************************
+//********************************************************************************
+//static void convertHSVtoRGB(
+	//float  h,float	s,float  v,
+	//float* r,float*	g,float* b
+//){
+	//float	c,x;
+	//uint8_t	hi;
+	//
+	//if( s <= 0 ){
+		//*r = *g = *b = v;
+	//}else{
+		//c	= v*s;		//円柱モデル
+		//hi	= h * 360/60;		//値範囲0~1を0~360°として切り捨て除算。
+		//x	= c*(1-abs(hi%2-1));
+	//
+		//switch(hi){
+			//case 0:	setRgb( r,g,b,  c,x,0 );	break;
+			//case 1:	setRgb( r,g,b,  x,c,0 );	break;
+			//case 2:	setRgb( r,g,b,  0,c,x );	break;
+			//case 3:	setRgb( r,g,b,  0,x,c );	break;
+			//case 4:	setRgb( r,g,b,  x,0,c );	break;
+			//case 5:	setRgb( r,g,b,  c,0,x );	break;
+			//default:break;
+		//}
+	//}
+//}
+//********************************************************************************
+// setで良い？copy?
+//********************************************************************************
+static void setRgb(
+	float*	r,
+	float*	g,
+	float*	b,
+	float	val_0,
+	float	val_1,
+	float	val_2
+){
+	*r	= val_0;
+	*g	= val_1;
+	*b	= val_2;
 }
