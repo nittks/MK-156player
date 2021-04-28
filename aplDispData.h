@@ -28,20 +28,16 @@ enum{
 	APL_DSP_DATA_7SEG_9,
 	APL_DSP_DATA_7SEG_BLANK
 };
-typedef struct{
-	uint8_t		digitBit;
-	uint8_t		segBit;
-	uint8_t		red;
-	uint8_t		green;
-	uint8_t		blue;
-}VALVE_CHK;
 
 typedef struct {
 	unsigned char	led7Seg[LED_7SEG_DIGIT_NUM];
 	unsigned char	bright7seg;
-	unsigned char	color7seg;
+	unsigned char	red;
+	unsigned char	green;
+	unsigned char	blue;
 	bool			valveChkMode;
-	VALVE_CHK		valveChk;
+	uint8_t			digitBit;
+	uint8_t			segBit;
 }APL_DISP_DATA;
 
 

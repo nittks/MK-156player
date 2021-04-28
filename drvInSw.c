@@ -88,20 +88,20 @@ static void inputRotEnc( void )
 			rotEncState[i] = ROT_ENC_STATE_DEBOUNCE;
 			rotEncDebTimeCnt[i] = 0;
 			drvInSwData.rotEncState[i]	= DRV_IN_ROT_ENC_STATE_FORWARD;
-			//逆転
-			}else if( rotEncState[i] == ROT_ENC_STATE_REVERCE ){
+		//逆転
+		}else if( rotEncState[i] == ROT_ENC_STATE_REVERCE ){
 			rotEncState[i] = ROT_ENC_STATE_DEBOUNCE;
 			rotEncDebTimeCnt[i] = 0;
 			drvInSwData.rotEncState[i]	= DRV_IN_ROT_ENC_STATE_REVERCE;
-			//デバウンス待機
-			}else if( rotEncState[i] == ROT_ENC_STATE_DEBOUNCE ){
+		//デバウンス待機
+		}else if( rotEncState[i] == ROT_ENC_STATE_DEBOUNCE ){
 			
 			drvInSwData.rotEncState[i]	= DRV_IN_ROT_ENC_STATE_STOP;
 			//デバウンス経過
 			if( rotEncDebTimeCnt[i] >= ROT_ENC_DEBTIME ){
 				rotEncDebTimeCnt[i] = 0;
 				rotEncState[i] = ROT_ENC_STATE_WAIT;
-				}else{
+			}else{
 				rotEncDebTimeCnt[i]++;
 			}
 		}
@@ -146,7 +146,7 @@ static void inputPushSw( void )
 
 			case PUSH_SW_STATE_ON:
 				if( pSw->portInLatch == PORT_ON ){
-					if( pSw->cntTimeJudge <= PUSH_SW_LONGON_10MS ){
+					if( pSw->cntTimeJudge < PUSH_SW_LONGON_10MS ){
 						pSw->cntTimeJudge++;
 						if( pSw->cntTimeJudge == PUSH_SW_LONGON_10MS ){	//確定時、1発だけ送る
 							drvInSwData.pushSwState[i] = DRV_IN_PUSH_SW_STATE_LONGON;
@@ -225,5 +225,6 @@ static void chkRotateVectCnt( unsigned char portNo )
 		rotEncState[portNo] = ROT_ENC_STATE_REVERCE;
 		rotateVect[portNo]	 = 0;
 	}
+
 }
 

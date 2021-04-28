@@ -148,15 +148,20 @@ static void stateJudge( void )
 		switch( aplCtrl.stateSet ){
 		case APL_CTRL_STATE_SET_BRIGHT_7SEG:		//調光(7セグ
 			if( inAplDataSw->pushSwSet == APL_DATA_PUSH_SW_ON ){
-				aplCtrl.stateSet = APL_CTRL_STATE_SET_DISPCYC_7SEG;
+				aplCtrl.stateSet = APL_CTRL_STATE_SET_COLOR_7SEG;
 			}else if( inAplDataCar->ill == APL_DATA_ILL_ON ){
 				aplCtrl.stateSet = APL_CTRL_STATE_SET_BRIGHT_DIM_7SEG;
 			}
 			break;
 		case APL_CTRL_STATE_SET_BRIGHT_DIM_7SEG:	//調光減光(7セグ
 			if( inAplDataSw->pushSwSet == APL_DATA_PUSH_SW_ON ){
-				aplCtrl.stateSet = APL_CTRL_STATE_SET_DISPCYC_7SEG;
+				aplCtrl.stateSet = APL_CTRL_STATE_SET_COLOR_7SEG;
 			}else if( inAplDataCar->ill == APL_DATA_ILL_OFF ){
+				aplCtrl.stateSet = APL_CTRL_STATE_SET_BRIGHT_7SEG;
+			}
+			break;
+		case APL_CTRL_STATE_SET_COLOR_7SEG:
+			if( inAplDataSw->pushSwSet == APL_DATA_PUSH_SW_ON ){
 				aplCtrl.stateSet = APL_CTRL_STATE_SET_DISPCYC_7SEG;
 			}
 			break;
@@ -215,15 +220,16 @@ static void procSetting( void )
 		
 	case APL_CTRL_STATE_SETTING:		//設定
 		switch( aplCtrl.stateSet ){
-		case APL_CTRL_STATE_SET_COLOR_7SEG:			//調色
-			changeSettingItem( &aplCtrlSet.color7seg ,SET_COLOR);
-			break;
 		case APL_CTRL_STATE_SET_BRIGHT_7SEG:			//調光(7セグ
 			changeSettingVal( &aplCtrlSet.bright7seg );
 			break;
 		case APL_CTRL_STATE_SET_BRIGHT_DIM_7SEG:		//調光減光(7セグ
 			changeSettingVal( &aplCtrlSet.brightDim7seg );
 			break;
+		case APL_CTRL_STATE_SET_COLOR_7SEG:			//調色
+			changeSettingItem( &aplCtrlSet.colorNo ,SET_COLOR);
+			aplCtrlSet.colorRGB	= COLOR_TABLE[aplCtrlSet.colorNo];
+			break;			
 		case APL_CTRL_STATE_SET_DISPCYC_7SEG:		//表示更新速度(7セグ
 			changeSettingVal( &aplCtrlSet.dispcyc7seg );
 			break;
@@ -314,13 +320,15 @@ static void apryEep( void )
 
 	if( inAplDataEep->read == APL_DATA_EEP_STATE_READED){
 		//読込済みなら反映
-		aplCtrlSet.color7seg			= inAplDataEep->color7seg;
+		aplCtrlSet.colorNo				= inAplDataEep->color7seg;
+		aplCtrlSet.colorRGB				= COLOR_TABLE[aplCtrlSet.colorNo];
 		aplCtrlSet.bright7seg			= inAplDataEep->bright7seg;
 		aplCtrlSet.brightDim7seg		= inAplDataEep->brightDim7seg;
 		aplCtrlSet.dispcyc7seg			= inAplDataEep->dispcyc7seg;
 	}else if( inAplDataEep->read == APL_DATA_EEP_STATE_SUMERROR){
 		//SUMエラー時はデフォルト値読込
-		aplCtrlSet.color7seg			= eepDefault[COLOR_7SEG];
+		aplCtrlSet.colorNo				= eepDefault[COLOR_7SEG];
+		aplCtrlSet.colorRGB				= COLOR_TABLE[aplCtrlSet.colorNo];
 		aplCtrlSet.bright7seg			= eepDefault[BRIGHT_7SEG];
 		aplCtrlSet.brightDim7seg		= eepDefault[BRIGHT_DIM_7SEG];
 		aplCtrlSet.dispcyc7seg			= eepDefault[DISPCYC_7SEG];

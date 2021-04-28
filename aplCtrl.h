@@ -1,6 +1,8 @@
 #ifndef APL_CTRL_H
 #define APL_CTRL_H
 
+#include <avr/io.h>
+
 //状態
 typedef enum{
 	APL_CTRL_STATE_BOOT,		//起動初回
@@ -17,9 +19,9 @@ typedef enum{
 
 //状態(設定内
 typedef enum{
-	APL_CTRL_STATE_SET_COLOR_7SEG,			//調色
 	APL_CTRL_STATE_SET_BRIGHT_7SEG,			//調光(7セグ
 	APL_CTRL_STATE_SET_BRIGHT_DIM_7SEG,		//調光減光(7セグ
+	APL_CTRL_STATE_SET_COLOR_7SEG,			//調色
 	APL_CTRL_STATE_SET_DISPCYC_7SEG,		//表示更新速度(7セグ
 	APL_CTRL_STATE_SET_PALSE_SPEED,			//パルス仕様車速
 	APL_CTRL_STATE_SET_PALSE_REV,			//パルス仕様回転数
@@ -33,14 +35,19 @@ typedef struct {
 	APL_CTRL_STATE_SET	stateSet;
 }APL_CTRL;
 
+
+typedef struct{
+	uint8_t		red;
+	uint8_t		green;
+	uint8_t		blue;
+}COLOR_RGB;
+
 typedef struct {
-	unsigned char	color7seg;			//調色
+	uint8_t			colorNo;
+	COLOR_RGB		colorRGB;
 	unsigned char	bright7seg;			//調光(7セグ
-	unsigned char	brightBarled;		//調光(バーLED
 	unsigned char	brightDim7seg;		//調光減光(7セグ
-	unsigned char	brightDimBarled;	//調光減光(バーLED
 	unsigned char	dispcyc7seg;		//表示更新速度(7セグ
-	unsigned char	dispcycBarled;		//表示更新速度(バーLED
 }APL_CTRL_SET;
 
 typedef struct {
@@ -58,11 +65,14 @@ typedef enum{
 }SET_ITEM_NO;
 
 enum{
-	SETTING_COLOR_RED,
-	SETTING_COLOR_GREEN,
-	SETTING_COLOR_BLUE,
 	SETTING_COLOR_WHITE,
-	SETTING_COLOR_MAX = SETTING_COLOR_WHITE
+	SETTING_COLOR_RED,
+	SETTING_COLOR_YELLOW,
+	SETTING_COLOR_GREEN,
+	SETTING_COLOR_AQUA,
+	SETTING_COLOR_BLUE,
+	SETTING_COLOR_PERPLE,
+	SETTING_COLOR_MAX = SETTING_COLOR_PERPLE
 };
 
 enum{
