@@ -16,8 +16,8 @@
 #define	PUSH_SW_DOUBLE_TIMEOUT_10MS	((uint8_t)( 500/10))	//  500ms/10[ms/cyc]
 
 
-#define	ROT_VECT_FORWARD	((signed char)(4))
-#define	ROT_VECT_REVERCE	((signed char)(-4))
+#define	ROT_VECT_FORWARD	((signed char)(-4))
+#define	ROT_VECT_REVERCE	((signed char)(4))
 
 static const signed char grayCodeTable[0xF+1] = {0,-1,1,0,1,0,0,-1,-1,0,0,1,0,1,-1,0};
 

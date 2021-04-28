@@ -218,10 +218,10 @@ static void chkRotateVectCnt( unsigned char portNo )
 	rotateVect[portNo]		+=grayCodeTable[ grayCode[portNo] ];
 
 	//変化量が4or-4で回転方向決定
-	if( rotateVect[portNo] >= ROT_VECT_FORWARD ){
+	if( rotateVect[portNo] <= ROT_VECT_FORWARD ){
 		rotEncState[portNo] = ROT_ENC_STATE_FORWARD;
 		rotateVect[portNo]	 = 0;
-	}else if( rotateVect[portNo] <= ROT_VECT_REVERCE ){
+	}else if( rotateVect[portNo] >= ROT_VECT_REVERCE ){
 		rotEncState[portNo] = ROT_ENC_STATE_REVERCE;
 		rotateVect[portNo]	 = 0;
 	}
