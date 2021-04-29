@@ -89,16 +89,23 @@ void aplDispDataMain( void )
 	// 調色データ出力
 	//------------------------------
 	if( dispState != DISP_STATE_VALVE_CHK ){
-		aplDispData.red			= inAplCtrlSet->colorRGB.red;
-		aplDispData.green		= inAplCtrlSet->colorRGB.green;
-		aplDispData.blue		= inAplCtrlSet->colorRGB.blue;
+		if( inAplCtrlSet->colorNo == SETTING_COLOR_USER ){
+			aplDispData.red		= inAplCtrlSet->colorRGB.red;
+			aplDispData.green	= inAplCtrlSet->colorRGB.green;
+			aplDispData.blue	= inAplCtrlSet->colorRGB.blue;
+		}else{
+			aplDispData.red		= COLOR_TABLE[inAplCtrlSet->colorNo].red;
+			aplDispData.green	= COLOR_TABLE[inAplCtrlSet->colorNo].green;
+			aplDispData.blue	= COLOR_TABLE[inAplCtrlSet->colorNo].blue;
+		}
+		
 	}
 	
 	//------------------------------
 	// 輝度データ出力
 	//------------------------------
 	if( inAplDataCar->ill == APL_DATA_ILL_OFF ){
-		aplDispData.bright7seg		= inAplCtrlSet->bright7seg/3;
+		aplDispData.bright7seg		= inAplCtrlSet->bright7seg;
 	}else{
 		aplDispData.bright7seg		= inAplCtrlSet->brightDim7seg;
 	}
@@ -153,7 +160,22 @@ void aplDispDataMain( void )
 
 		switch( inAplCtrl->stateSet){
 		case APL_CTRL_STATE_SET_COLOR_7SEG:		//調色
-			disp7seg( &aplDispData.led7Seg[0] , inAplCtrlSet->colorNo );
+			if( inAplCtrl->stateColorUser != APL_CTRL_STATE_SET_COLOR_USER_UNSELECT ){
+				switch( inAplCtrl->stateColorUser ){
+					case APL_CTRL_STATE_SET_COLOR_USER_RED:
+						disp7seg( &aplDispData.led7Seg[0] , inAplCtrlSet->colorRGB.red );
+						break;
+					case APL_CTRL_STATE_SET_COLOR_USER_GREEN:
+						disp7seg( &aplDispData.led7Seg[0] , inAplCtrlSet->colorRGB.green );
+						break;
+					case APL_CTRL_STATE_SET_COLOR_USER_BLUE:
+						disp7seg( &aplDispData.led7Seg[0] , inAplCtrlSet->colorRGB.blue );
+						break;
+					default:break;
+				}
+			}else{
+				disp7seg( &aplDispData.led7Seg[0] , inAplCtrlSet->colorNo );
+			}
 			break;
 		case APL_CTRL_STATE_SET_BRIGHT_7SEG:		//調光(7セグ
 			disp7seg( &aplDispData.led7Seg[0] , inAplCtrlSet->bright7seg );

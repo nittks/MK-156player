@@ -10,6 +10,9 @@
 
 typedef enum{
 	COLOR_7SEG,
+	COLOR_RED,
+	COLOR_GREEN,
+	COLOR_BLUE,
 	BRIGHT_7SEG,
 	BRIGHT_DIM_7SEG,
 	DISPCYC_7SEG,
@@ -24,20 +27,17 @@ enum{
 	COLOR_7SEG_AQUA,
 	COLOR_7SEG_BLUE,
 	COLOR_7SEG_PURPLE,
+	COLOR_7SEG_USER,
 	COLOR_7SEG_MAX
 };
 
-COLOR_RGB COLOR_TABLE[COLOR_7SEG_MAX] ={
-	{  30 ,  30 ,  30 },
-	{ 100 ,   0 ,   0 },
-	{  50 ,  50 ,   0 },
-	{   0 , 100 ,   0 },
-	{   0 ,  50 ,  50 },
-	{   0 ,   0 , 100 },
-	{  50 ,   0 ,  50 }};
+
 
 unsigned char eepDefault[SETTING_ITEM_MAX] = {
 	COLOR_7SEG_WHITE,
+	50,		//red
+	50,		//green
+	50,		//blue
 	80,		//7セグ輝度
 	20,		//7セグ輝度(減光
 	20,		//7セグ表示更新速度

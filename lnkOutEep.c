@@ -37,6 +37,9 @@ void lnkOutEepMain( void )
 
 		i=0;
 		outDrvEepWrite.val[i++]	= inAplCtrlSet->colorNo;
+		outDrvEepWrite.val[i++]	= inAplCtrlSet->colorRGB.red;
+		outDrvEepWrite.val[i++]	= inAplCtrlSet->colorRGB.green;
+		outDrvEepWrite.val[i++]	= inAplCtrlSet->colorRGB.blue;
 		outDrvEepWrite.val[i++]	= inAplCtrlSet->bright7seg;
 		outDrvEepWrite.val[i++]	= inAplCtrlSet->brightDim7seg;
 		outDrvEepWrite.val[i++]	= inAplCtrlSet->dispcyc7seg;

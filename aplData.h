@@ -81,6 +81,9 @@ typedef enum{
 typedef struct{
 	APL_DATA_EEP_STATE	read;
 	unsigned char		color7seg;
+	unsigned char		red;
+	unsigned char		green;
+	unsigned char		blue;
 	unsigned char		bright7seg;
 	unsigned char		brightDim7seg;
 	unsigned char		dispcyc7seg;

@@ -43,12 +43,18 @@ void lnkInEepMain( void )
 				i=0;
 				aplDataEep.read				= APL_DATA_EEP_STATE_READED;
 				aplDataEep.color7seg		= inDrvEep->val[i++];
+				aplDataEep.red				= inDrvEep->val[i++];
+				aplDataEep.green			= inDrvEep->val[i++];
+				aplDataEep.blue				= inDrvEep->val[i++];
 				aplDataEep.bright7seg		= inDrvEep->val[i++];
 				aplDataEep.brightDim7seg	= inDrvEep->val[i++];
 				aplDataEep.dispcyc7seg		= inDrvEep->val[i++];
 			}else{
 				aplDataEep.read				= APL_DATA_EEP_STATE_SUMERROR;
 				aplDataEep.color7seg		= 0;
+				aplDataEep.red				= 0;
+				aplDataEep.green			= 0;
+				aplDataEep.blue				= 0;
 				aplDataEep.bright7seg		= 0;
 				aplDataEep.brightDim7seg	= 0;
 				aplDataEep.dispcyc7seg		= 0;

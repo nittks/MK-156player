@@ -1,6 +1,8 @@
 #ifndef APL_DISP_DATA_INC_H
 #define APL_DISP_DATA_INC_H
 
+#include "aplCtrl.h"
+
 #define		CYC_TIME_MS		((uint8_t)10)
 //********************************************************************************
 // 標準動作用定数
@@ -37,7 +39,15 @@ typedef enum{
 //********************************************************************************
 const unsigned char SETTING_PALSE_SPEED[]=	{0,4,8,16,20,25};		//車速パルス仕様
 const unsigned char SETTING_PALSE_REV[]={0,1,2,3,4,5,6,8,10,12};	//回転数パルス仕様(気筒数
-	
+
+COLOR_RGB COLOR_TABLE[SETTING_COLOR_MAX] ={
+	{  30 ,  30 ,  30 },
+	{ 100 ,   0 ,   0 },
+	{  50 ,  50 ,   0 },
+	{   0 , 100 ,   0 },
+	{   0 ,  50 ,  50 },
+	{   0 ,   0 , 100 },
+	{  50 ,   0 ,  50 }};	
 
 #define SET_BRIGHT_7SEG_DISP	((unsigned char)180)
 
