@@ -33,7 +33,7 @@ static const unsigned char	led7SegBit[LED_7SEG_MAX]={
 	0b01011011,
 	0b01111011,
 	0b00011110,
-	0b01111110,
+	0b01111111,
 	0b00011111,
 	0b00000000,
 };

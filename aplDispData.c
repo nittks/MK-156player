@@ -123,10 +123,10 @@ void aplDispDataMain( void )
 	case APL_CTRL_STATE_NOMARL:		//通常
 		switch( dispState ){
 		case DISP_STATE_VALVE_CHK:
-			if( valveChk() == VALVE_CHK_END ){		//valveChk()が値取得のみのように見えそう
+//			if( valveChk() == VALVE_CHK_END ){		//valveChk()が値取得のみのように見えそう
 				aplDispData.valveChkMode = false;
 				dispState	= DISP_STATE_NORMAL;
-			}
+//			}
 			break;
 		case DISP_STATE_NORMAL:
 			dispSpeed( &aplDispData.led7Seg[0] , inAplDataCar->speed );
@@ -156,45 +156,17 @@ void aplDispDataMain( void )
 	// 設定
 	//****************************************
 	case APL_CTRL_STATE_SETTING:		//設定
-		//設定モード表示ON
-
-		switch( inAplCtrl->stateSet){
-		case APL_CTRL_STATE_SET_COLOR_7SEG:		//調色
-			if( inAplCtrl->stateColorUser != APL_CTRL_STATE_SET_COLOR_USER_UNSELECT ){
-				switch( inAplCtrl->stateColorUser ){
-					case APL_CTRL_STATE_SET_COLOR_USER_RED:
-						disp7seg( &aplDispData.led7Seg[0] , inAplCtrlSet->colorRGB.red );
-						break;
-					case APL_CTRL_STATE_SET_COLOR_USER_GREEN:
-						disp7seg( &aplDispData.led7Seg[0] , inAplCtrlSet->colorRGB.green );
-						break;
-					case APL_CTRL_STATE_SET_COLOR_USER_BLUE:
-						disp7seg( &aplDispData.led7Seg[0] , inAplCtrlSet->colorRGB.blue );
-						break;
-					default:break;
-				}
-			}else{
-				disp7seg( &aplDispData.led7Seg[0] , inAplCtrlSet->colorNo );
-			}
-			break;
-		case APL_CTRL_STATE_SET_BRIGHT_7SEG:		//調光(7セグ
-			disp7seg( &aplDispData.led7Seg[0] , inAplCtrlSet->bright7seg );
-			break;
-		case APL_CTRL_STATE_SET_BRIGHT_DIM_7SEG:		//調光減光(7セグ
-			disp7seg( &aplDispData.led7Seg[0] , inAplCtrlSet->brightDim7seg );
-			break;
-		case APL_CTRL_STATE_SET_DISPCYC_7SEG:		//表示更新速度(7セグ
-			disp7seg( &aplDispData.led7Seg[0], inAplCtrlSet->dispcyc7seg * SPEED_DIGIT );
-			break;
-		case APL_CTRL_STATE_SET_PALSE_SPEED:			//パルス仕様車速 
-			disp7seg( &aplDispData.led7Seg[0] , SETTING_PALSE_SPEED[inAplCtrlSetPalse->speed] );
-			break;
-		case APL_CTRL_STATE_SET_PALSE_REV:			//パルス仕様回転数 
-			disp7seg( &aplDispData.led7Seg[0] , SETTING_PALSE_REV[inAplCtrlSetPalse->rev] );
-			break;
-		default:
-			break;
+		//調光(減光)だけ上書き。上書き法はちょっと嫌
+		if( inAplCtrl->stateSet == APL_CTRL_STATE_SETTING_BRIGHT_DIM ){
+			aplDispData.bright7seg		= inAplCtrlSet->brightDim7seg;
+		}else{
+			aplDispData.bright7seg		= inAplCtrlSet->bright7seg;
 		}
+		
+		
+		//設定モード表示ON
+		disp7seg( &aplDispData.led7Seg[0] , inAplCtrlSet->dspVal );
+
 		break;
 	}
 }

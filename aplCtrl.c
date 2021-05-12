@@ -6,19 +6,15 @@
 #include "lnkOutEep.h"
 #include "lnkOutCom.h"
 #include "hardware.h"
+#include "aplCtrlSetting.h"
 
 static APL_CTRL				aplCtrl;
-static APL_CTRL_SET			aplCtrlSet;
-static APL_CTRL_SET			aplCtrlSetBak;		//設定保存せず抜ける祭に戻す、元の値保持用
-static APL_CTRL_SET_PALSE	aplCtrlSetPalse;
 static APL_CTRL_SET_PALSE	aplCtrlSetPalseBak;
+static APL_CTRL_SETTING		aplCtrlSetting;
 
 static void stateJudge( void );
-static void stateJudgeSetUserColor( void );
+static void judgeSetting( void );
 static void procSetting( void );
-static void procSettingUserColor( void );
-static void changeSettingVal( unsigned char *val );
-static void changeSettingItem( unsigned char *setNo , SET_ITEM_NO no );
 static void chkSetPalse( void );
 static void apryEep( void );
 //********************************************************************************
@@ -27,11 +23,12 @@ static void apryEep( void );
 void initAplCtrl( void )
 {
 	aplCtrl.state			= APL_CTRL_STATE_BOOT;
-	aplCtrl.stateSet		= APL_CTRL_STATE_SET_BRIGHT_7SEG;
+	aplCtrl.stateSet		= APL_CTRL_STATE_SETTING_BRIGHT;
 	aplCtrl.stateColorUser	= APL_CTRL_STATE_SET_COLOR_USER_UNSELECT;
 	aplCtrlSetPalse.speed	= INIT_PALSE_SPEED;
 	aplCtrlSetPalse.rev		= INIT_PALSE_REV;
 	
+	aplCtrlSetting			= aplCtrlSetting_new( settingContents0 ,  HIERARCHY_NUM );	
 }
 //********************************************************************************
 // 制御状態取得
@@ -63,8 +60,7 @@ void aplCtrlMain( void )
 
 	//状態判定、状態遷移
 	stateJudge();
-
-	//設定処理
+	
 	procSetting();
 }
 //********************************************************************************
@@ -102,11 +98,7 @@ static void stateJudge( void )
 		}else if( inAplDataSw->pushSwSet == APL_DATA_PUSH_SW_LONGON ){
 			//通常->設定
 			aplCtrl.state = APL_CTRL_STATE_SETTING;
-			if( inAplDataCar->ill == APL_DATA_ILL_ON ){
-				aplCtrl.stateSet = APL_CTRL_STATE_SET_BRIGHT_DIM_7SEG;
-			}else{
-				aplCtrl.stateSet = APL_CTRL_STATE_SET_BRIGHT_7SEG;
-			}
+
 			//入力ユニットから受信しているパルス設定値を現在設定値として取得
 			aplCtrlSetPalse.speed	= inAplDataCar->palseSetSpeed;
 			aplCtrlSetPalse.rev		= inAplDataCar->palseSetRev;
@@ -146,210 +138,61 @@ static void stateJudge( void )
 		
 	//****************************************
 	// 設定
-	// 遷移処理見直し予定
 	//****************************************
 	case APL_CTRL_STATE_SETTING:		//設定
-		switch( aplCtrl.stateSet ){
-		case APL_CTRL_STATE_SET_BRIGHT_7SEG:		//調光(7セグ
-			if( inAplDataSw->pushSwSet == APL_DATA_PUSH_SW_ON ){
-				aplCtrl.stateSet = APL_CTRL_STATE_SET_COLOR_7SEG;
-				aplCtrl.stateColorUser = APL_CTRL_STATE_SET_COLOR_USER_UNSELECT;
-			}else if( inAplDataCar->ill == APL_DATA_ILL_ON ){
-				aplCtrl.stateSet = APL_CTRL_STATE_SET_BRIGHT_DIM_7SEG;
-			}
-			break;
-		case APL_CTRL_STATE_SET_BRIGHT_DIM_7SEG:	//調光減光(7セグ
-			if( inAplDataSw->pushSwSet == APL_DATA_PUSH_SW_ON ){
-				aplCtrl.stateSet = APL_CTRL_STATE_SET_COLOR_7SEG;
-				aplCtrl.stateColorUser = APL_CTRL_STATE_SET_COLOR_USER_UNSELECT;
-			}else if( inAplDataCar->ill == APL_DATA_ILL_OFF ){
-				aplCtrl.stateSet = APL_CTRL_STATE_SET_BRIGHT_7SEG;
-			}
-			break;
-		case APL_CTRL_STATE_SET_COLOR_7SEG:
-				if( aplCtrl.stateColorUser == APL_CTRL_STATE_SET_COLOR_USER_UNSELECT ){
-					if( inAplDataSw->pushSwSet == APL_DATA_PUSH_SW_ON ){
-						if( aplCtrlSet.colorNo == SETTING_COLOR_USER ){
-							aplCtrl.stateColorUser = APL_CTRL_STATE_SET_COLOR_USER_RED;
-						}else{
-							aplCtrl.stateSet = APL_CTRL_STATE_SET_DISPCYC_7SEG;
-						}
-					}
-				}else{
-					stateJudgeSetUserColor();
-				}
-			break;
-		case APL_CTRL_STATE_SET_DISPCYC_7SEG:		//表示更新速度(7セグ
-			if( inAplDataSw->pushSwSet == APL_DATA_PUSH_SW_ON ){
-				aplCtrl.stateSet = APL_CTRL_STATE_SET_PALSE_SPEED;
-			}
-			break;
-		case APL_CTRL_STATE_SET_PALSE_SPEED:		//パルス仕様車速 
-			if( inAplDataSw->pushSwSet == APL_DATA_PUSH_SW_ON ){
-				aplCtrl.stateSet = APL_CTRL_STATE_SET_PALSE_REV;
-			}
-			break;
-		case APL_CTRL_STATE_SET_PALSE_REV:			//パルス仕様回転数 
-			if( inAplDataSw->pushSwSet == APL_DATA_PUSH_SW_ON ){
-				if( inAplDataCar->ill == APL_DATA_ILL_ON ){
-					aplCtrl.stateSet = APL_CTRL_STATE_SET_BRIGHT_DIM_7SEG;
-				}else{
-					aplCtrl.stateSet = APL_CTRL_STATE_SET_BRIGHT_7SEG;
-				}
-			}
-			break;
-		default:
-			break;
-		}
+		judgeSetting();
+		break;
+		
+	default:break;
+	}
+}
 
-		//設定から出る
-		if( inAplDataSw->pushSwSet == APL_DATA_PUSH_SW_LONGON ){
+void judgeSetting( void )
+{
+	APL_DATA_SW		*inAplDataSw;
+	inAplDataSw		= getAplDataSw();
+	bool			isNextHierarchy;
+	
+	switch( inAplDataSw->pushSwSet ){
+		case APL_DATA_PUSH_SW_DOUBLEON:
+			if( aplCtrlSetting->getNowHierarchy(aplCtrlSetting) <= 0 ){
+				aplCtrlSetting->exitSetting(aplCtrlSetting);
+				aplCtrl.state	= APL_CTRL_STATE_NOMARL;
+			}else{
+				aplCtrlSetting->preSettingRestore(aplCtrlSetting);
+				aplCtrlSetting->changeHierarchyUp(aplCtrlSetting);
+			}
+			break;
+		case APL_DATA_PUSH_SW_ON:
+			isNextHierarchy = aplCtrlSetting->isNextHierarchy(aplCtrlSetting);
+			if( isNextHierarchy == true ){
+				aplCtrlSetting->changeHierarchyDown(aplCtrlSetting);
+			}else{
+				aplCtrlSetting->saveSetting(aplCtrlSetting);
+				aplCtrlSetting->changeHierarchyUp(aplCtrlSetting);
+			}
+			break;
+		case  APL_DATA_PUSH_SW_LONGON:
 			setLnkOutEep();	//EEPROM書込み要求
 			chkSetPalse();	//パルス設定変更有無チェック
 			aplCtrl.state	= APL_CTRL_STATE_NOMARL;
-		}else if( inAplDataSw->pushSwSet == APL_DATA_PUSH_SW_DOUBLEON ){
-			aplCtrl.state	= APL_CTRL_STATE_NOMARL;
-			aplCtrlSet		= aplCtrlSetBak;		//変更前の値に戻す
-		}
-		break;
+			aplCtrlSetting->exitSetting(aplCtrlSetting);
+			break;
+		default:break;
 	}
-}
-static void stateJudgeSetUserColor( void )
-{
-	APL_DATA_SW		*inAplDataSw;
-	inAplDataSw		= getAplDataSw();
 	
-	switch( aplCtrl.stateColorUser ){
-		case APL_CTRL_STATE_SET_COLOR_USER_RED:
-		if( inAplDataSw->pushSwSet == APL_DATA_PUSH_SW_ON ){
-			aplCtrl.stateColorUser = APL_CTRL_STATE_SET_COLOR_USER_GREEN;
-		}
-		break;
-		case APL_CTRL_STATE_SET_COLOR_USER_GREEN:
-		if( inAplDataSw->pushSwSet == APL_DATA_PUSH_SW_ON ){
-			aplCtrl.stateColorUser = APL_CTRL_STATE_SET_COLOR_USER_BLUE;
-		}
-		break;
-		case APL_CTRL_STATE_SET_COLOR_USER_BLUE:
-		if( inAplDataSw->pushSwSet == APL_DATA_PUSH_SW_ON ){
-			aplCtrl.stateColorUser = APL_CTRL_STATE_SET_COLOR_USER_RED;
-		}
-		break;
+	switch( inAplDataSw->rotEncSet ){
+		case APL_DATA_ROT_ENC_UP:	aplCtrlSetting->selectUp(aplCtrlSetting);		break;
+		case APL_DATA_ROT_ENC_DOWN:	aplCtrlSetting->selectDown(aplCtrlSetting);	break;
 		default:break;
 	}
 }
 //********************************************************************************
-// 設定サブルーチン
 //********************************************************************************
-static void procSetting( void )
+void procSetting( void )
 {
-	switch( aplCtrl.state ){
-	case APL_CTRL_STATE_BOOT:		//起動初回
-		//無処理
-		break;
-
-	case APL_CTRL_STATE_NOMARL:		//通常
-		//無処理
-		break;
-
-	case APL_CTRL_STATE_TESTDISP:		//テストモード
-		//無処理
-		break;
-		
-	case APL_CTRL_STATE_SETTING:		//設定
-		switch( aplCtrl.stateSet ){
-		case APL_CTRL_STATE_SET_BRIGHT_7SEG:			//調光(7セグ
-			changeSettingVal( &aplCtrlSet.bright7seg );
-			break;
-		case APL_CTRL_STATE_SET_BRIGHT_DIM_7SEG:		//調光減光(7セグ
-			changeSettingVal( &aplCtrlSet.brightDim7seg );
-			break;
-		case APL_CTRL_STATE_SET_COLOR_7SEG:			//調色
-			if( aplCtrl.stateColorUser == APL_CTRL_STATE_SET_COLOR_USER_UNSELECT ){
-				changeSettingItem( &aplCtrlSet.colorNo ,SET_COLOR);
-			}else{
-				procSettingUserColor();
-			}
-			break;
-
-		case APL_CTRL_STATE_SET_DISPCYC_7SEG:		//表示更新速度(7セグ
-			changeSettingVal( &aplCtrlSet.dispcyc7seg );
-			break;
-		case APL_CTRL_STATE_SET_PALSE_SPEED:			//パルス仕様車速 
-			changeSettingItem(	&aplCtrlSetPalse.speed ,SET_PALSE_SPEED);
-			break;
-		case APL_CTRL_STATE_SET_PALSE_REV:			//パルス仕様回転数 
-			changeSettingItem(	&aplCtrlSetPalse.rev,SET_PALSE_REV);
-			break;
-		default:
-			break;
-		break;
-		}
-	}
-}
-
-static void procSettingUserColor( void )
-{
-	switch( aplCtrl.stateColorUser ){
-		case APL_CTRL_STATE_SET_COLOR_USER_RED:			//調色
-			changeSettingVal( &aplCtrlSet.colorRGB.red );
-			break;
-		case APL_CTRL_STATE_SET_COLOR_USER_GREEN:			//調色
-			changeSettingVal( &aplCtrlSet.colorRGB.green );
-			break;
-		case APL_CTRL_STATE_SET_COLOR_USER_BLUE:			//調色
-			changeSettingVal( &aplCtrlSet.colorRGB.blue );
-			break;
-		default:break;
-	}
-}
-//********************************************************************************
-// 設定値変更
-//********************************************************************************
-void changeSettingVal( unsigned char *val )
-{
-	APL_DATA_SW		*inAplDataSw;
-	inAplDataSw		= getAplDataSw();
-
-	if( inAplDataSw->rotEncSet == APL_DATA_ROT_ENC_UP ){
-		//上限ブロック
-		if( *val < ( SETTING_VAL_MAX - SETTING_VAL_INTERVAL ) ){
-			*val += SETTING_VAL_INTERVAL;
-		}else{
-			*val = SETTING_VAL_MAX;
-		}
-	}else if( inAplDataSw->rotEncSet == APL_DATA_ROT_ENC_DOWN ){
-		//下限ブロック
-		if( *val > ( SETTING_VAL_MIN + SETTING_VAL_INTERVAL ) ){
-			*val -= SETTING_VAL_INTERVAL;
-		}else{
-			*val = SETTING_VAL_MIN;
-		}
-	}
-}
-//********************************************************************************
-// パルス設定値変更
-//********************************************************************************
-void changeSettingItem( unsigned char *setNo , SET_ITEM_NO no )
-{
-	APL_DATA_SW		*inAplDataSw;
-	inAplDataSw		= getAplDataSw();
-
-	if( inAplDataSw->rotEncSet == APL_DATA_ROT_ENC_UP ){
-		//上限ブロック
-		if( *setNo < PALSE_ITEM_MAX[no] ){
-			*setNo += 1;
-		}else{
-			*setNo = PALSE_ITEM_MIN[no];
-		}
-	}else if( inAplDataSw->rotEncSet == APL_DATA_ROT_ENC_DOWN ){
-		//下限ブロック
-		if( *setNo > PALSE_ITEM_MIN[no] ){
-			*setNo -= 1;
-		}else{
-			*setNo = PALSE_ITEM_MAX[no];
-		}
-	}
+	aplCtrlSet.dspVal	= aplCtrlSetting->getDspVal(aplCtrlSetting);
+	aplCtrl.stateSet	= (APL_CTRL_STATE_SET)aplCtrlSetting->getState(aplCtrlSetting);
 }
 
 //********************************************************************************
@@ -386,11 +229,13 @@ static void apryEep( void )
 		aplCtrlSet.dispcyc7seg			= inAplDataEep->dispcyc7seg;
 	}else if( inAplDataEep->read == APL_DATA_EEP_STATE_SUMERROR){
 		//SUMエラー時はデフォルト値読込
-		aplCtrlSet.colorNo				= eepDefault[COLOR_7SEG];
-		aplCtrlSet.colorRGB.red			=
-		aplCtrlSet.bright7seg			= eepDefault[BRIGHT_7SEG];
-		aplCtrlSet.brightDim7seg		= eepDefault[BRIGHT_DIM_7SEG];
-		aplCtrlSet.dispcyc7seg			= eepDefault[DISPCYC_7SEG];
+		aplCtrlSet.colorNo				= eepDefault[EEP_COLOR_7SEG];
+		aplCtrlSet.colorRGB.red			= eepDefault[EEP_COLOR_RED];
+		aplCtrlSet.colorRGB.green		= eepDefault[EEP_COLOR_GREEN];
+		aplCtrlSet.colorRGB.blue		= eepDefault[EEP_COLOR_BLUE];
+		aplCtrlSet.bright7seg			= eepDefault[EEP_BRIGHT_7SEG];
+		aplCtrlSet.brightDim7seg		= eepDefault[EEP_BRIGHT_DIM_7SEG];
+		aplCtrlSet.dispcyc7seg			= eepDefault[EEP_DISPCYC_7SEG];
 		setLnkOutEep();	//EEPROM書込み要求
 	}
 }
