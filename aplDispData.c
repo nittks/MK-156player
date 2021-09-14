@@ -36,6 +36,8 @@ static void firstPosDigitSeg( void );
 static void firstColor( void );
 static bool nextColor( void );
 static bool nextSegDigitColor( void );
+
+volatile static uint8_t	debugSpeed = 0;
 //********************************************************************************
 // 初期化
 //********************************************************************************
@@ -123,13 +125,14 @@ void aplDispDataMain( void )
 	case APL_CTRL_STATE_NOMARL:		//通常
 		switch( dispState ){
 		case DISP_STATE_VALVE_CHK:
-//			if( valveChk() == VALVE_CHK_END ){		//valveChk()が値取得のみのように見えそう
+			if( valveChk() == VALVE_CHK_END ){		//valveChk()が値取得のみのように見えそう
 				aplDispData.valveChkMode = false;
 				dispState	= DISP_STATE_NORMAL;
-//			}
+			}
 			break;
 		case DISP_STATE_NORMAL:
-			dispSpeed( &aplDispData.led7Seg[0] , inAplDataCar->speed );
+			//dispSpeed( &aplDispData.led7Seg[0] , inAplDataCar->speed );
+			dispSpeed( &aplDispData.led7Seg[0] , debugSpeed );
 			break;
 		default:
 			break;

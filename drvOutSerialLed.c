@@ -233,6 +233,7 @@ void interSetTxBuffer(void)
 		USART0.STATUS	|= USART_TXCIF_bm;
 		USART0.CTRLA	|= USART_TXCIE_bm;
 	}
+	
 	sei();
 }
 

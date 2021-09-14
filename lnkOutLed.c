@@ -37,7 +37,6 @@ void lnkOutLedMain( void )
 			outDrvLed7SegData.val[i] = led7SegBit[ inAplDispData->led7Seg[i] ];
 		}
 	}
-		
 	outDrvLed7SegData.brightRed		= inAplDispData->red  * ((float)inAplDispData->bright7seg/100);
 	outDrvLed7SegData.brightGreen	= inAplDispData->green* ((float)inAplDispData->bright7seg/100);
 	outDrvLed7SegData.brightBlue	= inAplDispData->blue * ((float)inAplDispData->bright7seg/100);

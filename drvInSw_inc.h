@@ -39,8 +39,8 @@ typedef enum{
 
 //ポート状態
 typedef enum{
-	PORT_OFF	= 0,
-	PORT_ON		= 1
+	PORT_OFF	= 1,
+	PORT_ON		= 0
 }SW_PORT_STATE;
 
 typedef enum{

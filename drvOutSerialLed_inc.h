@@ -4,7 +4,7 @@
 
 #define LED_STARTUP_TIME	(100/10)	// Xmsec/1周期	, 時間：根拠無し
 // WS2812B parameters
-#define T0H_NS      400
+#define T0H_NS      300
 #define T1H_NS		800
 #define T_WIDTH_NS  1250
 #define T_RESET_US  50
