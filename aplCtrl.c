@@ -221,18 +221,18 @@ static void apryEep( void )
 	if( inAplDataEep->read == APL_DATA_EEP_STATE_READED){
 		//読込済みなら反映
 		aplCtrlSet.colorNo				= inAplDataEep->color7seg;
-		aplCtrlSet.colorRGB.red			= inAplDataEep->red;
-		aplCtrlSet.colorRGB.green		= inAplDataEep->green;
-		aplCtrlSet.colorRGB.blue		= inAplDataEep->blue;
+		aplCtrlSet.color.h				= inAplDataEep->h;
+		aplCtrlSet.color.s				= inAplDataEep->s;
+		aplCtrlSet.color.v				= inAplDataEep->v;
 		aplCtrlSet.bright7seg			= inAplDataEep->bright7seg;
 		aplCtrlSet.brightDim7seg		= inAplDataEep->brightDim7seg;
 		aplCtrlSet.dispcyc7seg			= inAplDataEep->dispcyc7seg;
 	}else if( inAplDataEep->read == APL_DATA_EEP_STATE_SUMERROR){
 		//SUMエラー時はデフォルト値読込
 		aplCtrlSet.colorNo				= eepDefault[EEP_COLOR_7SEG];
-		aplCtrlSet.colorRGB.red			= eepDefault[EEP_COLOR_RED];
-		aplCtrlSet.colorRGB.green		= eepDefault[EEP_COLOR_GREEN];
-		aplCtrlSet.colorRGB.blue		= eepDefault[EEP_COLOR_BLUE];
+		aplCtrlSet.color.h				= (float)eepDefault[EEP_COLOR_H]/100;
+		aplCtrlSet.color.s				= (float)eepDefault[EEP_COLOR_S]/100;
+		aplCtrlSet.color.v				= (float)eepDefault[EEP_COLOR_V]/100;
 		aplCtrlSet.bright7seg			= eepDefault[EEP_BRIGHT_7SEG];
 		aplCtrlSet.brightDim7seg		= eepDefault[EEP_BRIGHT_DIM_7SEG];
 		aplCtrlSet.dispcyc7seg			= eepDefault[EEP_DISPCYC_7SEG];

@@ -25,9 +25,9 @@ enum{
 
 enum{
 	EEP_COLOR_7SEG,
-	EEP_COLOR_RED,
-	EEP_COLOR_GREEN,
-	EEP_COLOR_BLUE,
+	EEP_COLOR_H,
+	EEP_COLOR_S,
+	EEP_COLOR_V,
 	EEP_BRIGHT_7SEG,
 	EEP_BRIGHT_DIM_7SEG,
 	EEP_DISPCYC_7SEG,
@@ -35,10 +35,10 @@ enum{
 };
 unsigned char eepDefault[EEP_SETTING_ITEM_MAX] = {
 	COLOR_7SEG_WHITE,
-	50,		//red
-	50,		//green
-	50,		//blue
-	80,		//7セグ輝度
+	 0,		//h
+	 0,		//s
+	100 ,	//v
+	60,		//7セグ輝度
 	20,		//7セグ輝度(減光
 	20,		//7セグ表示更新速度
 };
@@ -51,12 +51,11 @@ static APL_CTRL_SET_PALSE	aplCtrlSetPalse;
 static APL_CTRL_SET_PALSE	aplCtrlSetPalseBak;
 
 #define	HIERARCHY_NUM		((uint8_t)4)
-#define	ITEM_NUM_RGB		((uint8_t)3)
 #define VOLUME_MAX			((uint8_t)100)
 static SETTING_CONTENTS		settingContents3[] = {
-	{ APL_CTRL_STATE_SETTING_COLOR_R	,VOLUME_MAX	, TYPE_VAL	, 5	, NULL	, NULL	, &aplCtrlSet.colorRGB.red		, &aplCtrlSetBak.colorRGB.red	},
-	{ APL_CTRL_STATE_SETTING_COLOR_G	,VOLUME_MAX	, TYPE_VAL	, 5	, NULL	, NULL	, &aplCtrlSet.colorRGB.green	, &aplCtrlSetBak.colorRGB.green	},
-	{ APL_CTRL_STATE_SETTING_COLOR_B	,VOLUME_MAX	, TYPE_VAL	, 5	, NULL	, NULL	, &aplCtrlSet.colorRGB.blue		, &aplCtrlSetBak.colorRGB.blue	}
+	{ APL_CTRL_STATE_SETTING_COLOR_R	,VOLUME_MAX	, TYPE_VAL	, 5	, NULL	, NULL	, &aplCtrlSet.color.h	, &aplCtrlSetBak.color.h	},
+	{ APL_CTRL_STATE_SETTING_COLOR_G	,VOLUME_MAX	, TYPE_VAL	, 5	, NULL	, NULL	, &aplCtrlSet.color.s	, &aplCtrlSetBak.color.s	},
+	{ APL_CTRL_STATE_SETTING_COLOR_B	,VOLUME_MAX	, TYPE_VAL	, 5	, NULL	, NULL	, &aplCtrlSet.color.v	, &aplCtrlSetBak.color.v	}
 };
 
 static SETTING_CONTENTS		settingContents2 [] = {

@@ -26,6 +26,9 @@ void initAplData( void )
 	aplDataEep.bright7seg		= 0;
 	aplDataEep.brightDim7seg	= 0;
 	aplDataEep.dispcyc7seg		= 0;
+	aplDataEep.h				= 0;
+	aplDataEep.s				= 0;
+	aplDataEep.v				= 0;
 }
 //********************************************************************************
 // メイン処理

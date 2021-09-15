@@ -35,6 +35,7 @@ typedef struct {
 	unsigned char	red;
 	unsigned char	green;
 	unsigned char	blue;
+	float			h,s,v;
 	bool			valveChkMode;
 	uint8_t			digitBit;
 	uint8_t			segBit;

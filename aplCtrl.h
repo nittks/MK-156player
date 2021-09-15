@@ -53,15 +53,15 @@ typedef struct {
 
 
 typedef struct{
-	uint8_t		red;
-	uint8_t		green;
-	uint8_t		blue;
-}COLOR_RGB;
+	uint8_t		h;
+	uint8_t		s;
+	uint8_t		v;
+}COLOR;
 
 typedef struct {
 	uint8_t			dspVal;				//設定画面表示値
 	uint8_t			colorNo;
-	COLOR_RGB		colorRGB;
+	COLOR			color;
 	unsigned char	bright7seg;			//調光(7セグ
 	unsigned char	brightDim7seg;		//調光減光(7セグ
 	unsigned char	dispcyc7seg;		//表示更新速度(7セグ

@@ -17,6 +17,9 @@ typedef enum{
 #define		DISPCYC_7SEG_DIGIT			((unsigned short)1)	//1%辺りの周期[10ms](100%で1000ms)
 #define		SPEED_DIGIT		((unsigned char)1)		//1%辺りの表示値
 
+typedef struct{
+	float	h,s,v;
+}stHSV;
 //********************************************************************************
 // テストモード
 //********************************************************************************
@@ -37,16 +40,14 @@ typedef enum{
 //********************************************************************************
 // 設定
 //********************************************************************************
-
-
-COLOR_RGB COLOR_TABLE[SETTING_COLOR_MAX] ={
-	{  30 ,  30 ,  30 },
-	{ 100 ,   0 ,   0 },
-	{  50 ,  50 ,   0 },
-	{   0 , 100 ,   0 },
-	{   0 ,  50 ,  50 },
-	{   0 ,   0 , 100 },
-	{  50 ,   0 ,  50 }};	
+stHSV COLOR_TABLE[SETTING_COLOR_MAX] ={
+	{   0 ,   0 ,   1 },
+	{   0 ,   1 ,   1 },
+	{ 0.16,   1 , 0.5 },
+	{ 0.33,   1 ,   1 },
+	{ 0.50,   1 , 0.5 },
+	{ 0.66,   1 ,   1 },
+	{ 0.83,   1 ,   1 }};	
 
 #define SET_BRIGHT_7SEG_DISP	((unsigned char)180)
 
@@ -58,13 +59,26 @@ COLOR_RGB COLOR_TABLE[SETTING_COLOR_MAX] ={
 
 #define VALVE_CHK_OFFTIME_MS	1000
 #define VALVE_CHK_STEPTIME_MS	40
-#define VALVE_CHK_BRIGHTNESS	100
 
 #define HSV_MAX			1
 #define HSV_CYC_ADD_H	0.005
 #define HSV_CYC_ADD_S	0.01
 #define HSV_CYC_ADD_V	0.01
 #define RGB_MAX			100
+
+typedef enum{
+	HSV_RED,
+	HSV_GREEN,
+	HSV_BLUE,
+	HSV_COLOR_MAX
+}HSV_COLOR;
+
+static stHSV RGB2HSV_TABLE[HSV_COLOR_MAX] = {
+	{ 0		, 1		, 1	},
+	{ 0.33	, 1		, 1 },
+	{ 0.66	, 1		, 1 },
+};
+
 /*
 segRGBsequential
 アニメーションを固定値で持つのと分岐演算で処理するの、どちらが良いか？

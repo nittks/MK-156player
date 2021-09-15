@@ -40,9 +40,9 @@ void lnkOutEepMain( void )
 		outDrvEepWrite.val[i++]	= inAplCtrlSet->brightDim7seg;
 		outDrvEepWrite.val[i++]	= inAplCtrlSet->dispcyc7seg;
 		outDrvEepWrite.val[i++]	= inAplCtrlSet->colorNo;
-		outDrvEepWrite.val[i++]	= inAplCtrlSet->colorRGB.red;
-		outDrvEepWrite.val[i++]	= inAplCtrlSet->colorRGB.green;
-		outDrvEepWrite.val[i++]	= inAplCtrlSet->colorRGB.blue;
+		outDrvEepWrite.val[i++]	= inAplCtrlSet->color.h*100;
+		outDrvEepWrite.val[i++]	= inAplCtrlSet->color.s*100;
+		outDrvEepWrite.val[i++]	= inAplCtrlSet->color.v*100;
 		
 		//sum値計算
 		outDrvEepWrite.val[DRV_EEP_MAP_SUM] = 0;

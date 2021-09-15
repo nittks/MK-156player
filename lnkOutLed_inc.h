@@ -5,6 +5,8 @@
 #define CNT100MSMAX	((unsigned char)20)	//5ms割り込み20回で100ms
 
 #define DOT_ON( inData )	( inData|0x01)		//7セグの点(dot)を表示する
+#define RGB_MAX			((uint8_t)100)
+#define BRIGHT_MAX		((uint8_t)100)
 
 enum{
 	LED_7SEG_0,

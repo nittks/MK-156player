@@ -6,6 +6,8 @@
 #include "aplDispData.h"
 
 static uint8_t positionConvert( uint8_t onSegBit );
+static void convertHSVtoRGB( float  h,float	s,float  v, float* r,float*	g,float* b );
+static void setRgb( float* r,float* g,float* b,float val_0,float val_1,float val_2);
 //********************************************************************************
 // 初期化
 //********************************************************************************
@@ -20,6 +22,7 @@ void lnkOutLedMain( void )
 	APL_DISP_DATA		*inAplDispData;
 	DRV_LED_7SEG_DATA	outDrvLed7SegData;
 	uint8_t				i;
+	float				red,green,blue;
 
 	inAplDispData = getAplDispData();
 	
@@ -37,9 +40,13 @@ void lnkOutLedMain( void )
 			outDrvLed7SegData.val[i] = led7SegBit[ inAplDispData->led7Seg[i] ];
 		}
 	}
-	outDrvLed7SegData.brightRed		= inAplDispData->red  * ((float)inAplDispData->bright7seg/100);
-	outDrvLed7SegData.brightGreen	= inAplDispData->green* ((float)inAplDispData->bright7seg/100);
-	outDrvLed7SegData.brightBlue	= inAplDispData->blue * ((float)inAplDispData->bright7seg/100);
+	
+	convertHSVtoRGB(	inAplDispData->h ,inAplDispData->s ,inAplDispData->v * ((float)inAplDispData->bright7seg / BRIGHT_MAX),
+						&red ,&green ,&blue	);
+
+	outDrvLed7SegData.brightRed		= red  * RGB_MAX;
+	outDrvLed7SegData.brightGreen	= green* RGB_MAX;
+	outDrvLed7SegData.brightBlue	= blue * RGB_MAX;
 
 	setDrvOutSerialLed7seg( &outDrvLed7SegData );
 }
@@ -62,4 +69,52 @@ static uint8_t positionConvert( uint8_t onSegBit )
 		((( onSegBit >> 3 ) & 0x01) << 6 ) ;
 
 	return( segBit );
+}
+
+//********************************************************************************
+// HSV -> RGB変換
+// 参考：検索ヒットした複数サイト。最終的にはwikiベース
+// https://ja.wikipedia.org/wiki/HSV%E8%89%B2%E7%A9%BA%E9%96%93
+//********************************************************************************
+static void convertHSVtoRGB(
+	float  h,float	s,float  v,
+	float* r,float*	g,float* b
+){
+	float	f,calcA,calcB,calcC,calcD;
+	int		i;
+	
+	if( s <= 0 ){
+		*r = *g = *b = v;
+	}else{
+		h	*= 6;
+		i	= (int)h;
+		f	= h - (float)i;
+		
+		calcA	= v;
+		calcB	= v * (1-s);
+		calcC	= v * (1-s*f);
+		calcD	= v * (1-s*(1-f));	
+		
+		switch(i){
+			case 0:	setRgb( r,g,b,  calcA,calcD,calcB );	break;
+			case 1:	setRgb( r,g,b,  calcC,calcA,calcB );	break;
+			case 2:	setRgb( r,g,b,  calcB,calcA,calcD );	break;
+			case 3:	setRgb( r,g,b,  calcB,calcC,calcA );	break;
+			case 4:	setRgb( r,g,b,  calcD,calcB,calcA );	break;
+			case 5:	setRgb( r,g,b,  calcA,calcB,calcC );	break;
+			default:break;
+		}
+	}
+}
+static void setRgb(
+	float*	r,
+	float*	g,
+	float*	b,
+	float	val_0,
+	float	val_1,
+	float	val_2
+){
+	*r	= val_0;
+	*g	= val_1;
+	*b	= val_2;
 }
