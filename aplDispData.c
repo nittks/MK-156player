@@ -375,9 +375,9 @@ static bool allSegRGBGradation( void )
 	static	uint16_t	cntTimeMs = 0;
 		
 	// vshの順で0.00~1.00まで加算する
-	if( v < HSV_MAX ){
+	if( v < HSV_V_MAX ){
 		v += HSV_CYC_ADD_V;
-		v = ( v > HSV_MAX )? HSV_MAX : v;
+		v = ( v > HSV_V_MAX )? HSV_V_MAX : v;
 	}else if( s < HSV_MAX ){
 		s += HSV_CYC_ADD_S;
 		s = ( s > HSV_MAX )? HSV_MAX : s;

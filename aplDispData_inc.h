@@ -41,13 +41,13 @@ typedef enum{
 // 設定
 //********************************************************************************
 stHSV COLOR_TABLE[SETTING_COLOR_MAX] ={
-	{   0 ,   0 ,   1 },
+	{   0 ,   0 , 0.33 },
 	{   0 ,   1 ,   1 },
 	{ 0.16,   1 , 0.5 },
 	{ 0.33,   1 ,   1 },
 	{ 0.50,   1 , 0.5 },
 	{ 0.66,   1 ,   1 },
-	{ 0.83,   1 ,   1 }};	
+	{ 0.83,   1 , 0.5 }};	
 
 #define SET_BRIGHT_7SEG_DISP	((unsigned char)180)
 
@@ -61,6 +61,7 @@ stHSV COLOR_TABLE[SETTING_COLOR_MAX] ={
 #define VALVE_CHK_STEPTIME_MS	40
 
 #define HSV_MAX			1
+#define HSV_V_MAX		0.4
 #define HSV_CYC_ADD_H	0.005
 #define HSV_CYC_ADD_S	0.01
 #define HSV_CYC_ADD_V	0.01
