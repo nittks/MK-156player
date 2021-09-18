@@ -220,8 +220,8 @@ void interSetTxBuffer(void)
 		CCL_CTRLA &= ~CCL_ENABLE_bm;	//CCL有効時はレジスタ変更ロックがかかるため、先に解除する
 		switch( idxTxDigit ){
 			case 0:	CCL.LUT0CTRLA |= (CCL_OUTEN_bm | CCL_ENABLE_bm);	break;
-			case 1:	CCL.LUT3CTRLA |= (CCL_OUTEN_bm | CCL_ENABLE_bm);	break;
-			case 2:	CCL.LUT2CTRLA |= (CCL_OUTEN_bm | CCL_ENABLE_bm);	break;
+			case 1:	CCL.LUT2CTRLA |= (CCL_OUTEN_bm | CCL_ENABLE_bm);	break;
+			case 2:	CCL.LUT3CTRLA |= (CCL_OUTEN_bm | CCL_ENABLE_bm);	break;
 			default:break;
 		}
 		CCL_CTRLA |= CCL_ENABLE_bm;
@@ -252,12 +252,12 @@ void interChangeNextCCLPort( void ){
 			CCL.LUT0CTRLA &= (~CCL_OUTEN_bm);
 		break;
 		case 1:	
-			CCL.LUT3CTRLA &= (~CCL_ENABLE_bm);
-			CCL.LUT3CTRLA &= (~CCL_OUTEN_bm);
-		break;
-		case 2:	
 			CCL.LUT2CTRLA &= (~CCL_ENABLE_bm);
 			CCL.LUT2CTRLA &= (~CCL_OUTEN_bm);
+		break;
+		case 2:	
+			CCL.LUT3CTRLA &= (~CCL_ENABLE_bm);
+			CCL.LUT3CTRLA &= (~CCL_OUTEN_bm);
 		break;
 		default:
 			break;
