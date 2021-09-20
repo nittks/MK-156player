@@ -130,17 +130,8 @@ void drvOutSerialLedMain( void )
 	uint8_t		chkBit;
 	uint8_t		isLedUpdateChk;
 
-	//起動後一定時間は、消灯指示を送り続ける
-	if( cntStartupTime <= LED_STARTUP_TIME ){
-		cntStartupTime++;
-			
-		digitUpdateFlag	= (uint8_t)pow(2,LED_7SEG_DIGIT_NUM) -1;
-		idxTxDigit	= 0;
-		idxTxData	= 0;
-		USART0.CTRLA |= USART_DREIE_bm;
-			
-		return;
-	}
+	//起動後一定時間は、消灯指示を送り続けるのは
+	//LEDが固まる？ので削除。
 	
 	//LED点灯指示に変化があれば、送信データを準備する
 	//ネストが少し嫌
@@ -179,10 +170,10 @@ static uint8_t isLedUpdate( void )
 	
 	retUpdate = false;
 	digitUpdateFlag= 0;
-	if(	(drvLed7SegData.brightRed	!= drvLed7SegDataPre.brightRed) |
-		(drvLed7SegData.brightGreen	!= drvLed7SegDataPre.brightGreen) |
-		(drvLed7SegData.brightBlue	!= drvLed7SegDataPre.brightBlue)
-	){
+		if(	(drvLed7SegData.brightRed	!= drvLed7SegDataPre.brightRed) |
+			(drvLed7SegData.brightGreen	!= drvLed7SegDataPre.brightGreen) |
+			(drvLed7SegData.brightBlue	!= drvLed7SegDataPre.brightBlue)
+		){
 		//色が変更されていたら全て更新
 		digitUpdateFlag	= (uint8_t)pow(2,LED_7SEG_DIGIT_NUM) -1;
 

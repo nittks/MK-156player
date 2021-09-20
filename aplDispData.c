@@ -308,6 +308,7 @@ static bool segRGBsequential( void )
 		firstPosDigitSeg();
 		nextColor();
 	}else if( cntTimeMs % VALVE_CHK_STEPTIME_MS == 0 ){
+		PORTD.OUTTGL	= 0x60;
 		endFlag = nextSegDigitColor();		//終了時間は規定しないため、工程終了した時点でendとする。
 	}
 	cntTimeMs += CYC_TIME_MS;

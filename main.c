@@ -1,5 +1,5 @@
 /*
- * periodTask.c
+ * 
  *
  * Created: 2016/05/06 8:25:08
  *  Author: sin
@@ -7,8 +7,8 @@
 
 /*
 定期タスク
-MPU		:ATmega328
-clock	:内蔵8MHz
+MPU		:ATmega3208
+clock	:内蔵20MHz
 */
 
 #include "main.h"
@@ -29,7 +29,10 @@ clock	:内蔵8MHz
 
 #define INT_CNT_MAX	((unsigned char)125)	//8us*125=1ms毎割り込み
 
+static uint16_t		waitBootTimeCntMs=0;
+
 static void mainTask( void );
+static void waitLedBoot( void );
 static void initReg( void );
 static void initTaskTimer( void );
 //********************************************************************************
@@ -39,6 +42,9 @@ int main(void)
 {
 	initMain();
 
+	waitLedBoot();		//送信が早すぎるとSerialLEDへが固まる。
+						//また、電源ON->OFF->ONが早すぎるとON時に点灯する。電源電荷を抜きたい(回路変更したい)
+	
 	while(1)
 	{
 		//処理したらスリープ。タイマ割り込みで起きたら再度ループ開始
@@ -53,7 +59,7 @@ int main(void)
 void initMain( void )
 {
 	initReg();
-
+	
 	initDrvIn();
 	initLnkIn();
 	initApl();
@@ -69,7 +75,7 @@ void initMain( void )
 static void mainTask( void )
 {
 	unsigned char	i;
-	
+	//PORTD.OUTTGL	= 0x40;
 	//処理タスク実行時間チェック
 	for( i=0; i<TASK_MAX ; i++){
 		if( taskParameter[i].regist == true ){	//タスク有効
@@ -79,12 +85,21 @@ static void mainTask( void )
 				//リセット
 				taskParameter[i].currentTime = taskParameter[i].cycleTime; 
 				//タスク実行
+
+				//PORTD.OUTTGL	= 0x20;
 				taskParameter[i].func();
+				//PORTD.OUTTGL	= 0x20;
 			}
 		}
 	}
 }
 
+static void waitLedBoot( void )
+{
+	while( waitBootTimeCntMs < LED_BOOT_TIME_MS ){
+		set_sleep_mode(SLEEP_MODE_IDLE);
+	}
+}
 
 //********************************************************************************
 // タスク時間カウント
@@ -98,6 +113,10 @@ void interTaskTime( void )
 //	PORTF.OUTTGL	= (PIN4_bm);
 	
 	TCA0.SINGLE.INTFLAGS |= TCA_SINGLE_OVF_bm;
+
+	if( waitBootTimeCntMs < LED_BOOT_TIME_MS ){
+		waitBootTimeCntMs++;
+	}
 
 	//処理タスク実行時間チェック
 	for( i=0; i<TASK_MAX ; i++){
@@ -147,10 +166,16 @@ static void initReg(void)
 	
 	
 		//I/O設定
-	PORTA.DIR	= 0x00;
+	PORTA.DIR	= 0x08;
 	PORTC.DIR	= 0x00;
-	PORTD.DIR	= 0x00;
-	PORTE.DIR	= 0x00;
+	PORTD.DIR	= 0x68;
+	PORTF.DIR	= 0x08;
+	
+	PORTA.OUT	= 0x00;
+	PORTC.OUT	= 0x00;
+	PORTD.OUT	= 0x00;
+	PORTF.OUT	= 0x00;
+	
 
 	PORTA.PIN0CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
 	PORTA.PIN1CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
@@ -171,18 +196,18 @@ static void initReg(void)
 	PORTD.PIN2CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
 	PORTD.PIN3CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
 	PORTD.PIN4CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
-	PORTD.PIN5CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
-	PORTD.PIN6CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
+	PORTD.PIN5CTRL	= (0<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
+	PORTD.PIN6CTRL	= (0<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
 	PORTD.PIN7CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
 
-	PORTE.PIN0CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
-	PORTE.PIN1CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
-	PORTE.PIN2CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
-	PORTE.PIN3CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
-	PORTE.PIN4CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
-	PORTE.PIN5CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
-	PORTE.PIN6CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
-	PORTE.PIN7CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
+	PORTF.PIN0CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
+	PORTF.PIN1CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
+	PORTF.PIN2CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
+	PORTF.PIN3CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
+	PORTF.PIN4CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
+	PORTF.PIN5CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
+	PORTF.PIN6CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
+	PORTF.PIN7CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
 	
 	//割り込み許可
 	sei();
