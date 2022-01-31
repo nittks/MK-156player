@@ -1,4 +1,5 @@
 #include <avr/io.h>
+#include <assert.h>
 
 #include "lnkInCom_inc.h"
 #include "lnkInCom.h"
@@ -16,9 +17,12 @@ void lnkInComMain( void )
 	DRV_UART_RX		*inDrvUartRx;
 	APL_DATA_CAR	aplDataCar;
 	unsigned char	i;
-	unsigned char	sum;
+	volatile unsigned char	sum;
 	
 	inDrvUartRx = getDrvUartRx();
+	if( inDrvUartRx == NULL ){
+		return;
+	}
 
 	sum=0;
 	for( i=0 ; i<inDrvUartRx->rxDataNum-1 ; i++ ){

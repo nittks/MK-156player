@@ -100,7 +100,6 @@ void aplDispDataMain( void )
 			aplDispData.s	= COLOR_TABLE[inAplCtrlSet->colorNo].s;
 			aplDispData.v	= COLOR_TABLE[inAplCtrlSet->colorNo].v;
 		}
-		
 	}
 	
 	//------------------------------
@@ -131,8 +130,8 @@ void aplDispDataMain( void )
 			}
 			break;
 		case DISP_STATE_NORMAL:
-			//dispSpeed( &aplDispData.led7Seg[0] , inAplDataCar->speed );
-			dispSpeed( &aplDispData.led7Seg[0] , debugSpeed );
+			dispSpeed( &aplDispData.led7Seg[0] , inAplDataCar->speed );
+//			dispSpeed( &aplDispData.led7Seg[0] , debugSpeed );
 			break;
 		default:
 			break;

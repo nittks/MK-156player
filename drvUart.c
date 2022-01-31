@@ -33,27 +33,17 @@ static unsigned char	rxDataCnt;			//URATデータ長カウンタ
 static unsigned char	rxDataLen;			//UARTフレームより取得したフレームレングス
 static unsigned char	rxFlag;
 
+static int8_t USART_1_init();
+
 //********************************************************************************//
 // 初期化
 //********************************************************************************//
 void initDrvUart( void )
 {
 	unsigned char	i;
+	
+	USART_1_init();
 
-	/* 周波数誤差保証 参照元：mega3209.pdf 日本語版 P.48,158 */
-	/* 工場で格納された周波数誤差でのボーレート補償 */
-	/* 自動ボーレート(同期領域)なしでの非同期通信 */
-	int8_t sigrow_val = SIGROW.OSC16ERR5V; // 符号付き誤差取得
-	int32_t baud_reg_val = (64*(F_CPU/8))/(16*USEBAUD);		//少数切り捨て (64*fCLK_PRE)/(S*fBAUD) 
-	assert (baud_reg_val >= 0x4A); // 負の最大比較で正当な最小BAUDレジスタ値を確認
-	baud_reg_val *= (1024 + sigrow_val); // (分解能+誤差)で乗算
-	baud_reg_val /= 1024; // 分解能で除算
-	USART1.BAUD = (int16_t) baud_reg_val; // 補正したボーレート設定
-
-	USART1.CTRLA	= SET_CTRLA( RS485_AUTO_XDIR_ON , RS485_AUTO_TX_OUTPUT_OFF );
-	USART1.CTRLB	= USART_RXEN_bm | USART_TXEN_bm | USART_RXMODE_NORMAL_gc;
-	USART1.CTRLC	= USART_CMODE_ASYNCHRONOUS_gc | USART_PMODE_DISABLED_gc | 
-					  USART_SBMODE_2BIT_gc | USART_CHSIZE_8BIT_gc;
 	//送信
 	for( i=0 ; i<DRV_UART_RX_BUF_SIZE; i++ ){
 		drvUartTx.txData[i]	= 0;
@@ -76,13 +66,60 @@ void initDrvUart( void )
 
 	//送受信許可
 	EN_UART_TX;
-	EN_UART_RX;
+//	EN_UART_RX;
 //	UCSR0B	= (1<<TXEN0);
 
 	//受信完了割込み許可
 	uartState		= UART_STATE_STANDBY;
 	EN_INTER_UART_RX_COMP;
 }
+static int8_t USART_1_init()
+{
+	/* 周波数誤差保証 参照元：mega3209.pdf 日本語版 P.48,158 */
+	/* 工場で格納された周波数誤差でのボーレート補償 */
+	/* 自動ボーレート(同期領域)なしでの非同期通信 */
+	
+volatile	int8_t sigrow_val = SIGROW.OSC20ERR5V; // 符号付き誤差取得
+volatile	int32_t baud_reg_val = (uint16_t)USART1_BAUD_RATE(9600);
+	
+	assert (baud_reg_val >= 0x4A); // 負の最大比較で正当な最小BAUDレジスタ値を確認
+	baud_reg_val *= (1024 + sigrow_val); // (分解能+誤差)で乗算
+	baud_reg_val /= 1024; // 分解能で除算
+	USART1.BAUD = (int16_t) baud_reg_val; // 補正したボーレート設定
+
+	USART1.CTRLA = 0
+//			  0 << USART_ABEIE_bp /* Auto-baud Error Interrupt Enable: disabled */
+//			 | 1 << USART_DREIE_bp /* Data Register Empty Interrupt Enable: disabled */
+//			 | 0 << USART_LBME_bp /* Loop-back Mode Enable: disabled */
+			 | USART_RS485_EXT_gc /* RS485 Mode disabled */
+			 | 0 << USART_RXCIE_bp /* Receive Complete Interrupt Enable: disabled */
+//			 | 0 << USART_RXSIE_bp /* Receiver Start Frame Interrupt Enable: disabled */
+//			 | 1 << USART_TXCIE_bp; /* Transmit Complete Interrupt Enable: disabled */
+;
+	USART1.CTRLB = 0 << USART_MPCM_bp       /* Multi-processor Communication Mode: disabled */
+//	               | 0 << USART_ODME_bp     /* Open Drain Mode Enable: disabled */
+	               | 1 << USART_RXEN_bp     /* Receiver Enable: enabled */
+	               | USART_RXMODE_NORMAL_gc /* Normal mode */
+//	               | 0 << USART_SFDEN_bp    /* Start Frame Detection Enable: disabled */
+	               | 1 << USART_TXEN_bp;    /* Transmitter Enable: enabled */
+
+	USART1.CTRLC = USART_CMODE_ASYNCHRONOUS_gc /* Asynchronous Mode */
+			 | USART_CHSIZE_8BIT_gc /* Character size: 8 bit */
+			 | USART_PMODE_DISABLED_gc /* No Parity */
+			 | USART_SBMODE_2BIT_gc; /* 1 stop bit */
+
+	// USART1.DBGCTRL = 0 << USART_DBGRUN_bp; /* Debug Run: disabled */
+
+	// USART1.EVCTRL = 0 << USART_IREI_bp; /* IrDA Event Input Enable: disabled */
+
+	// USART1.RXPLCTRL = 0x0 << USART_RXPL_gp; /* Receiver Pulse Length: 0x0 */
+
+	// USART1.TXPLCTRL = 0x0 << USART_TXPL_gp; /* Transmit pulse length: 0x0 */
+
+	return 0;
+}
+
+
 
 //********************************************************************************//
 // 送信セット
@@ -147,8 +184,15 @@ void interUartTxFin(void)
 //********************************************************************************//
 DRV_UART_RX *getDrvUartRx( void )
 {
-	rxFlag = false;
-	return( &drvUartRx );
+	DRV_UART_RX*	ret;
+	
+	if( rxFlag == false ){
+		ret = NULL;
+	}else{
+		ret = &drvUartRx;
+		rxFlag = false;
+	}
+	return( ret );
 }
 
 
@@ -211,7 +255,9 @@ void interGetUartRxData(void)
 					}
 					//Lnk取得用配列へコピー
 					memcpy( &drvUartRx.rxData[0] , &rxDataBuf[0] , rxDataCnt);
+					drvUartRx.rxDataNum	= rxDataCnt;
 					rxDataCnt = 0;
+					rxFlag = true;
 				}
 			}
 		}else{

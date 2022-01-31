@@ -4,6 +4,8 @@
 #include "main.h"
 
 #define USEBAUD	((unsigned short)9600)
+#define USART1_BAUD_RATE(BAUD_RATE) ((float)(F_CPU * 64 / (16 * (float)BAUD_RATE)) + 0.5)
+
 //----------------------------------------
 // 全体
 //----------------------------------------
@@ -24,7 +26,7 @@ enum{
 	RXMODE_GENAUTO	= 0x2,
 	RXMODE_LINAUTO	= 0x3,
 };
-#define	SET_CTRLA( xdir , txd )		( (USART1.CTRLA & (~USART_RS485_gm)) | (( xdir << USART_RS4851_bp ) | (txd << USART_RS4850_bp)))
+#define	SET_CTRLA( xdir , txd )		( (USART1.CTRLA & (~USART_RS485_gm)) | (( txd << USART_RS4851_bp ) | ( xdir << USART_RS4850_bp)))
 #define	SET_CTRLB( rxmode )			( (USART1.CTRLB & USART_RXMODE_gm) | ( rxmode << USART_RXMODE_gp ))
 
 enum{

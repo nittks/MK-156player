@@ -10,7 +10,7 @@ typedef struct{
 
 
 static void powerLed( void );
-#define LED_BOOT_TIME_MS	((uint16_t)100)
+#define LED_BOOT_TIME_MS	((uint16_t)1)
 #define	TASK_NUM	7
 // main_inc.hに記述するとsim実行時に値がセットされなくなったため、.cへ移動
 // IEDverが変わったため？AtmelStudio6->7

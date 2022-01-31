@@ -40,16 +40,17 @@ static void initTaskTimer( void );
 //********************************************************************************
 int main(void)
 {
+	uint8_t		usartrx;
 	initMain();
 
 	waitLedBoot();		//送信が早すぎるとSerialLEDへが固まる。
 						//また、電源ON->OFF->ONが早すぎるとON時に点灯する。電源電荷を抜きたい(回路変更したい)
-	
 	while(1)
 	{
 		//処理したらスリープ。タイマ割り込みで起きたら再度ループ開始
 		mainTask();
 		set_sleep_mode(SLEEP_MODE_IDLE);
+
 	}
 }
 
@@ -65,7 +66,7 @@ void initMain( void )
 	initApl();
 	initLnkOut();
 	initDrvOut();
-	
+
 	initTaskTimer();
 	
 //	for( i=0 ; i<TASK_NUM ; i++ ){
@@ -86,9 +87,9 @@ static void mainTask( void )
 				taskParameter[i].currentTime = taskParameter[i].cycleTime; 
 				//タスク実行
 
-				//PORTD.OUTTGL	= 0x20;
+//				PORTD.OUT	|= 0x40;
 				taskParameter[i].func();
-				//PORTD.OUTTGL	= 0x20;
+//				PORTD.OUT	&= (~0x40);
 			}
 		}
 	}
@@ -116,15 +117,16 @@ void interTaskTime( void )
 
 	if( waitBootTimeCntMs < LED_BOOT_TIME_MS ){
 		waitBootTimeCntMs++;
-	}
+	}else{
 
-	//処理タスク実行時間チェック
-	for( i=0; i<TASK_MAX ; i++){
-		if( taskParameter[i].regist == true ){	//登録有効タスクのみ
+		//処理タスク実行時間チェック
+		for( i=0; i<TASK_MAX ; i++){
+			if( taskParameter[i].regist == true ){	//登録有効タスクのみ
 
-			//10msで1カウントダウン。
-			if( taskParameter[i].currentTime > 0 ){
-				taskParameter[i].currentTime--;
+				//10msで1カウントダウン。
+				if( taskParameter[i].currentTime > 0 ){
+					taskParameter[i].currentTime--;
+				}
 			}
 		}
 	}
@@ -164,50 +166,52 @@ static void initReg(void)
 	CLKCTRL.MCLKCTRLB	= 0;
 	CLKCTRL.MCLKCTRLA	= CLKCTRL_CLKSEL_OSC20M_gc;
 	
+	//PORTA.OUT	= 0x00;
+	//PORTC.OUT	= 0x00;
+	//PORTD.OUT	= 0x00;
+	//PORTF.OUT	= 0x00;
 	
-		//I/O設定
-	PORTA.DIR	= 0x08;
-	PORTC.DIR	= 0x00;
-	PORTD.DIR	= 0x68;
-	PORTF.DIR	= 0x08;
+	//I/O設定
+	PORTA.DIRSET	= 0x08;
+	PORTC.DIRSET	= 0x09;
+	PORTD.DIRSET	= 0x68;
+	PORTF.DIRSET	= 0x08;
 	
-	PORTA.OUT	= 0x00;
-	PORTC.OUT	= 0x00;
-	PORTD.OUT	= 0x00;
-	PORTF.OUT	= 0x00;
+	PORTC.DIRCLR	= 0x06;
+
 	
 
-	PORTA.PIN0CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
-	PORTA.PIN1CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
-	PORTA.PIN2CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
-	PORTA.PIN3CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
-	PORTA.PIN4CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
-	PORTA.PIN5CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
-	PORTA.PIN6CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
-	PORTA.PIN7CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
+	PORTA.PIN0CTRL	= (1<<PORT_PULLUPEN_bp);
+	PORTA.PIN1CTRL	= (1<<PORT_PULLUPEN_bp);
+	PORTA.PIN2CTRL	= (1<<PORT_PULLUPEN_bp);
+	PORTA.PIN3CTRL	= (1<<PORT_PULLUPEN_bp);
+	PORTA.PIN4CTRL	= (1<<PORT_PULLUPEN_bp);
+	PORTA.PIN5CTRL	= (1<<PORT_PULLUPEN_bp);
+	PORTA.PIN6CTRL	= (1<<PORT_PULLUPEN_bp);
+	PORTA.PIN7CTRL	= (1<<PORT_PULLUPEN_bp);
 
-	PORTC.PIN0CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
-	PORTC.PIN1CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
-	PORTC.PIN2CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
-	PORTC.PIN3CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
+	PORTC.PIN0CTRL	= (0<<PORT_PULLUPEN_bp);
+	PORTC.PIN1CTRL	= (0<<PORT_PULLUPEN_bp);
+	PORTC.PIN2CTRL	= (0<<PORT_PULLUPEN_bp);
+	PORTC.PIN3CTRL	= (0<<PORT_PULLUPEN_bp);
 
-	PORTD.PIN0CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
-	PORTD.PIN1CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
-	PORTD.PIN2CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
-	PORTD.PIN3CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
-	PORTD.PIN4CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
-	PORTD.PIN5CTRL	= (0<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
-	PORTD.PIN6CTRL	= (0<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
-	PORTD.PIN7CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
+	PORTD.PIN0CTRL	= (1<<PORT_PULLUPEN_bp);
+	PORTD.PIN1CTRL	= (1<<PORT_PULLUPEN_bp);
+	PORTD.PIN2CTRL	= (1<<PORT_PULLUPEN_bp);
+	PORTD.PIN3CTRL	= (1<<PORT_PULLUPEN_bp);
+	PORTD.PIN4CTRL	= (1<<PORT_PULLUPEN_bp);
+	PORTD.PIN5CTRL	= (0<<PORT_PULLUPEN_bp);
+	PORTD.PIN6CTRL	= (0<<PORT_PULLUPEN_bp);
+	PORTD.PIN7CTRL	= (1<<PORT_PULLUPEN_bp);
 
-	PORTF.PIN0CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
-	PORTF.PIN1CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
-	PORTF.PIN2CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
-	PORTF.PIN3CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
-	PORTF.PIN4CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
-	PORTF.PIN5CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
-	PORTF.PIN6CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
-	PORTF.PIN7CTRL	= (1<<PORT_PULLUPEN_bp) | PORT_ISC_INPUT_DISABLE_gc;
+	PORTF.PIN0CTRL	= (1<<PORT_PULLUPEN_bp);
+	PORTF.PIN1CTRL	= (1<<PORT_PULLUPEN_bp);
+	PORTF.PIN2CTRL	= (1<<PORT_PULLUPEN_bp);
+	PORTF.PIN3CTRL	= (1<<PORT_PULLUPEN_bp);
+	PORTF.PIN4CTRL	= (1<<PORT_PULLUPEN_bp);
+	PORTF.PIN5CTRL	= (1<<PORT_PULLUPEN_bp);
+	PORTF.PIN6CTRL	= (1<<PORT_PULLUPEN_bp);
+	PORTF.PIN7CTRL	= (1<<PORT_PULLUPEN_bp);
 	
 	//割り込み許可
 	sei();
