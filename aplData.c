@@ -1,3 +1,5 @@
+#include <avr/io.h>
+#include <stdbool.h>
 
 #include "aplData.h"
 #include "aplData_inc.h"
@@ -13,6 +15,10 @@ static APL_DATA_EEP		aplDataEep;
 //********************************************************************************
 void initAplData( void )
 {
+	
+	aplDataCar.rx				= false;
+	aplDataCar.sumerr			= false;
+	
 	aplDataCar.ig				= APL_DATA_IG_OFF;
 	aplDataCar.acc				= APL_DATA_ACC_OFF;
 	aplDataCar.ill				= APL_DATA_ILL_OFF;

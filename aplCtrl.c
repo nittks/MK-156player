@@ -11,10 +11,13 @@
 static APL_CTRL				aplCtrl;
 static APL_CTRL_SET_PALSE	aplCtrlSetPalseBak;
 static APL_CTRL_SETTING		aplCtrlSetting;
+static APL_CTRL_ERR_FLAG	aplCtrlErrFlag;		//フラグ？フラグで良い？state list 
+static ERR_TIMER			errTimer;
 
 static void stateJudge( void );
 static void judgeSetting( void );
 static void procSetting( void );
+static void judgeErr( void );
 static void chkSetPalse( void );
 static void apryEep( void );
 //********************************************************************************
@@ -28,7 +31,13 @@ void initAplCtrl( void )
 	aplCtrlSetPalse.speed	= INIT_PALSE_SPEED;
 	aplCtrlSetPalse.rev		= INIT_PALSE_REV;
 	
-	aplCtrlSetting			= aplCtrlSetting_new( settingContents0 ,  HIERARCHY_NUM );	
+	aplCtrlSetting			= aplCtrlSetting_new( settingContents0 ,  HIERARCHY_NUM );
+	
+	aplCtrlErrFlag.rx		= false;
+	aplCtrlErrFlag.sum		= false;
+	
+	errTimer.rx				= 0;
+	errTimer.sum			= 0;
 }
 //********************************************************************************
 // 制御状態取得
@@ -50,6 +59,13 @@ APL_CTRL_SET *getAplCtrlSet( void )
 APL_CTRL_SET_PALSE *getAplCtrlSetPalse( void )
 {
 	return( &aplCtrlSetPalse );
+}
+//********************************************************************************
+// 異常状態取得
+//********************************************************************************
+APL_CTRL_ERR_FLAG *getAplCtrlErrFlag( void )
+{
+	return( &aplCtrlErrFlag );
 }
 //********************************************************************************
 // メイン処理
@@ -76,6 +92,8 @@ static void stateJudge( void )
 	inAplDataSw		= getAplDataSw();
 	inAplDataEep	= getAplDataEep();
 
+	judgeErr();
+	
 	switch( aplCtrl.state ){
 	//****************************************
 	// 初回起動
@@ -195,6 +213,34 @@ void procSetting( void )
 	aplCtrl.stateSet	= (APL_CTRL_STATE_SET)aplCtrlSetting->getState(aplCtrlSetting);
 }
 
+static void judgeErr( void )
+{
+	APL_DATA_CAR	*inAplDataCar	= getAplDataCar();
+	
+	// 通信途絶
+	if( inAplDataCar->rx == false ){
+		errTimer.rx++;
+		if( errTimer.rx >= ERR_TABLE.rx ){
+			aplCtrlErrFlag.rx	= true;
+		}
+	}else{
+		errTimer.rx			= 0;
+		aplCtrlErrFlag.rx	= false;
+	}
+	
+	// 通信SUMエラー
+	if( ( inAplDataCar->rx == true ) &&
+		( inAplDataCar->sumerr = true )
+	){
+		errTimer.sum++;
+		if( errTimer.sum >= ERR_TABLE.sum ){
+			aplCtrlErrFlag.sum	= true;
+		}
+	}else{
+		errTimer.sum		= 0;
+		aplCtrlErrFlag.sum	= false;
+	}	
+}
 //********************************************************************************
 // パルス仕様設定変更チェック&変更要求
 //********************************************************************************

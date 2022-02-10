@@ -18,6 +18,9 @@ enum{
 };
 
 typedef struct{
+	unsigned char	rx;
+	unsigned char	sumerr;
+	
 	unsigned char	speed;
 	unsigned short	rev;
 	unsigned char	palseSetSpeed;

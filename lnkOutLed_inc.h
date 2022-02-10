@@ -1,6 +1,8 @@
 #ifndef LNK_OUT_LED_INC_H
 #define LNK_OUT_LED_INC_H
 
+#include "aplDispData.h"
+
 #define CNTMAX		((unsigned char)10)	//8bit
 #define CNT100MSMAX	((unsigned char)20)	//5ms割り込み20回で100ms
 
@@ -39,5 +41,13 @@ static const unsigned char	led7SegBit[LED_7SEG_MAX]={
 	0b00011111,
 	0b00000000,
 };
+
+// 結線順序やミラ反転をしてないため、positionConvertで入れ替える
+// [0]を百の位に表示する
+static const uint8_t errSeg[APL_DISP_DATA_ERR_MAX][LED_7SEG_DIGIT_NUM] = {
+	{ 0b00111001 , 0b00111111 , 0b00110111 },	//COM
+	{ 0b01101101 , 0b00111110 , 0b00110111 }	//SUM
+};
+
 
 #endif

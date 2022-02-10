@@ -5,6 +5,8 @@
 #include "aplCtrl.h"
 #include "aplCtrlSetting.h"
 
+#define		TASK_CYC_MS				((uint8_t)10)
+
 #define		SETTING_VAL_MAX			((unsigned char)100)
 #define		SETTING_VAL_MIN			((unsigned char)0)
 #define		SETTING_VAL_DEF			((unsigned char)50)		//デフォルト値(EEPROM読み込みエラー時
@@ -92,4 +94,20 @@ static SETTING_CONTENTS		settingContents0[1] ={
 	{ APL_CTRL_STATE_SETTING_ROOT	, (sizeof(settingContents1)/sizeof(SETTING_CONTENTS)-1)
 																, TYPE_ITEM	, 1	, NULL	, &settingContents1[0]	, NULL	, NULL	}
 };
+
+
+
+typedef struct{
+	uint16_t	rx;
+	uint16_t	sum;
+}ERR_TIMER;
+
+ERR_TIMER ERR_TABLE	= {
+	( 5 * 1000 / TASK_CYC_MS ),
+	( 3 * 1000 / TASK_CYC_MS )
+};
+
+
+
+
 #endif

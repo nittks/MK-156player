@@ -26,6 +26,7 @@ static void dispSpeed(	unsigned char *retSpeed	, const unsigned char  inSpeed	);
 static void disp7seg(	unsigned char *retSpeed	, const unsigned char  inSpeed	);
 static unsigned char	makeTestDataSpeed( void );
 static unsigned char	makeTestDataSpeedManual( void );
+static bool isErr( void );
 static bool valveChk( void );
 static bool segRGBsequential( void );
 static bool allSegRGBGradation( void );
@@ -46,13 +47,14 @@ void initAplDispData( void )
 		aplDispData.led7Seg[i]	= APL_DSP_DATA_7SEG_BLANK;
 	}
 	
-	aplDispData.h		= 0;
+	aplDispData.h	= 0;
 	aplDispData.s	= 0;
 	aplDispData.v	= 0;
-	aplDispData.h		= 0;
-	aplDispData.s		= 0;
-	aplDispData.v		= 0;
-	aplDispData.valveChkMode	= true;
+	aplDispData.h	= 0;
+	aplDispData.s	= 0;
+	aplDispData.v	= 0;
+	aplDispData.mode	= APL_DISP_DATA_MODE_VALVE_CHK;
+	aplDispData.errNo	= APL_DISP_DATA_ERR_RX;
 
 	dispCycSpeed	= 0;
 
@@ -124,14 +126,29 @@ void aplDispDataMain( void )
 	case APL_CTRL_STATE_NOMARL:		//通常
 		switch( dispState ){
 		case DISP_STATE_VALVE_CHK:
+			aplDispData.mode	= APL_DISP_DATA_MODE_VALVE_CHK;
 			if( valveChk() == VALVE_CHK_END ){		//valveChk()が値取得のみのように見えそう
-				aplDispData.valveChkMode = false;
 				dispState	= DISP_STATE_NORMAL;
 			}
 			break;
 		case DISP_STATE_NORMAL:
-			dispSpeed( &aplDispData.led7Seg[0] , inAplDataCar->speed );
-//			dispSpeed( &aplDispData.led7Seg[0] , debugSpeed );
+			if( isErr() ){
+				aplDispData.mode	= APL_DISP_DATA_MODE_ERR;
+				APL_CTRL_ERR_FLAG	*inAplCtrlErrFlag	= getAplCtrlErrFlag();
+				if( inAplCtrlErrFlag->rx == true ){
+					aplDispData.errNo	= APL_DISP_DATA_ERR_RX;
+				}else if( inAplCtrlErrFlag->sum == true ){
+					aplDispData.errNo	= APL_DISP_DATA_ERR_SUM;
+				}else{
+//					aplDispData.errNo	= Don't care 	//とりえない？
+				}
+				
+			}else{
+				aplDispData.mode	= APL_DISP_DATA_MODE_NORMAL;
+				dispSpeed( &aplDispData.led7Seg[0] , inAplDataCar->speed );
+//				dispSpeed( &aplDispData.led7Seg[0] , debugSpeed );
+			}
+		
 			break;
 		default:
 			break;
@@ -164,8 +181,7 @@ void aplDispDataMain( void )
 		}else{
 			aplDispData.bright7seg		= inAplCtrlSet->bright7seg;
 		}
-		
-		
+
 		//設定モード表示ON
 		disp7seg( &aplDispData.led7Seg[0] , inAplCtrlSet->dspVal );
 
@@ -173,6 +189,22 @@ void aplDispDataMain( void )
 	}
 }
 
+//********************************************************************************
+// エラーある？
+//********************************************************************************
+static bool isErr( void )
+{
+	APL_CTRL_ERR_FLAG	*inAplCtrlErrFlag	= getAplCtrlErrFlag();
+	
+	if( (inAplCtrlErrFlag->rx	== true ) ||
+		(inAplCtrlErrFlag->sum	== true )
+	){
+		return( true );
+	}else{
+		return( false );
+	}
+	
+}
 //********************************************************************************
 // 車速表示
 //********************************************************************************

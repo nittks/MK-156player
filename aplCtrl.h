@@ -1,7 +1,8 @@
 #ifndef APL_CTRL_H
 #define APL_CTRL_H
 
-#include <avr/io.h>
+#include <stdbool.h>
+#include <stdint.h>
 
 //状態
 typedef enum{
@@ -114,11 +115,20 @@ enum{
 };
 
 
+// 異常
+typedef struct
+{
+	bool			rx;
+	bool			sum;
+}APL_CTRL_ERR_FLAG;
+
 extern void initAplCtrl( void );
 extern void aplCtrlMain( void );
 extern APL_CTRL *getAplCtrl( void );
 extern APL_CTRL_SET *getAplCtrlSet( void );
 extern APL_CTRL_SET_PALSE *getAplCtrlSetPalse( void );
+extern APL_CTRL_ERR_FLAG *getAplCtrlErrFlag( void );
+
 
 
 #endif

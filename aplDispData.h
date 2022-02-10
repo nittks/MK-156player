@@ -6,6 +6,17 @@
 #include "hardware.h"
 #include "aplCtrl.h"
 
+typedef enum{
+	APL_DISP_DATA_MODE_VALVE_CHK,
+	APL_DISP_DATA_MODE_NORMAL,
+	APL_DISP_DATA_MODE_ERR,
+}APL_DISP_DATA_MODE;
+
+typedef enum{
+	APL_DISP_DATA_ERR_RX	= 0,
+	APL_DISP_DATA_ERR_SUM,
+	APL_DISP_DATA_ERR_MAX,
+}APL_DISP_DATA_ERR;
 
 enum{
 	APL_DISP_DATA_RED	= SETTING_COLOR_RED,
@@ -30,15 +41,18 @@ enum{
 };
 
 typedef struct {
+	APL_DISP_DATA_MODE	mode;
+	APL_DISP_DATA_ERR	errNo;
+	
 	unsigned char	led7Seg[LED_7SEG_DIGIT_NUM];
 	unsigned char	bright7seg;
 	unsigned char	red;
 	unsigned char	green;
 	unsigned char	blue;
 	float			h,s,v;
-	bool			valveChkMode;
 	uint8_t			digitBit;
 	uint8_t			segBit;
+	
 }APL_DISP_DATA;
 
 

@@ -26,7 +26,8 @@ void lnkOutLedMain( void )
 
 	inAplDispData = getAplDispData();
 	
-	if( inAplDispData->valveChkMode == true ){
+	switch(inAplDispData->mode){
+	case APL_DISP_DATA_MODE_VALVE_CHK:
 		for( i=0 ; i<LED_7SEG_DIGIT_NUM ; i++ ){
 			if( (inAplDispData->digitBit & (1<<i)) != 0 ){
 				outDrvLed7SegData.val[i] = positionConvert( inAplDispData->segBit );
@@ -34,11 +35,25 @@ void lnkOutLedMain( void )
 				outDrvLed7SegData.val[i] = 0;
 			}
 		}
-	}else{
+		break;
+	case APL_DISP_DATA_MODE_ERR:
+		if( inAplDispData->errNo == APL_DISP_DATA_ERR_RX ){
+			//セット記述を関数にしようと思ったけど、とりあえずこれで
+			outDrvLed7SegData.val[0]	= positionConvert( errSeg[APL_DISP_DATA_ERR_RX][2] );
+			outDrvLed7SegData.val[1]	= positionConvert( errSeg[APL_DISP_DATA_ERR_RX][1] );
+			outDrvLed7SegData.val[2]	= positionConvert( errSeg[APL_DISP_DATA_ERR_RX][0] );
+		}else if( inAplDispData->errNo == APL_DISP_DATA_ERR_SUM ){
+			outDrvLed7SegData.val[0]	= positionConvert( errSeg[APL_DISP_DATA_ERR_SUM][2] );
+			outDrvLed7SegData.val[1]	= positionConvert( errSeg[APL_DISP_DATA_ERR_SUM][1] );
+			outDrvLed7SegData.val[2]	= positionConvert( errSeg[APL_DISP_DATA_ERR_SUM][0] );
+		}
+		break;	
+	case APL_DISP_DATA_MODE_NORMAL:
 		//1の位から1桁毎、セグメントパターンをセット
 		for( i=0 ; i<LED_7SEG_DIGIT_NUM ; i++ ){
 			outDrvLed7SegData.val[i] = led7SegBit[ inAplDispData->led7Seg[i] ];
 		}
+		break;
 	}
 	
 	convertHSVtoRGB(	inAplDispData->h ,inAplDispData->s ,inAplDispData->v * ((float)inAplDispData->bright7seg / BRIGHT_MAX),

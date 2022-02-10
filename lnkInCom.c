@@ -1,5 +1,6 @@
 #include <avr/io.h>
 #include <assert.h>
+#include <stdbool.h>
 
 #include "lnkInCom_inc.h"
 #include "lnkInCom.h"
@@ -21,8 +22,11 @@ void lnkInComMain( void )
 	
 	inDrvUartRx = getDrvUartRx();
 	if( inDrvUartRx == NULL ){
+		aplDataCar.rx		= false;
 		return;
 	}
+
+	aplDataCar.rx		= true;
 
 	sum=0;
 	for( i=0 ; i<inDrvUartRx->rxDataNum-1 ; i++ ){
@@ -30,8 +34,9 @@ void lnkInComMain( void )
 	}
 	
 	if( sum != inDrvUartRx->rxData[inDrvUartRx->rxDataNum-1]){
-		//SUMエラー。処理無し
+		aplDataCar.sumerr	= true;		
 	}else{
+		aplDataCar.sumerr	= false;
 
 		aplDataCar.speed	= inDrvUartRx->rxData[UART_NO_SPEED];
 		aplDataCar.rev		= (( (unsigned short)inDrvUartRx->rxData[UART_NO_REV0] << 8) |
@@ -39,7 +44,7 @@ void lnkInComMain( void )
 		aplDataCar.palseSetSpeed	= inDrvUartRx->rxData[UART_NO_PALSE_SET] & 0x0F;
 		aplDataCar.palseSetRev		= inDrvUartRx->rxData[UART_NO_PALSE_SET] >> 4;
 
-		aplDataCar.ig	= (inDrvUartRx->rxData[UART_NO_CAR_SIG] & (1<<POS_IG)) >> POS_IG;
+		aplDataCar.ig	= (inDrvUartRx->rxData[UART_NO_CAR_SIG] & (1<<POS_IG )) >> POS_IG;
 		aplDataCar.acc	= (inDrvUartRx->rxData[UART_NO_CAR_SIG] & (1<<POS_ACC)) >> POS_ACC;
 		aplDataCar.ill	= (inDrvUartRx->rxData[UART_NO_CAR_SIG] & (1<<POS_ILL)) >> POS_ILL;
 		aplDataCar.vtc	= (inDrvUartRx->rxData[UART_NO_CAR_SIG] & (1<<POS_VTC)) >> POS_VTC;
