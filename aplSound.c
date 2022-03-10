@@ -70,7 +70,7 @@ static void porcWaterTemp( void )
 {
 	APL_DATA_CAR	*inAplDataCar	= getAplDataCar();
 	
-	if( waterTempState == WATER_TEMP_LOW ){
+	if( waterTempState == WATER_TEMP_STATE_LOW ){
 		if( inAplDataCar->waterTemp >= WATER_TEMP_NORMAL ){
 			waterTempState	= WATER_TEMP_STATE_NORMAL;
 			aplSound.waterOk	= true;

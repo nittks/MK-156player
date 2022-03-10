@@ -6,7 +6,12 @@
 // 送信
 //----------------------------------------
 #define DRV_UART_TX_BUF_SIZE	8
+#define COMMAND_BUF_SIZE		4
+#define	COMMAND_LEN_MAX			6
 typedef struct{
+	uint8_t			commandNum;
+	uint8_t			commandLen[COMMAND_BUF_SIZE];
+	uint8_t			txCommand[COMMAND_BUF_SIZE][COMMAND_LEN_MAX];
 	unsigned char	txData[DRV_UART_TX_BUF_SIZE];
 	unsigned char	txDataNum;
 }DRV_UART_TX;
