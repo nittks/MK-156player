@@ -12,31 +12,13 @@
 //公開用
 static APL_SOUND	aplSound;
 
-//内部処理用
-//通常時
-static unsigned short	dispCycSpeed;
+static bool		waterTempState;
+static bool		vtecOnState;
 
-//テストデータ
-static unsigned char	testCycSpeed;
-static unsigned char	testSpeed;
-static TEST_STATE		testStateSpeed;
-static DISP_STATE		dispState;
-static WATER_TEMP		waterTempState;
 
-static void dispSpeed(	unsigned char *retSpeed	, const unsigned char  inSpeed	);
-static void disp7seg(	unsigned char *retSpeed	, const unsigned char  inSpeed	);
-static unsigned char	makeTestDataSpeed( void );
-static unsigned char	makeTestDataSpeedManual( void );
-static bool isErr( void );
-static bool valveChk( void );
-static bool segRGBsequential( void );
-static bool allSegRGBGradation( void );
-static void alloff( void );
-static void firstPosDigitSeg( void );
-static bool nextColor( void );
-static bool nextSegDigitColor( void );
+static void porcWaterTemp( void );
+static void procVtec( void );
 
-volatile static uint8_t	debugSpeed = 0;
 //********************************************************************************
 // 初期化
 //********************************************************************************
@@ -45,6 +27,7 @@ void initAplSound( void )
 	aplSound.waterOk		= false;
 
 	waterTempState	= WATER_TEMP_STATE_LOW;
+	vtecOnState		= false;
 	
 }
 //********************************************************************************
@@ -73,13 +56,16 @@ void aplSoundMain( void )
 	//****************************************
 	case APL_CTRL_STATE_NOMARL:		//通常
 		porcWaterTemp();
+		procVtec();
 		break;
 	
 	default:
 		break;
 	}
 }
-
+//********************************************************************************
+// 水温処理
+//********************************************************************************
 static void porcWaterTemp( void )
 {
 	APL_DATA_CAR	*inAplDataCar	= getAplDataCar();
@@ -96,3 +82,22 @@ static void porcWaterTemp( void )
 		}
 	}
 }		
+//********************************************************************************
+// VTEC処理
+//********************************************************************************
+static void procVtec( void )
+{
+	APL_DATA_CAR	*inAplDataCar	= getAplDataCar();
+
+	if( vtecOnState == false ){
+		if( inAplDataCar->vtc == true ){
+			vtecOnState		= true;
+			aplSound.vtec	= true;
+		}
+	}else{
+		aplSound.vtec	= false;
+		if( inAplDataCar->vtc == false ){
+			vtecOnState	= false;
+		}
+	}
+}

@@ -53,6 +53,7 @@ typedef struct {
 	uint8_t			digitBit;
 	uint8_t			segBit;
 	bool			waterOk;
+	bool			vtec;
 	
 }APL_SOUND;
 
