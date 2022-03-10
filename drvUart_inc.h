@@ -2,6 +2,7 @@
 #define DRV_UART_INC_H
 
 #include "main.h"
+#include "drvUart.h"	// DEFI_IDでenumを参照したい
 
 #define USEBAUD	((unsigned short)9600)
 #define USART1_BAUD_RATE(BAUD_RATE) ((float)(F_CPU * 64 / (16 * (float)BAUD_RATE)) + 0.5)
@@ -12,7 +13,7 @@
 typedef enum{
 	UART_STATE_STANDBY,		//受信停止(終了
 	UART_STATE_TRANS,		//送信中
-	UART_STATE_RECEIVE		//受信中
+	UART_STATE_RECEIVE,		//受信中
 }UART_STATE;
 
 #define	RS485_AUTO_XDIR OFF	(0)
@@ -78,15 +79,25 @@ enum{
 
 #define RX_BUF_SIZE		0xF;	//受信バッファサイズ
 
-#define UART_DATAPOS_ID			0		//データ位置ID
-#define UART_DATAPOS_LENGTH		1		//データ位置レングス
+
+#define	DEFI_FRAME_LEN	((uint8_t)5)
+
 #define UART_FRAME_TIMEOUT		2		//タイムアウト(10(フレーム周期)-7(送信時間)=2(空き時間
 
-#define UART_ID_CARDATA			0x11		//フレームID
-
 #define DI_UART_RX						(USART1.CTRLB = USART1.CTRLB & (~USART_RXEN_bm))	//受信禁止
-#define EN_UART_RX						(USART1.CTRLB = USART1.CTRLB | (USART_RXEN_bm))	//受信許可
+#define EN_UART_RX						(USART1.CTRLB = USART1.CTRLB | (USART_RXEN_bm))		//受信許可
 #define DI_INTER_UART_RX_COMP			(USART1.CTRLA = USART1.CTRLA & (~USART_RXCIE_bm))	//受信完了割込み禁止
 #define EN_INTER_UART_RX_COMP			(USART1.CTRLA = USART1.CTRLA | (USART_RXCIE_bm))	//受信完了割込み許可
+
+#define	ID_NUM	((uint8_t)7)
+const uint8_t DEFI_ID[ID_NUM] = {	// IDマッチ比較でループしたいから配列で欲しい
+	ID_TURBO		,
+	ID_TACHO		,
+	ID_OIL_PRESS	,
+	ID_FUEL_PRESS	,
+	ID_EXT_TEMP		,
+	ID_OIL_TEMP		,
+	ID_WATER_TEMP
+};
 
 #endif

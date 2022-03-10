@@ -5,6 +5,8 @@
 #define F_PDIV	((uint8_t)1)
 	// ↑SerialLedの信号幅の400nsをタイマで作るため、カウント数が整数になる分周値で最も低速になる倍率を選択。
 
+#include <avr/io.h>
+
 enum{
 	TASK_DRV_IN_MAIN,
 	TASK_LINK_IN,

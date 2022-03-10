@@ -34,7 +34,7 @@ static unsigned char	rxDataLen;			//UARTフレームより取得したフレー�
 static unsigned char	rxFlag;
 
 static int8_t USART_1_init();
-
+static bool isIdMatch( uint8_t rxBuf );
 //********************************************************************************//
 // 初期化
 //********************************************************************************//
@@ -224,41 +224,33 @@ void interGetUartRxData(void)
 		//データチェック
 		if( uartState == UART_STATE_STANDBY){
 			//フレームID判定
-			if(( rxDataCnt == UART_DATAPOS_ID ) &&		//ID位置
-			( rxBuf == UART_ID_CARDATA )				//ID一致
+			if( ( rxDataCnt == UART_DATAPOS_ID ) &&		//ID位置
+				( isIdMatch( rxBuf ) )				//ID一致
 			){
 				uartState = UART_STATE_RECEIVE;	//受信状態へ移行
 				rxDataBuf[rxDataCnt] = rxBuf;
 				rxDataCnt++;
 			}
-		}else if( uartState == UART_STATE_RECEIVE){
-			//データ長取得
-			if( rxDataCnt == UART_DATAPOS_LENGTH ){
-				rxDataLen = rxBuf;		//フレーム長記録
-				rxDataBuf[rxDataCnt] = rxBuf;
-				rxDataCnt++;
+		}else if( uartState == UART_STATE_RECEIVE ){
 
-			//通常受信
-			}else{
-				rxDataBuf[rxDataCnt] = rxBuf;
-				rxDataCnt++;
+			rxDataBuf[rxDataCnt] = rxBuf;
+			rxDataCnt++;
 					
-				//受信完了
-				if( rxDataCnt >= rxDataLen ){
-					//送信要求有りの場合、送信状態へ移行
-					if( txReqFlag == true ){	
-						txReqFlag = false;
-						uartState = UART_STATE_STANDBY;
-						enableTask( TASK_UART_CHANGE_TX );		//タスクマネージャへ起動タスクをセット
-					}else{
-						uartState = UART_STATE_STANDBY;
-					}
-					//Lnk取得用配列へコピー
-					memcpy( &drvUartRx.rxData[0] , &rxDataBuf[0] , rxDataCnt);
-					drvUartRx.rxDataNum	= rxDataCnt;
-					rxDataCnt = 0;
-					rxFlag = true;
+			//受信完了
+			if( rxDataCnt >= DEFI_FRAME_LEN ){
+				//送信要求有りの場合、送信状態へ移行
+				if( txReqFlag == true ){	
+					txReqFlag = false;
+					uartState = UART_STATE_STANDBY;
+					enableTask( TASK_UART_CHANGE_TX );		//タスクマネージャへ起動タスクをセット
+				}else{
+					uartState = UART_STATE_STANDBY;
 				}
+				//Lnk取得用配列へコピー
+				memcpy( &drvUartRx.rxData[0] , &rxDataBuf[0] , rxDataCnt);
+				drvUartRx.rxDataNum	= rxDataCnt;
+				rxDataCnt = 0;
+				rxFlag = true;
 			}
 		}else{
 			//取り得ない
@@ -267,7 +259,19 @@ void interGetUartRxData(void)
 	sei();	//割込み許可
 
 }
-
+static bool isIdMatch( uint8_t rxBuf )
+{
+	bool	ret = false;
+	
+	for( uint8_t i=0 ; i<ID_NUM ; i++ ){
+		if( rxBuf == DEFI_ID[i] ){
+			ret = true;
+			break;
+		}
+	}
+	
+	return( ret );
+}
 
 //********************************************************************************//
 // UART

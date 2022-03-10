@@ -1,6 +1,8 @@
 #ifndef APL_DATA_H
 #define APL_DATA_H
 
+#include <stdbool.h>
+#include <stdlib.h>
 //********************************************************************************
 // UART車両情報
 //********************************************************************************
@@ -18,7 +20,9 @@ enum{
 };
 
 typedef struct{
-	unsigned char	rx;
+	bool			rx;
+	uint8_t			waterTemp;
+	
 	unsigned char	sumerr;
 	
 	unsigned char	speed;

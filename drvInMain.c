@@ -1,11 +1,11 @@
 #include <avr/io.h>
 
-#include "drvInMain_inc.h"
-#include "drvInMain.h"
-
 #include "drvInSw.h"
 #include "drvUart.h"
 #include "drvEep.h"
+
+#include "drvInMain_inc.h"
+#include "drvInMain.h"
 
 void initDrvIn( void )
 {

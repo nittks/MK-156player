@@ -40,7 +40,6 @@ static void initTaskTimer( void );
 //********************************************************************************
 int main(void)
 {
-	uint8_t		usartrx;
 	initMain();
 
 	waitLedBoot();		//送信が早すぎるとSerialLEDへが固まる。

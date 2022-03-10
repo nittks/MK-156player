@@ -1,6 +1,6 @@
 #include <avr/io.h>
 #include <stdbool.h>
-
+#include <stdlib.h>
 #include "aplData.h"
 #include "aplData_inc.h"
 #include "hardware.h"
@@ -17,13 +17,7 @@ void initAplData( void )
 {
 	
 	aplDataCar.rx				= false;
-	aplDataCar.sumerr			= false;
-	
-	aplDataCar.ig				= APL_DATA_IG_OFF;
-	aplDataCar.acc				= APL_DATA_ACC_OFF;
-	aplDataCar.ill				= APL_DATA_ILL_OFF;
-	aplDataCar.speed			= 0;
-	aplDataCar.rev				= 0;
+	aplDataCar.waterTemp		= 0;
 	
 	aplDataSw.rotEncSet			= APL_DATA_ROT_ENC_STOP;
 	aplDataSw.pushSwSet			= APL_DATA_PUSH_SW_OFF;
