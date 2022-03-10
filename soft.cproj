@@ -201,6 +201,15 @@
     <Compile Include="drvEep_inc.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="drvInCarSw.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="drvInCarSw.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="drvInCarSw_inc.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="drvInMain.c">
       <SubType>compile</SubType>
     </Compile>

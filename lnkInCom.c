@@ -4,9 +4,11 @@
 
 #include "aplData.h"
 #include "drvUart.h"
+#include "drvInCarSw.h"
 #include "lnkInCom_inc.h"
 #include "lnkInCom.h"
 
+static void procCarSw( APL_DATA_CAR* aplDataCar );
 static uint8_t asciiToVal( uint8_t* angleStr );
 static uint8_t valToSenser( uint8_t val , uint8_t id );
 
@@ -19,6 +21,9 @@ void lnkInComMain( void )
 {
 	DRV_UART_RX		*inDrvUartRx;
 	APL_DATA_CAR	aplDataCar;
+	
+	//車両スイッチ、信号処理
+	procCarSw( &aplDataCar );
 	
 	inDrvUartRx = getDrvUartRx();
 	if( inDrvUartRx == NULL ){
@@ -40,6 +45,15 @@ void lnkInComMain( void )
 	setAplDataCar( &aplDataCar );
 }
 
+//**********************************************************************
+//車両スイッチ、信号処理
+//**********************************************************************
+static void procCarSw( APL_DATA_CAR* aplDataCar )
+{
+	DRV_IN_CAR_SW	*inDrvInCarSw;
+	inDrvInCarSw	= getDrvInCarSw();
+	aplDataCar->vtc	= (inDrvInCarSw->vtc == DRV_IN_CAR_SW_ON)? true : false;
+}
 
 static uint8_t asciiToVal( uint8_t* angleStr )
 {
@@ -69,6 +83,4 @@ static uint8_t valToSenser( uint8_t val , uint8_t id )
 	return( ret );
 }
 	
-	
-
 	
