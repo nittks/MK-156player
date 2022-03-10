@@ -52,6 +52,7 @@ typedef struct {
 	float			h,s,v;
 	uint8_t			digitBit;
 	uint8_t			segBit;
+	bool			waterOk;
 	
 }APL_SOUND;
 
