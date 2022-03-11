@@ -11,9 +11,23 @@ ISR(TCA0_OVF_vect)	//タイマ割り込み
 {
 	interTaskTime();
 }
+ISR(USART0_RXC_vect)		//UART受信割込み
+{
+	interGetUartRxData0();
+}
+
 ISR(USART1_RXC_vect)		//UART受信割込み
 {
-	interGetUartRxData();
+	interGetUartRxData1();
+}
+
+ISR(USART0_DRE_vect)
+{
+	interSetUartTxData0();
+}
+ISR(USART1_DRE_vect)
+{
+	interSetUartTxData1();
 }
 
 ISR(PORTD_PORT_vect){		//ポート変化割り込み

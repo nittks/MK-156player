@@ -100,4 +100,29 @@ const uint8_t DEFI_ID[ID_NUM] = {	// IDマッチ比較でループしたいか�
 	ID_WATER_TEMP
 };
 
+// 送信
+typedef struct{
+	DRV_UART_TX		drvUartTx;
+	uint8_t			dataCnt;
+	uint8_t			cnt;
+	bool			reqFlag;
+}UART_TX_DATA;
+
+// 受信
+typedef struct{
+	DRV_UART_RX		drvUartRx;
+	uint8_t			dataBuf[DRV_UART_RX_BUF_SIZE];	//受信中データを入れていくバッファ
+	uint8_t			dataBufCnt;						//受信中データバッファ用カウンタ
+	uint8_t			dataCnt;							//URATデータ長カウンタ
+	uint8_t			dataLen;							//UARTフレームより取得したフレームレングス
+	bool			flag;
+}UART_RX_DATA;
+
+typedef struct{
+	UART_STATE		uartState;
+	UART_TX_DATA	tx;
+	UART_RX_DATA	rx;
+}UART_DATA;
+
+
 #endif

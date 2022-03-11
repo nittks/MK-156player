@@ -45,7 +45,7 @@ void lnkOutComMain( void )
 	
 	outDrvUartTx.commandNum	= commandCnt;
 
-	setDrvUartTx( &outDrvUartTx );
+	setDrvUartTx( &outDrvUartTx , UART_NO_1 );
 }
 
 static void SoundPlaySelect( DRV_UART_TX* out , uint8_t* commandCnt , uint8_t fileNo )

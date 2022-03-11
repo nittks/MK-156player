@@ -2,6 +2,12 @@
 #ifndef DRV_UART_H
 #define DRV_UART_H
 
+
+enum{
+	UART_NO_0,
+	UART_NO_1,
+	UART_MAX,
+};
 //----------------------------------------
 // 送信
 //----------------------------------------
@@ -52,9 +58,10 @@ enum{
 extern void initDrvUart( void );
 extern void drvUartMain( void );
 extern void interSetUartTxData(void);
-extern void interGetUartRxData(void);
-extern void drvUartChangeTx( void );
-extern void setDrvUartTx( DRV_UART_TX *inP );
-extern DRV_UART_RX *getDrvUartRx( void );
+extern void interGetUartRxData0(void);
+extern void interGetUartRxData1(void);
+extern void drvUartChangeTx( uint8_t uartNo );
+extern void setDrvUartTx( uint8_t uartNo , DRV_UART_TX *inP );
+extern DRV_UART_RX *getDrvUartRx( uint8_t uartNo );
 
 #endif
