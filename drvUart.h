@@ -52,15 +52,19 @@ enum{
 };
 #define ANGLE_DIGIT		((uint8_t)3)
 
+#define UART_LEN_DEFI				((uint8_t)5)
+#define UART_LEN_MK156(len)			((uint8_t)2+len)	//2:スタートバイト+エンドバイト
+#define UART_MK156_LEN_POS			((uint8_t)2)
+
 //----------------------------------------
 // 公開関数
 //----------------------------------------
 extern void initDrvUart( void );
 extern void drvUartMain( void );
-extern void interSetUartTxData(void);
+extern void interSetUartTxData0(void);
+extern void interSetUartTxData1(void);
 extern void interGetUartRxData0(void);
 extern void interGetUartRxData1(void);
-extern void drvUartChangeTx( uint8_t uartNo );
 extern void setDrvUartTx( uint8_t uartNo , DRV_UART_TX *inP );
 extern DRV_UART_RX *getDrvUartRx( uint8_t uartNo );
 

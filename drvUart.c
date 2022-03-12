@@ -16,8 +16,10 @@ static UART_DATA		uartData[UART_MAX];
 
 static int8_t USART_0_init();
 static int8_t USART_1_init();
+static void uartTx( uint8_t uartNo , USART_t* USART_REG );
 static void uartRx( uint8_t uartNo , USART_t* USART_REG );
-static bool isIdMatch( uint8_t rxBuf );
+static bool isRxComplete( uint8_t uartNo , uint8_t rxCnt , uint8_t* rxData );
+
 //********************************************************************************//
 // 初期化
 //********************************************************************************//
@@ -67,7 +69,7 @@ static int8_t USART_0_init()
 	/* 自動ボーレート(同期領域)なしでの非同期通信 */
 	
 	volatile	int8_t sigrow_val = SIGROW.OSC20ERR5V; // 符号付き誤差取得
-	volatile	int32_t baud_reg_val = (uint16_t)USART1_BAUD_RATE(19200);
+	volatile	int32_t baud_reg_val = (uint16_t)USART_BAUD_RATE(19200);
 	
 	assert (baud_reg_val >= 0x4A); // 負の最大比較で正当な最小BAUDレジスタ値を確認
 	baud_reg_val *= (1024 + sigrow_val); // (分解能+誤差)で乗算
@@ -115,7 +117,7 @@ static int8_t USART_1_init()
 	/* 自動ボーレート(同期領域)なしでの非同期通信 */
 	
 volatile	int8_t sigrow_val = SIGROW.OSC20ERR5V; // 符号付き誤差取得
-volatile	int32_t baud_reg_val = (uint16_t)USART1_BAUD_RATE(9600);
+volatile	int32_t baud_reg_val = (uint16_t)USART_BAUD_RATE(9600);
 	
 	assert (baud_reg_val >= 0x4A); // 負の最大比較で正当な最小BAUDレジスタ値を確認
 	baud_reg_val *= (1024 + sigrow_val); // (分解能+誤差)で乗算
@@ -161,21 +163,6 @@ void setDrvUartTx( uint8_t uartNo , DRV_UART_TX *inP )
 	uartData[uartNo].tx.drvUartTx	= *inP;
 	uartData[uartNo].tx.reqFlag		= true;		//送信要求セット
 }
-
-//********************************************************************************//
-// 受信完了→ウェイト後、送信モードへ移行
-//********************************************************************************//
-void drvUartChangeTx( uint8_t uartNo )
-{
-	cli();
-
-	disableTask( TASK_UART_CHANGE_TX );		//本関数の起動無効化依頼
-	uartData[uartNo].uartState = UART_STATE_TRANS;
-	
-	EN_INTER_UART_TX_REG_EMPTY;		//送信バッファ空割込み許可 
-	DI_INTER_UART_RX_COMP;			//受信完了割込み禁止
-	sei();
-}
 													
 //********************************************************************************//
 // 送信レジスタ空割込み
@@ -183,13 +170,13 @@ void drvUartChangeTx( uint8_t uartNo )
 void interSetUartTxData0(void)
 {
 	cli();
-	uartRx(UART_NO_0 , &USART0);
+	uartTx(UART_NO_0 , &USART0);
 	sei();
 }
 void interSetUartTxData1(void)
 {
 	cli();
-	uartRx(UART_NO_1 , &USART1);
+	uartTx(UART_NO_1 , &USART1);
 	sei();
 }
 
@@ -285,55 +272,53 @@ static void uartRx( uint8_t uartNo , USART_t* USART_REG )
 			//受信したので、タイムアウトタイマクリア
 			clearTimer( TIMER_DRV_IN_UART_TIMEOUT );
 		}
-		//データチェック
-		if( *uartState == UART_STATE_STANDBY){
-			//フレームID判定
-			if( ( rx->dataCnt == UART_DATAPOS_ID ) &&		//ID位置
-				( isIdMatch( rxBuf ) )				//ID一致
-			){
-				*uartState = UART_STATE_RECEIVE;	//受信状態へ移行
-				rx->dataBuf[rx->dataCnt] = rxBuf;
-				rx->dataCnt++;
-			}
-		}else if( *uartState == UART_STATE_RECEIVE ){
 
-			rx->dataBuf[rx->dataCnt] = rxBuf;
-			rx->dataCnt++;
+		rx->dataBuf[rx->dataCnt] = rxBuf;
+		rx->dataCnt++;
 					
-			//受信完了
-			if( rx->dataCnt >= DEFI_FRAME_LEN ){
-				//送信要求有りの場合、送信状態へ移行
-				if( tx->reqFlag == true ){	
-					tx->reqFlag = false;
-					*uartState = UART_STATE_STANDBY;
-					enableTask( TASK_UART_CHANGE_TX );		//タスクマネージャへ起動タスクをセット
-				}else{
-					*uartState = UART_STATE_STANDBY;
-				}
-				//Lnk取得用配列へコピー
-				memcpy( &rx->drvUartRx.rxData[0] , &rx->dataBuf[0] , rx->dataCnt);
-				rx->drvUartRx.rxDataNum	= rx->dataCnt;
-				rx->dataCnt = 0;
-				rx->flag = true;
+		//受信完了
+		if( isRxComplete(uartNo , rx->dataCnt , &rx->dataBuf[0] ) ){
+			//送信要求有りの場合、送信状態へ移行
+			if( tx->reqFlag == true ){	
+				tx->reqFlag = false;
+				*uartState = UART_STATE_STANDBY;
+			}else{
+				*uartState = UART_STATE_STANDBY;
 			}
-		}else{
-			//取り得ない
+			//Lnk取得用配列へコピー
+			memcpy( &rx->drvUartRx.rxData[0] , &rx->dataBuf[0] , rx->dataCnt);
+			rx->drvUartRx.rxDataNum	= rx->dataCnt;
+			rx->dataCnt = 0;
+			rx->flag = true;
 		}
 	}
 }
-static bool isIdMatch( uint8_t rxBuf )
+
+static bool isRxComplete( uint8_t uartNo , uint8_t rxCnt , uint8_t* rxData )
 {
-	bool	ret = false;
-	
-	for( uint8_t i=0 ; i<ID_NUM ; i++ ){
-		if( rxBuf == DEFI_ID[i] ){
-			ret = true;
+	bool	ret=false;
+
+	switch( uartNo ){
+		case UART_NO_0:
+			if( rxCnt >= UART_LEN_DEFI){
+				ret	= true;
+			}
+		break;
+		case UART_NO_1:
+			if( ( rxCnt >= UART_MK156_LEN_POS ) &&
+				( rxCnt >= UART_LEN_MK156(rxData[UART_MK156_LEN_POS]) )
+			){
+				ret = true;
+			}
 			break;
-		}
+		default:
+			//取りえない
+			break;
 	}
-	
 	return( ret );
 }
+
+
 
 //********************************************************************************//
 // UART

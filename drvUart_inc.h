@@ -5,7 +5,7 @@
 #include "drvUart.h"	// DEFI_IDでenumを参照したい
 
 #define USEBAUD	((unsigned short)9600)
-#define USART1_BAUD_RATE(BAUD_RATE) ((float)(F_CPU * 64 / (16 * (float)BAUD_RATE)) + 0.5)
+#define USART_BAUD_RATE(BAUD_RATE) ((float)(F_CPU * 64 / (16 * (float)BAUD_RATE)) + 0.5)
 
 //----------------------------------------
 // 全体

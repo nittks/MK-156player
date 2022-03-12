@@ -11,7 +11,7 @@ typedef struct{
 
 static void powerLed( void );
 #define LED_BOOT_TIME_MS	((uint16_t)1)
-#define	TASK_NUM	7
+#define	TASK_NUM	6
 // main_inc.hに記述するとsim実行時に値がセットされなくなったため、.cへ移動
 // IEDverが変わったため？AtmelStudio6->7
 // また、変数を.hに定義するのは良くないとのこと。
@@ -23,8 +23,7 @@ static TASK_PARAMETER	taskParameter[TASK_NUM]	={
 	{	true,	2,	10,	aplMain		},
 	{	true,	3,	10,	lnkOutMain	},
 	{	true,	4,	10,	drvOutMain	},
-	{	false,	5,	250,powerLed	},
-	{	false,	0,	2,	drvUartChangeTx}		//UARTドライバからの要求により有効化する
+	{	false,	5,	250,powerLed	}
 };
 //CTRLA CLKSEL
 enum{
