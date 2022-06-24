@@ -36,14 +36,8 @@ void lnkOutEepMain( void )
 		eepReq = false;
 
 		i=0;
-		outDrvEepWrite.val[i++]	= inAplCtrlSet->bright7seg;
-		outDrvEepWrite.val[i++]	= inAplCtrlSet->brightDim7seg;
-		outDrvEepWrite.val[i++]	= inAplCtrlSet->dispcyc7seg;
-		outDrvEepWrite.val[i++]	= inAplCtrlSet->colorNo;
-		outDrvEepWrite.val[i++]	= inAplCtrlSet->color.h*100;
-		outDrvEepWrite.val[i++]	= inAplCtrlSet->color.s*100;
-		outDrvEepWrite.val[i++]	= inAplCtrlSet->color.v*100;
-		
+//		outDrvEepWrite.val[i++]	= inAplCtrlSet->bright7seg;
+
 		//sum値計算
 		outDrvEepWrite.val[DRV_EEP_MAP_SUM] = 0;
 		for( i=0 ; i<DRV_EEP_MAP_SUM ; i++ ){

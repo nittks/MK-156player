@@ -23,12 +23,6 @@ void initAplData( void )
 	aplDataSw.pushSwSet			= APL_DATA_PUSH_SW_OFF;
 
 	aplDataEep.read				= APL_DATA_EEP_STATE_UNREAD;
-	aplDataEep.bright7seg		= 0;
-	aplDataEep.brightDim7seg	= 0;
-	aplDataEep.dispcyc7seg		= 0;
-	aplDataEep.h				= 0;
-	aplDataEep.s				= 0;
-	aplDataEep.v				= 0;
 }
 //********************************************************************************
 // メイン処理

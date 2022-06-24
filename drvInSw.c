@@ -11,14 +11,9 @@
 static DRV_IN_SW		drvInSwData;		//スイッチ入力データ
 
 //内部状態
-static ROT_ENC_STATE	rotEncState[ROT_ENC_NUM];		//ロータリーエンコーダー状態
 static PORT_PUSH_SW		portPushSw[PUSH_SW_NUM];
-static unsigned char	rotEncDebTimeCnt[ROT_ENC_NUM];	//デバウンス経過時間カウント
 static unsigned char	grayCode[ROT_ENC_NUM];			//ROTENC入力。前回値を保存し、今回値と合わせグレイコード化する
-static signed char		rotateVect[ROT_ENC_NUM];		//ROTENC。回転方向変化量カウント。逆方向はマイナス値のためsingedを使用
 
-static void chkRotateVectCnt( unsigned char portNo );
-static void inputRotEnc( void );
 static void inputPushSw( void );
 //********************************************************************************//
 // 初期化
@@ -29,13 +24,7 @@ void initDrvInSw( void )
 
 	//出力
 	for( i=0 ; i<ROT_ENC_NUM; i++ ){
-		drvInSwData.rotEncState[i]	= DRV_IN_ROT_ENC_STATE_STOP;	//入力無し
 		drvInSwData.pushSwState[i]	= DRV_IN_PUSH_SW_STATE_OFF;	//入力無し
-
-		rotEncState[i]	= ROT_ENC_STATE_WAIT;	//監視開始
-		rotEncDebTimeCnt[i]	= 0;		//デバウンス経過時間カウント
-		grayCode[i]		= 0;
-		rotateVect[i]	= 0;
 	}
 	for( i=0 ; i<PUSH_SW_NUM; i++ ){
 		portPushSw[i].portIn		= PORT_OFF;
@@ -68,46 +57,9 @@ DRV_IN_SW *getDrvInSw( void )
 void drvInSwMain( void )
 {
 	cli();
-
-	inputRotEnc();
 	inputPushSw();
-
 	sei();
 }
-
-//********************************************************************************//
-// ロータリーエンコーダー入力検知処理
-//********************************************************************************//
-static void inputRotEnc( void )
-{
-	uint8_t	i;
-	
-	for( i=0 ; i<ROT_ENC_NUM; i++ ){
-		//正転
-		if( rotEncState[i] == ROT_ENC_STATE_FORWARD ){
-			rotEncState[i] = ROT_ENC_STATE_DEBOUNCE;
-			rotEncDebTimeCnt[i] = 0;
-			drvInSwData.rotEncState[i]	= DRV_IN_ROT_ENC_STATE_FORWARD;
-		//逆転
-		}else if( rotEncState[i] == ROT_ENC_STATE_REVERCE ){
-			rotEncState[i] = ROT_ENC_STATE_DEBOUNCE;
-			rotEncDebTimeCnt[i] = 0;
-			drvInSwData.rotEncState[i]	= DRV_IN_ROT_ENC_STATE_REVERCE;
-		//デバウンス待機
-		}else if( rotEncState[i] == ROT_ENC_STATE_DEBOUNCE ){
-			
-			drvInSwData.rotEncState[i]	= DRV_IN_ROT_ENC_STATE_STOP;
-			//デバウンス経過
-			if( rotEncDebTimeCnt[i] >= ROT_ENC_DEBTIME ){
-				rotEncDebTimeCnt[i] = 0;
-				rotEncState[i] = ROT_ENC_STATE_WAIT;
-			}else{
-				rotEncDebTimeCnt[i]++;
-			}
-		}
-	}
-}
-
 //********************************************************************************//
 // プッシュスイッチ入力検知処理
 //********************************************************************************//
@@ -196,35 +148,4 @@ static void inputPushSw( void )
 //********************************************************************************//
 void interPortD( void )
 {
-	unsigned char	portTmp;		//ロータリーエンコーダー全4入力一時保存
-
-	cli();
-	portTmp	= (~PORTD.IN) & 0x03;
-
-	if( portTmp != (grayCode[NO_SET]&0x03)){	//ポート変化
-		grayCode[NO_SET]	= (((grayCode[NO_SET] << 2) | portTmp) & 0x0F);
-		chkRotateVectCnt( NO_SET );
-	}
-
-
-	sei();
 }
-//********************************************************************************//
-// 回転変化量チェック
-//********************************************************************************//
-static void chkRotateVectCnt( unsigned char portNo )
-{
-	//グレイコードテーブルをもとに、回転方向変化量を加算していく
-	rotateVect[portNo]		+=grayCodeTable[ grayCode[portNo] ];
-
-	//変化量が4or-4で回転方向決定
-	if( rotateVect[portNo] <= ROT_VECT_FORWARD ){
-		rotEncState[portNo] = ROT_ENC_STATE_FORWARD;
-		rotateVect[portNo]	 = 0;
-	}else if( rotateVect[portNo] >= ROT_VECT_REVERCE ){
-		rotEncState[portNo] = ROT_ENC_STATE_REVERCE;
-		rotateVect[portNo]	 = 0;
-	}
-
-}
-

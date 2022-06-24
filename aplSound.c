@@ -1,3 +1,4 @@
+#define DEBUG
 #include <avr/io.h>
 #include <avr/interrupt.h>  //割り込みを使用するため
 #include <stdbool.h>
@@ -69,7 +70,18 @@ void aplSoundMain( void )
 static void porcWaterTemp( void )
 {
 	APL_DATA_CAR	*inAplDataCar	= getAplDataCar();
-	
+
+#ifdef DEBUG
+	volatile static uint16_t	timeCnt10ms = 0;
+	if( timeCnt10ms >= 50 ){
+		aplSound.waterOk	= true;
+		timeCnt10ms = 0;
+	}else{
+		aplSound.waterOk	= false;
+		timeCnt10ms++;
+	}
+#endif
+/*
 	if( waterTempState == WATER_TEMP_STATE_LOW ){
 		if( inAplDataCar->waterTemp >= WATER_TEMP_NORMAL ){
 			waterTempState	= WATER_TEMP_STATE_NORMAL;
@@ -81,6 +93,7 @@ static void porcWaterTemp( void )
 			waterTempState	= WATER_TEMP_STATE_LOW;
 		}
 	}
+*/
 }		
 //********************************************************************************
 // VTEC処理

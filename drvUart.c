@@ -14,8 +14,8 @@
 
 static UART_DATA		uartData[UART_MAX];
 
-static int8_t USART_0_init();
 static int8_t USART_1_init();
+static int8_t USART_0_init();
 static void uartTx( uint8_t uartNo , USART_t* USART_REG );
 static void uartRx( uint8_t uartNo , USART_t* USART_REG );
 static bool isRxComplete( uint8_t uartNo , uint8_t rxCnt , uint8_t* rxData );
@@ -27,8 +27,8 @@ void initDrvUart( void )
 {
 	unsigned char	i;
 	
-	USART_0_init();		//defi
-	USART_1_init();		//MK-156
+	USART_1_init();		//defi
+	USART_0_init();		//MK-156
 
 	for( uint8_t uartNo=0 ; uartNo <= UART_MAX ; uartNo++ ){
 		//送信
@@ -52,23 +52,23 @@ void initDrvUart( void )
 		uartData[uartNo].uartState		= UART_STATE_STANDBY;
 	}
 
-	//送受信許可
-	EN_UART_TX;
-
+	//送信許可
+	USART0.CTRLB |=	1 << USART_TXEN_bp;    /* Transmitter Enable: enabled */
 
 	//受信完了割込み許可
-	EN_INTER_UART_RX_COMP;
+	USART1.CTRLA |= ( USART_RXCIE_bm );
 }
 //********************************************************************************//
-// USART0設定。defi
+// USART1設定。defi
 //********************************************************************************//
-static int8_t USART_0_init()
+static int8_t USART_1_init()
 {
 	/* 周波数誤差保証 参照元：mega3209.pdf 日本語版 P.48,158 */
 	/* 工場で格納された周波数誤差でのボーレート補償 */
 	/* 自動ボーレート(同期領域)なしでの非同期通信 */
 	
-	volatile	int8_t sigrow_val = SIGROW.OSC20ERR5V; // 符号付き誤差取得
+//	volatile	int8_t sigrow_val = SIGROW.OSC20ERR5V; // 符号付き誤差取得
+	volatile	int8_t sigrow_val = 0;					// 符号付き誤差取得 ,128DAのSIGROWには周波数誤差レジスタが無い
 	volatile	int32_t baud_reg_val = (uint16_t)USART_BAUD_RATE(19200);
 	
 	assert (baud_reg_val >= 0x4A); // 負の最大比較で正当な最小BAUDレジスタ値を確認
@@ -108,50 +108,56 @@ static int8_t USART_0_init()
 	return 0;
 }
 //********************************************************************************//
-// USART1設定。MK-156
+// USART0設定。MK-156
 //********************************************************************************//
-static int8_t USART_1_init()
+static int8_t USART_0_init()
 {
 	/* 周波数誤差保証 参照元：mega3209.pdf 日本語版 P.48,158 */
 	/* 工場で格納された周波数誤差でのボーレート補償 */
 	/* 自動ボーレート(同期領域)なしでの非同期通信 */
 	
-volatile	int8_t sigrow_val = SIGROW.OSC20ERR5V; // 符号付き誤差取得
+//	volatile	int8_t sigrow_val = SIGROW.OSC20ERR5V; // 符号付き誤差取得
+volatile	int8_t sigrow_val = 0;					// 符号付き誤差取得 ,128DAのSIGROWには周波数誤差レジスタが無い
 volatile	int32_t baud_reg_val = (uint16_t)USART_BAUD_RATE(9600);
 	
 	assert (baud_reg_val >= 0x4A); // 負の最大比較で正当な最小BAUDレジスタ値を確認
 	baud_reg_val *= (1024 + sigrow_val); // (分解能+誤差)で乗算
 	baud_reg_val /= 1024; // 分解能で除算
-	USART1.BAUD = (int16_t) baud_reg_val; // 補正したボーレート設定
+	USART0.BAUD = (int16_t) baud_reg_val; // 補正したボーレート設定
 
-	USART1.CTRLA = 0
+	USART0.CTRLA = 0
 //			 | 0 << USART_ABEIE_bp /* Auto-baud Error Interrupt Enable: disabled */
 //			 | 1 << USART_DREIE_bp /* Data Register Empty Interrupt Enable: disabled */
 //			 | 0 << USART_LBME_bp /* Loop-back Mode Enable: disabled */
 //			 | USART_RS485_EXT_gc /* RS485 Mode disabled */
-			 | 1 << USART_RXCIE_bp /* Receive Complete Interrupt Enable: disabled */
+//			 | 1 << USART_RXCIE_bp /* Receive Complete Interrupt Enable: disabled */
 //			 | 0 << USART_RXSIE_bp /* Receiver Start Frame Interrupt Enable: disabled */
 //			 | 1 << USART_TXCIE_bp; /* Transmit Complete Interrupt Enable: disabled */
 	;
-	USART1.CTRLB = 0 << USART_MPCM_bp       /* Multi-processor Communication Mode: disabled */
+	USART0.CTRLB = 0 << USART_MPCM_bp       /* Multi-processor Communication Mode: disabled */
 //	               | 0 << USART_ODME_bp     /* Open Drain Mode Enable: disabled */
-	               | 1 << USART_RXEN_bp     /* Receiver Enable: enabled */
+//	               | 1 << USART_RXEN_bp     /* Receiver Enable: enabled */
 	               | USART_RXMODE_NORMAL_gc /* Normal mode */
 //	               | 0 << USART_SFDEN_bp    /* Start Frame Detection Enable: disabled */
-//	               | 1 << USART_TXEN_bp;    /* Transmitter Enable: enabled */
+	               | 1 << USART_TXEN_bp;    /* Transmitter Enable: enabled */
 	;
-	USART1.CTRLC = USART_CMODE_ASYNCHRONOUS_gc /* Asynchronous Mode */
+	USART0.CTRLC = USART_CMODE_ASYNCHRONOUS_gc /* Asynchronous Mode */
 			 | USART_CHSIZE_8BIT_gc /* Character size: 8 bit */
 			 | USART_PMODE_DISABLED_gc /* no Parity */
 			 | USART_SBMODE_1BIT_gc; /* 1 stop bit */
 
-	// USART1.DBGCTRL = 0 << USART_DBGRUN_bp; /* Debug Run: disabled */
+	// USART0.DBGCTRL = 0 << USART_DBGRUN_bp; /* Debug Run: disabled */
 
-	// USART1.EVCTRL = 0 << USART_IREI_bp; /* IrDA Event Input Enable: disabled */
+	// USART0.EVCTRL = 0 << USART_IREI_bp; /* IrDA Event Input Enable: disabled */
 
-	// USART1.RXPLCTRL = 0x0 << USART_RXPL_gp; /* Receiver Pulse Length: 0x0 */
+	// USART0.RXPLCTRL = 0x0 << USART_RXPL_gp; /* Receiver Pulse Length: 0x0 */
 
-	// USART1.TXPLCTRL = 0x0 << USART_TXPL_gp; /* Transmit pulse length: 0x0 */
+	// USART0.TXPLCTRL = 0x0 << USART_TXPL_gp; /* Transmit pulse length: 0x0 */
+
+	// PORTMUX
+	PORTMUX.USARTROUTEA	= (PORTMUX.USARTROUTEA & (~PORTMUX_USART0_gm)) | PORTMUX_USART0_ALT1_gc;	// RA4をUSARTとして使う
+	PORTMUX.SPIROUTEA	= (PORTMUX.SPIROUTEA & (~PORTMUX_SPI0_gm) ) | PORTMUX_SPI0_NONE_gc;			// defaultのspiを無効にする
+	SPI0.CTRLB			|=	1 << SPI_SSD_bp;														// エラッタ。2.10.1. SPIROUTEA値=NONE時に設定されなければならないSSDﾋﾞｯﾄ
 
 	return 0;
 }
@@ -162,6 +168,15 @@ void setDrvUartTx( uint8_t uartNo , DRV_UART_TX *inP )
 {
 	uartData[uartNo].tx.drvUartTx	= *inP;
 	uartData[uartNo].tx.reqFlag		= true;		//送信要求セット
+
+	if( uartNo == UART_0_MK156 ){
+		if( uartData[UART_0_MK156].uartState == UART_STATE_STANDBY ){
+			uartData[UART_0_MK156].uartState	= UART_STATE_TRANS;
+			USART0.CTRLA |= 1 << USART_DREIE_bp;			 /* Data Register Empty Interrupt Enable: disabled */
+		}
+	}else{
+		// USART_1_DEFI は送信しない
+	}
 }
 													
 //********************************************************************************//
@@ -170,13 +185,13 @@ void setDrvUartTx( uint8_t uartNo , DRV_UART_TX *inP )
 void interSetUartTxData0(void)
 {
 	cli();
-	uartTx(UART_NO_0 , &USART0);
+	uartTx(UART_0_MK156 , &USART0);
 	sei();
 }
 void interSetUartTxData1(void)
 {
 	cli();
-	uartTx(UART_NO_1 , &USART1);
+	uartTx(UART_1_DEFI , &USART1);
 	sei();
 }
 
@@ -186,14 +201,16 @@ static void uartTx( uint8_t uartNo , USART_t* USART_REG )
 	UART_TX_DATA*	tx	= &uartData[uartNo].tx;
 
 	while( USART_REG->STATUS & USART_DREIF_bm ){	//送信レジスタ空の間回す
-		USART_REG->TXDATAH = tx->drvUartTx.txData[tx->dataCnt];
+//		USART_REG->TXDATAH = tx->drvUartTx.txCommand[tx->dataCnt];
+		USART0.TXDATAL = tx->drvUartTx.txCommand[0][tx->dataCnt];
 		tx->dataCnt++;
 
-		if( tx->dataCnt >= tx->drvUartTx.txDataNum ){	//全データ送信済み
-
+		if( tx->dataCnt >= tx->drvUartTx.commandLen[tx->drvUartTx.commandNum] ){	//全データ送信済み
+			uartData[uartNo].uartState = UART_STATE_STANDBY;
 			tx->dataCnt = 0;
-			DI_INTER_UART_TX_REG_EMPTY;		//送信レジスタ空割込み禁止
-			EN_INTER_UART_TX_FIN;			//送信完了割込み許可
+			USART_REG->CTRLA &= (~USART_DREIF_bm);		//送信レジスタ空割込み禁止
+//			USART_REG->CTRLA |= ( USART_TXCIE_bm);		//送信完了割込み許可
+			break;
 		}
 	}
 	sei();	//割込み許可
@@ -207,7 +224,7 @@ void interUartTxFin( uint8_t uartNo )
 	cli();	//割り込み禁止
 
 	uartData[uartNo].uartState = UART_STATE_STANDBY;
-	EN_INTER_UART_RX_COMP;			//受信完了割込み許可
+		//受信完了割込み許可.この関数使ってないと思うのでエラーが出ないように一時的に引数決め打ち
 
 	sei();	//割込み許可
 }
@@ -236,13 +253,13 @@ DRV_UART_RX *getDrvUartRx( uint8_t uartNo )
 void interGetUartRxData0(void)
 {
 	cli();
-	uartRx(UART_NO_0 , &USART0);
+	uartRx(UART_0_MK156 , &USART0);
 	sei();
 }
 void interGetUartRxData1(void)
 {
 	cli();
-	uartRx(UART_NO_1 , &USART1);
+	uartRx(UART_1_DEFI , &USART1);
 	sei();
 }
 
@@ -299,12 +316,12 @@ static bool isRxComplete( uint8_t uartNo , uint8_t rxCnt , uint8_t* rxData )
 	bool	ret=false;
 
 	switch( uartNo ){
-		case UART_NO_0:
+		case UART_1_DEFI:
 			if( rxCnt >= UART_LEN_DEFI){
 				ret	= true;
 			}
 		break;
-		case UART_NO_1:
+		case UART_0_MK156:
 			if( ( rxCnt >= UART_MK156_LEN_POS ) &&
 				( rxCnt >= UART_LEN_MK156(rxData[UART_MK156_LEN_POS]) )
 			){

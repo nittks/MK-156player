@@ -24,31 +24,12 @@ void lnkInSwMain( void )
 	//SW入力ドライバデータ取得
 	inDrvInSw = getDrvInSw();
 
-	//ロータリーエンコーダー判定
-	aplDataSw.rotEncSet		= judgeRotEnc( inDrvInSw->rotEncState[ROT_ENC_SET] );
 	//プッシュスイッチ判定
 	aplDataSw.pushSwSet		= judgePushSw( inDrvInSw->pushSwState[PUSH_SW_SET] );
 
 	setAplDataSw( &aplDataSw );
 }
 
-//********************************************************************************
-// ロータリーエンコーダー入力判定
-//********************************************************************************
-static APL_DATA_ROT_ENC judgeRotEnc( DRV_IN_ROT_ENC_STATE rotEncState )
-{
-	APL_DATA_ROT_ENC	ret;
-
-	//ロータリーエンコーダー判定
-	if( rotEncState == DRV_IN_ROT_ENC_STATE_FORWARD ){
-		ret	= APL_DATA_ROT_ENC_UP;	
-	}else if( rotEncState == DRV_IN_ROT_ENC_STATE_REVERCE ){
-		ret	= APL_DATA_ROT_ENC_DOWN;
-	}else{
-		ret	= APL_DATA_ROT_ENC_STOP;
-	}
-	return( ret );
-}
 //********************************************************************************
 // プッシュスイッチ入力判定
 //********************************************************************************

@@ -42,22 +42,10 @@ void lnkInEepMain( void )
 			if( sum == inDrvEep->val[DRV_EEP_MAP_SUM] ){
 				i=0;
 				aplDataEep.read				= APL_DATA_EEP_STATE_READED;
-				aplDataEep.bright7seg		= inDrvEep->val[i++];
-				aplDataEep.brightDim7seg	= inDrvEep->val[i++];
-				aplDataEep.dispcyc7seg		= inDrvEep->val[i++];
-				aplDataEep.color7seg		= inDrvEep->val[i++];
-				aplDataEep.h				= inDrvEep->val[i++];
-				aplDataEep.s				= inDrvEep->val[i++];
-				aplDataEep.v				= inDrvEep->val[i++];
+//				aplDataEep.bright7seg		= inDrvEep->val[i++];
 			}else{
 				aplDataEep.read				= APL_DATA_EEP_STATE_SUMERROR;
-				aplDataEep.bright7seg		= 0;
-				aplDataEep.brightDim7seg	= 0;
-				aplDataEep.dispcyc7seg		= 0;
-				aplDataEep.color7seg		= 0;
-				aplDataEep.h				= 0;
-				aplDataEep.s				= 0;
-				aplDataEep.v				= 0;
+//				aplDataEep.bright7seg		= 0;
 			}
 			setAplDataEep( &aplDataEep );
 		}

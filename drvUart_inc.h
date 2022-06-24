@@ -27,8 +27,8 @@ enum{
 	RXMODE_GENAUTO	= 0x2,
 	RXMODE_LINAUTO	= 0x3,
 };
-#define	SET_CTRLA( xdir , txd )		( (USART1.CTRLA & (~USART_RS485_gm)) | (( txd << USART_RS4851_bp ) | ( xdir << USART_RS4850_bp)))
-#define	SET_CTRLB( rxmode )			( (USART1.CTRLB & USART_RXMODE_gm) | ( rxmode << USART_RXMODE_gp ))
+#define	SET_CTRLA( usart , xdir , txd )		( (usart.CTRLA & (~USART_RS485_gm)) | (( txd << USART_RS4851_bp ) | ( xdir << USART_RS4850_bp)))
+#define	SET_CTRLB( usart , rxmode )			( (usart.CTRLB & USART_RXMODE_gm) | ( rxmode << USART_RXMODE_gp ))
 
 enum{
 	CMODE_ASYNCHRONOUS	= 0x0,
@@ -61,19 +61,13 @@ enum{
 //----------------------------------------
 // 送信
 //----------------------------------------
-#define UART_DATA_REG_EMP_FLG			((USART1.STATUS & USART_DREIF_bm) >> USART_DREIF_bp)
+#define UART_DATA_REG_EMP_FLG( usart )		((usart.STATUS & USART_DREIF_bm) >> USART_DREIF_bp)
 #define DREIF_EMPTY		(1)
 #define DREIF_NOEMPTY	(0)
-#define DI_UART_TX						(USART1.CTRLB = USART1.CTRLB & (~USART_RXEN_bm))	//送信禁止
-#define EN_UART_TX						(USART1.CTRLB = USART1.CTRLB | (USART_RXEN_bm))		//送信許可
-#define DI_INTER_UART_TX_REG_EMPTY		(USART1.CTRLA = USART1.CTRLA & (~USART_DREIF_bm))	//送信バッファ空割込み禁止
-#define EN_INTER_UART_TX_REG_EMPTY		(USART1.CTRLA = USART1.CTRLA | (USART_DREIF_bm))	//送信バッファ空割込み許可
-#define DI_INTER_UART_TX_FIN			(USART1.CTRLA = USART1.CTRLA & (~USART_TXCIE_bm))	//送信完了割込み許可
-#define EN_INTER_UART_TX_FIN			(USART1.CTRLA = USART1.CTRLA | (USART_TXCIE_bm))	//送信完了割込み許可
 //----------------------------------------
 // 受信
 //----------------------------------------
-#define UART_REG_RXIC					((USART1.RXDATAH & USART_RXCIF_bm) >> USART_RXCIF_bp)		//UART受信完了フラグ
+#define UART_REG_RXIC( usart )				((usart.RXDATAH & USART_RXCIF_bm) >> USART_RXCIF_bp)		//UART受信完了フラグ
 #define RXC_IN_DATA						(1)		//受信データ有り
 #define RXC_NO_DATA						(0)		//受信データ無し
 
@@ -84,10 +78,6 @@ enum{
 
 #define UART_FRAME_TIMEOUT		2		//タイムアウト(10(フレーム周期)-7(送信時間)=2(空き時間
 
-#define DI_UART_RX						(USART1.CTRLB = USART1.CTRLB & (~USART_RXEN_bm))	//受信禁止
-#define EN_UART_RX						(USART1.CTRLB = USART1.CTRLB | (USART_RXEN_bm))		//受信許可
-#define DI_INTER_UART_RX_COMP			(USART1.CTRLA = USART1.CTRLA & (~USART_RXCIE_bm))	//受信完了割込み禁止
-#define EN_INTER_UART_RX_COMP			(USART1.CTRLA = USART1.CTRLA | (USART_RXCIE_bm))	//受信完了割込み許可
 
 #define	ID_NUM	((uint8_t)7)
 const uint8_t DEFI_ID[ID_NUM] = {	// IDマッチ比較でループしたいから配列で欲しい

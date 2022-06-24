@@ -117,18 +117,9 @@ static void stateJudge( void )
 			//通常->設定
 			aplCtrl.state = APL_CTRL_STATE_SETTING;
 
-			//入力ユニットから受信しているパルス設定値を現在設定値として取得
-			aplCtrlSetPalse.speed	= inAplDataCar->palseSetSpeed;
-			aplCtrlSetPalse.rev		= inAplDataCar->palseSetRev;
-
 			//変更前の値を保存(キャンセル時戻すため
 			//設定
 			aplCtrlSetBak = aplCtrlSet;
-			//パルス設定
-			aplCtrlSetPalse.speed		= inAplDataCar->palseSetSpeed;
-			aplCtrlSetPalse.rev			= inAplDataCar->palseSetRev;
-			aplCtrlSetPalseBak.speed	= inAplDataCar->palseSetSpeed;
-			aplCtrlSetPalseBak.rev		= inAplDataCar->palseSetRev;
 
 		}
 		break;

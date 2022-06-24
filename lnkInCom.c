@@ -25,7 +25,7 @@ void lnkInComMain( void )
 	//車両スイッチ、信号処理
 	procCarSw( &aplDataCar );
 	
-	inDrvUartRx = getDrvUartRx( UART_NO_0 );
+	inDrvUartRx = getDrvUartRx( UART_1_DEFI );
 	if( inDrvUartRx == NULL ){
 		aplDataCar.rx		= false;
 		return;

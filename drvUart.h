@@ -4,8 +4,8 @@
 
 
 enum{
-	UART_NO_0,
-	UART_NO_1,
+	UART_0_MK156,
+	UART_1_DEFI,
 	UART_MAX,
 };
 //----------------------------------------
