@@ -12,12 +12,12 @@ enum{
 // 送信
 //----------------------------------------
 #define DRV_UART_TX_BUF_SIZE	8
-#define COMMAND_BUF_SIZE		4
-#define	COMMAND_LEN_MAX			6
+#define COMMAND_NUM_MAX			4
+#define	COMMAND_LEN_MAX			10
 typedef struct{
 	uint8_t			commandNum;
-	uint8_t			commandLen[COMMAND_BUF_SIZE];
-	uint8_t			txCommand[COMMAND_BUF_SIZE][COMMAND_LEN_MAX];
+	uint8_t			length[COMMAND_NUM_MAX];
+	uint8_t			txCommand[COMMAND_NUM_MAX][COMMAND_LEN_MAX];
 	unsigned char	txData[DRV_UART_TX_BUF_SIZE];
 	unsigned char	txDataNum;
 }DRV_UART_TX;

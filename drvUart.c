@@ -36,7 +36,7 @@ void initDrvUart( void )
 			uartData[uartNo].tx.drvUartTx.txData[i]	= 0;
 		}
 		uartData[uartNo].tx.drvUartTx.txDataNum =	0;
-		uartData[uartNo].tx.dataCnt	= 0;
+		uartData[uartNo].tx.byteCnt	= 0;
 		uartData[uartNo].tx.cnt		= 0;
 		uartData[uartNo].tx.reqFlag	= false;
 
@@ -45,7 +45,7 @@ void initDrvUart( void )
 			uartData[uartNo].rx.drvUartRx.rxData[i]	= 0;
 		}
 		uartData[uartNo].rx.drvUartRx.rxDataNum =	0;
-		uartData[uartNo].rx.dataCnt		= 0;
+		uartData[uartNo].rx.byteCnt		= 0;
 		uartData[uartNo].rx.dataLen		= 0;
 		uartData[uartNo].rx.flag		= false;
 
@@ -201,16 +201,21 @@ static void uartTx( uint8_t uartNo , USART_t* USART_REG )
 	UART_TX_DATA*	tx	= &uartData[uartNo].tx;
 
 	while( USART_REG->STATUS & USART_DREIF_bm ){	//送信レジスタ空の間回す
-//		USART_REG->TXDATAH = tx->drvUartTx.txCommand[tx->dataCnt];
-		USART0.TXDATAL = tx->drvUartTx.txCommand[0][tx->dataCnt];
-		tx->dataCnt++;
+//		USART_REG->TXDATAH = tx->drvUartTx.txCommand[tx->byteCnt];
+		USART0.TXDATAL = tx->drvUartTx.txCommand[tx->commandCnt][tx->byteCnt];
+		tx->byteCnt++;
 
-		if( tx->dataCnt >= tx->drvUartTx.commandLen[tx->drvUartTx.commandNum] ){	//全データ送信済み
-			uartData[uartNo].uartState = UART_STATE_STANDBY;
-			tx->dataCnt = 0;
-			USART_REG->CTRLA &= (~USART_DREIF_bm);		//送信レジスタ空割込み禁止
-//			USART_REG->CTRLA |= ( USART_TXCIE_bm);		//送信完了割込み許可
-			break;
+		if( tx->byteCnt >= tx->drvUartTx.length[tx->commandCnt] ){
+			tx->byteCnt = 0;
+			tx->commandCnt++;	// 次のコマンドへ
+
+			if( tx->commandCnt >= tx->drvUartTx.commandNum ){
+				uartData[uartNo].uartState = UART_STATE_STANDBY;
+				tx->commandCnt = 0;
+				USART_REG->CTRLA &= (~USART_DREIF_bm);		//送信レジスタ空割込み禁止
+	//			USART_REG->CTRLA |= ( USART_TXCIE_bm);		//送信完了割込み許可
+				break;
+			}
 		}
 	}
 	sei();	//割込み許可
@@ -283,18 +288,18 @@ static void uartRx( uint8_t uartNo , USART_t* USART_REG )
 		timerCnt	= getTimerCnt  ( TIMER_DRV_IN_UART_TIMEOUT );
 		if( (timerCnt == TIMER_OVER_FLOW ) || (timerCnt > UART_FRAME_TIMEOUT) ){
 			*uartState = UART_STATE_STANDBY;	//待機中へリセット
-			rx->dataCnt=0;
+			rx->byteCnt=0;
 			rx->dataBufCnt=0;
 		}else{
 			//受信したので、タイムアウトタイマクリア
 			clearTimer( TIMER_DRV_IN_UART_TIMEOUT );
 		}
 
-		rx->dataBuf[rx->dataCnt] = rxBuf;
-		rx->dataCnt++;
+		rx->dataBuf[rx->byteCnt] = rxBuf;
+		rx->byteCnt++;
 					
 		//受信完了
-		if( isRxComplete(uartNo , rx->dataCnt , &rx->dataBuf[0] ) ){
+		if( isRxComplete(uartNo , rx->byteCnt , &rx->dataBuf[0] ) ){
 			//送信要求有りの場合、送信状態へ移行
 			if( tx->reqFlag == true ){	
 				tx->reqFlag = false;
@@ -303,9 +308,9 @@ static void uartRx( uint8_t uartNo , USART_t* USART_REG )
 				*uartState = UART_STATE_STANDBY;
 			}
 			//Lnk取得用配列へコピー
-			memcpy( &rx->drvUartRx.rxData[0] , &rx->dataBuf[0] , rx->dataCnt);
-			rx->drvUartRx.rxDataNum	= rx->dataCnt;
-			rx->dataCnt = 0;
+			memcpy( &rx->drvUartRx.rxData[0] , &rx->dataBuf[0] , rx->byteCnt);
+			rx->drvUartRx.rxDataNum	= rx->byteCnt;
+			rx->byteCnt = 0;
 			rx->flag = true;
 		}
 	}

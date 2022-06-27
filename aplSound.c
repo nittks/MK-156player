@@ -73,7 +73,7 @@ static void porcWaterTemp( void )
 
 #ifdef DEBUG
 	volatile static uint16_t	timeCnt10ms = 0;
-	if( timeCnt10ms >= 50 ){
+	if( timeCnt10ms >= 500 ){
 		aplSound.waterOk	= true;
 		timeCnt10ms = 0;
 	}else{

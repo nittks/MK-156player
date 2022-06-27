@@ -93,7 +93,8 @@ const uint8_t DEFI_ID[ID_NUM] = {	// IDマッチ比較でループしたいか�
 // 送信
 typedef struct{
 	DRV_UART_TX		drvUartTx;
-	uint8_t			dataCnt;
+	uint8_t			byteCnt;
+	uint8_t			commandCnt;
 	uint8_t			cnt;
 	bool			reqFlag;
 }UART_TX_DATA;
@@ -103,7 +104,7 @@ typedef struct{
 	DRV_UART_RX		drvUartRx;
 	uint8_t			dataBuf[DRV_UART_RX_BUF_SIZE];	//受信中データを入れていくバッファ
 	uint8_t			dataBufCnt;						//受信中データバッファ用カウンタ
-	uint8_t			dataCnt;							//URATデータ長カウンタ
+	uint8_t			byteCnt;							//URATデータ長カウンタ
 	uint8_t			dataLen;							//UARTフレームより取得したフレームレングス
 	bool			flag;
 }UART_RX_DATA;
