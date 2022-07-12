@@ -1,4 +1,4 @@
-#define DEBUG
+//#define DEBUG
 #include <avr/io.h>
 #include <avr/interrupt.h>  //割り込みを使用するため
 #include <stdbool.h>
@@ -81,7 +81,7 @@ static void porcWaterTemp( void )
 		timeCnt10ms++;
 	}
 #endif
-/*
+
 	if( waterTempState == WATER_TEMP_STATE_LOW ){
 		if( inAplDataCar->waterTemp >= WATER_TEMP_NORMAL ){
 			waterTempState	= WATER_TEMP_STATE_NORMAL;
@@ -93,7 +93,7 @@ static void porcWaterTemp( void )
 			waterTempState	= WATER_TEMP_STATE_LOW;
 		}
 	}
-*/
+
 }		
 //********************************************************************************
 // VTEC処理

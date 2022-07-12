@@ -18,6 +18,7 @@ static int8_t USART_1_init();
 static int8_t USART_0_init();
 static void uartTx( uint8_t uartNo , USART_t* USART_REG );
 static void uartRx( uint8_t uartNo , USART_t* USART_REG );
+static bool isDefiNotFirstData( uint8_t uartNo , UART_RX_DATA* rx , uint8_t rxBuf );
 static bool isRxComplete( uint8_t uartNo , uint8_t rxCnt , uint8_t* rxData );
 
 //********************************************************************************//
@@ -286,7 +287,9 @@ static void uartRx( uint8_t uartNo , USART_t* USART_REG )
 		//タイマオーバーフロー or フレーム間タイムアウト
 		//フレームの最初(ID)から受信しなおす
 		timerCnt	= getTimerCnt  ( TIMER_DRV_IN_UART_TIMEOUT );
-		if( (timerCnt == TIMER_OVER_FLOW ) || (timerCnt > UART_FRAME_TIMEOUT) ){
+		if( ((timerCnt == TIMER_OVER_FLOW ) || (timerCnt > UART_FRAME_TIMEOUT)) ||
+			( isDefiNotFirstData( uartNo , rx , rxBuf) )
+		){
 			*uartState = UART_STATE_STANDBY;	//待機中へリセット
 			rx->byteCnt=0;
 			rx->dataBufCnt=0;
@@ -315,6 +318,19 @@ static void uartRx( uint8_t uartNo , USART_t* USART_REG )
 		}
 	}
 }
+
+static bool isDefiNotFirstData( uint8_t uartNo , UART_RX_DATA* rx , uint8_t rxBuf )
+{
+	if( uartNo == UART_1_DEFI ){
+		if( ((rx->byteCnt==0) && ((rxBuf&0xF0)!=0)) ||		// ReceiverIDを期待したが上位0以外が来た
+			((rx->byteCnt!=0) && ((rxBuf&0xF0)==0))			// ControlかAngleを期待したがIDが来た
+		){
+			return( true );
+		}
+	}
+	return( false );
+}
+
 
 static bool isRxComplete( uint8_t uartNo , uint8_t rxCnt , uint8_t* rxData )
 {

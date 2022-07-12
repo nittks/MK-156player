@@ -8,11 +8,21 @@ typedef enum{
 	STATE_UP
 }STATE_CNT;
 
-#define	CONTROL_NORMAL_OPERATION	('1')
+#define	CONTROL_NORMAL_OPERATION	(0x31)
 enum{
 	MIN,
 	MAX,
 	MINMAX,
+};
+enum{
+	NO_TURBO		,
+	NO_TACHO		,
+	NO_OIL_PRESS	,
+	NO_FUEL_PRESS	,
+	NO_EXT_TEMP		,
+	NO_OIL_TEMP		,
+	NO_WATER_TEMP	,
+	NO_MAX			
 };
 const short SENSER_RANGE[ID_MAX][MINMAX] = {
 	{ -1	, 2		},		// ŽÀ‘•Žž—vŒŸ“¢
