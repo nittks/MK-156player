@@ -21,6 +21,9 @@ static void uartRx( uint8_t uartNo , USART_t* USART_REG );
 static bool isDefiNotFirstData( uint8_t uartNo , UART_RX_DATA* rx , uint8_t rxBuf );
 static bool isRxComplete( uint8_t uartNo , uint8_t rxCnt , uint8_t* rxData );
 
+uint8_t		debugLog[1000][5]={0};
+uint16_t	debugLogCnt=0;
+
 //********************************************************************************//
 // 初期化
 //********************************************************************************//
@@ -312,6 +315,11 @@ static void uartRx( uint8_t uartNo , USART_t* USART_REG )
 			}
 			//Lnk取得用配列へコピー
 			memcpy( &rx->drvUartRx.rxData[0] , &rx->dataBuf[0] , rx->byteCnt);
+			if( debugLogCnt < 1000 ){
+				memcpy( &debugLog[debugLogCnt++][0] , &rx->dataBuf[0]  , rx->byteCnt);
+			}else{
+				debugLogCnt=0;
+			}
 			rx->drvUartRx.rxDataNum	= rx->byteCnt;
 			rx->byteCnt = 0;
 			rx->flag = true;
@@ -322,7 +330,8 @@ static void uartRx( uint8_t uartNo , USART_t* USART_REG )
 static bool isDefiNotFirstData( uint8_t uartNo , UART_RX_DATA* rx , uint8_t rxBuf )
 {
 	if( uartNo == UART_1_DEFI ){
-		if( ((rx->byteCnt==0) && ((rxBuf&0xF0)!=0)) ||		// ReceiverIDを期待したが上位0以外が来た
+		if( ((rx->byteCnt==0) && ((rxBuf==0)	 )) ||		// ReciverIDが0x00
+			((rx->byteCnt==0) && ((rxBuf&0xF0)!=0)) ||		// ReceiverIDを期待したが上位0以外が来た
 			((rx->byteCnt!=0) && ((rxBuf&0xF0)==0))			// ControlかAngleを期待したがIDが来た
 		){
 			return( true );

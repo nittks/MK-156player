@@ -20,39 +20,42 @@ void initLnkInCom( void )
 void lnkInComMain( void )
 {
 	DRV_UART_RX		*inDrvUartRx;
-	APL_DATA_CAR	aplDataCar;
+	APL_DATA_CAR	*inAplDataCar	= getAplDataCar();	// 現在値を取得し、更新された値だけ書き換え、再セットする
+	APL_DATA_CAR	outAplDataCar	= *inAplDataCar;
 	
 	//車両スイッチ、信号処理
-	procCarSw( &aplDataCar );
+	procCarSw( &outAplDataCar );
 	
 	inDrvUartRx = getDrvUartRx( UART_1_DEFI );
 	if( inDrvUartRx == NULL ){
-		aplDataCar.rx		= false;
+		outAplDataCar.rx		= false;
 		return;
 	}
 
-	aplDataCar.rx		= true;
+	outAplDataCar.rx		= true;
 	
 	switch( inDrvUartRx->rxData[UART_DATAPOS_ID] ){
 	case ID_WATER_TEMP:
 		if( inDrvUartRx->rxData[UART_DATAPOS_CONTROL] == CONTROL_NORMAL_OPERATION ){
 			volatile uint16_t angle = asciiToAngle( &inDrvUartRx->rxData[UART_DATAPOS_ANGLE] );
-			aplDataCar.waterTemp	= angleToSensor( angle , ID_WATER_TEMP );
+			outAplDataCar.waterTemp	= angleToSensor( angle , ID_WATER_TEMP );
 		}
+		break;
+	default:
 		break;
 	}
 		
-	setAplDataCar( &aplDataCar );
+	setAplDataCar( &outAplDataCar );
 }
 
 //**********************************************************************
 //車両スイッチ、信号処理
 //**********************************************************************
-static void procCarSw( APL_DATA_CAR* aplDataCar )
+static void procCarSw( APL_DATA_CAR* outAplDataCar )
 {
 	DRV_IN_CAR_SW	*inDrvInCarSw;
 	inDrvInCarSw	= getDrvInCarSw();
-	aplDataCar->vtc	= (inDrvInCarSw->vtc == DRV_IN_CAR_SW_ON)? true : false;
+	outAplDataCar->vtc	= (inDrvInCarSw->vtc == DRV_IN_CAR_SW_ON)? true : false;
 }
 
 static uint16_t asciiToAngle( uint8_t* angleStr )

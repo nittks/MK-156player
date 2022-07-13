@@ -71,17 +71,6 @@ static void porcWaterTemp( void )
 {
 	APL_DATA_CAR	*inAplDataCar	= getAplDataCar();
 
-#ifdef DEBUG
-	volatile static uint16_t	timeCnt10ms = 0;
-	if( timeCnt10ms >= 500 ){
-		aplSound.waterOk	= true;
-		timeCnt10ms = 0;
-	}else{
-		aplSound.waterOk	= false;
-		timeCnt10ms++;
-	}
-#endif
-
 	if( waterTempState == WATER_TEMP_STATE_LOW ){
 		if( inAplDataCar->waterTemp >= WATER_TEMP_NORMAL ){
 			waterTempState	= WATER_TEMP_STATE_NORMAL;
