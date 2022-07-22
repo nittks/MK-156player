@@ -37,7 +37,7 @@ void lnkOutComMain( void )
 
 	uint8_t			commandCnt	= 0;
 	if( inAplSound->waterOk ){
-		SoundPlaySelect( &outDrvUartTx , &commandCnt  ,FILE_NAME_VTEC );
+		SoundPlaySelect( &outDrvUartTx , &commandCnt  ,FILE_NAME_WATER_READY );
 		SoundPlay( &outDrvUartTx , &commandCnt );
 	}
 
