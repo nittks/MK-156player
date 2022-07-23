@@ -19,9 +19,15 @@ typedef enum{
 	DRV_IN_PUSH_SW_STATE_DOUBLEON,
 }DRV_IN_PUSH_SW_STATE;
 
+typedef enum{
+	DRV_IN_PORT_LEVEL_LOW,
+	DRV_IN_PORT_LEVEL_HIGH,
+}DRV_IN_PORT_LEVEL;
+
 typedef struct{
 	DRV_IN_ROT_ENC_STATE	rotEncState[ROT_ENC_NUM];
 	DRV_IN_PUSH_SW_STATE	pushSwState[PUSH_SW_NUM];
+	DRV_IN_PORT_LEVEL		mk156Busy;
 }DRV_IN_SW;
 
 extern void initDrvInSw( void );

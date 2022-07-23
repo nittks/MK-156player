@@ -66,6 +66,7 @@ enum{
 typedef struct{
 	APL_DATA_ROT_ENC	rotEncSet;
 	APL_DATA_PUSH_SW	pushSwSet;
+	bool				mk156Busy;
 }APL_DATA_SW;
 
 //********************************************************************************

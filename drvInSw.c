@@ -32,6 +32,7 @@ void initDrvInSw( void )
 		portPushSw[i].state			= PUSH_SW_STATE_OFF;
 		portPushSw[i].cntTimeDebounce	= 0;
 	}
+	drvInSwData.mk156Busy	= DRV_IN_PORT_LEVEL_LOW;
 	
 	PORTD.DIRCLR	= 0x07;
 	PORTD.PIN0CTRL	|= ( PORT_INVEN_bm | PORT_PULLUPEN_bm );	//反転設定で従来動作
@@ -48,7 +49,7 @@ void initDrvInSw( void )
 //********************************************************************************//
 DRV_IN_SW *getDrvInSw( void )
 {
-	return( &drvInSwData );
+	return( &drvInSwData );	// 値渡しにしたい。
 }
 
 //********************************************************************************//
@@ -58,6 +59,7 @@ void drvInSwMain( void )
 {
 	cli();
 	inputPushSw();
+	drvInSwData.mk156Busy	= ( PORTC.IN & PIN3_bm ) >> PIN3_bp;
 	sei();
 }
 //********************************************************************************//
