@@ -86,9 +86,10 @@ static void mainTask( void )
 				taskParameter[i].currentTime = taskParameter[i].cycleTime; 
 				//タスク実行
 
-//				PORTD.OUT	|= 0x40;
+//				PORTF.OUT	|= 0x10;
+//				PORTF.OUTTGL	= 0x10;
 				taskParameter[i].func();
-//				PORTD.OUT	&= (~0x40);
+//				PORTF.OUT	&= (~0x10);
 			}
 		}
 	}
@@ -188,7 +189,7 @@ static void initReg(void)
 	PORTA.DIRSET	= 0x18;
 	PORTC.DIRSET	= 0x09;
 	PORTD.DIRSET	= 0x68;
-	PORTF.DIRSET	= 0x08;
+	PORTF.DIRSET	= 0x38;
 	
 	PORTC.DIRCLR	= 0x06;
 
@@ -214,7 +215,7 @@ static void initReg(void)
 	PORTD.PIN3CTRL	= (1<<PORT_PULLUPEN_bp);
 	PORTD.PIN4CTRL	= (1<<PORT_PULLUPEN_bp);
 	PORTD.PIN5CTRL	= (0<<PORT_PULLUPEN_bp);
-	PORTD.PIN6CTRL	= (0<<PORT_PULLUPEN_bp);
+	PORTD.PIN6CTRL	= (1<<PORT_PULLUPEN_bp);
 	PORTD.PIN7CTRL	= (1<<PORT_PULLUPEN_bp);
 
 	PORTF.PIN0CTRL	= (1<<PORT_PULLUPEN_bp);

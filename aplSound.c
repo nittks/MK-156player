@@ -43,6 +43,8 @@ APL_SOUND *getAplSound( void )
 //********************************************************************************
 void aplSoundMain( void )
 {
+	PORTF.OUTTGL	= 0x10;
+
 	APL_CTRL		*inAplCtrl	= getAplCtrl();
 
 	switch( inAplCtrl->state ){

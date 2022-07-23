@@ -9,6 +9,9 @@
 #include "lnkInCom_inc.h"
 #include "lnkInCom.h"
 
+uint8_t		debugLog[1000][5]={0};
+uint16_t	debugLogCnt=0;
+
 static void procCarSw( APL_DATA_CAR* aplDataCar );
 static uint16_t asciiToAngle( uint8_t* angleStr );
 static uint8_t asciiHexToDec( uint8_t asciiHex );
@@ -21,25 +24,24 @@ void initLnkInCom( void )
 //メイン処理
 void lnkInComMain( void )
 {
-	volatile	DRV_UART_RX		*inDrvUartRx;
+	volatile	DRV_UART_RX		inDrvUartRx;
 	APL_DATA_CAR	*inAplDataCar	= getAplDataCar();	// 現在値を取得し、更新された値だけ書き換え、再セットする
 	APL_DATA_CAR	outAplDataCar	= *inAplDataCar;
 	
 	//車両スイッチ、信号処理
 	procCarSw( &outAplDataCar );
-	
 	inDrvUartRx = getDrvUartRx( UART_1_DEFI );
-	if( inDrvUartRx == NULL ){
+
+	if( getDrvUartRxFin(UART_1_DEFI) == NULL ){
 		outAplDataCar.rx		= false;
 		return;
 	}
-
 	outAplDataCar.rx		= true;
-	
-	switch( inDrvUartRx->rxData[UART_DATAPOS_ID] ){
+
+	switch( inDrvUartRx.rxData[UART_DATAPOS_ID] ){
 	case ID_WATER_TEMP:
-		if( inDrvUartRx->rxData[UART_DATAPOS_CONTROL] == CONTROL_NORMAL_OPERATION ){
-			volatile uint16_t angle = asciiToAngle( &inDrvUartRx->rxData[UART_DATAPOS_ANGLE] );
+		if( inDrvUartRx.rxData[UART_DATAPOS_CONTROL] == CONTROL_NORMAL_OPERATION ){
+			volatile uint16_t angle = asciiToAngle( &inDrvUartRx.rxData[UART_DATAPOS_ANGLE] );
 			outAplDataCar.waterTemp	= angleToSensor( angle , ID_WATER_TEMP );
 		}
 		break;

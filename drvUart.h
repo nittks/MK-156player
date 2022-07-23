@@ -2,6 +2,7 @@
 #ifndef DRV_UART_H
 #define DRV_UART_H
 
+#include <stdbool.h>
 
 enum{
 	UART_0_MK156,
@@ -66,6 +67,7 @@ extern void interSetUartTxData1(void);
 extern void interGetUartRxData0(void);
 extern void interGetUartRxData1(void);
 extern void setDrvUartTx( uint8_t uartNo , DRV_UART_TX *inP );
-extern DRV_UART_RX *getDrvUartRx( uint8_t uartNo );
+extern bool getDrvUartRxFin( uint8_t uartNo );
+extern DRV_UART_RX getDrvUartRx( uint8_t uartNo );
 
 #endif

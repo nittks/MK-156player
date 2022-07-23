@@ -21,8 +21,8 @@ static void uartRx( uint8_t uartNo , USART_t* USART_REG );
 static bool isDefiNotFirstData( uint8_t uartNo , UART_RX_DATA* rx , uint8_t rxBuf );
 static bool isRxComplete( uint8_t uartNo , uint8_t rxCnt , uint8_t* rxData );
 
-uint8_t		debugLog[1000][5]={0};
-uint16_t	debugLogCnt=0;
+static uint8_t		debugLog[1000][5]={0};
+static uint16_t	debugLogCnt=0;
 
 //********************************************************************************//
 // 初期化
@@ -237,22 +237,21 @@ void interUartTxFin( uint8_t uartNo )
 
 	sei();	//割込み許可
 }
-
-
+//********************************************************************************//
+// 受信完了確認
+//********************************************************************************//
+bool getDrvUartRxFin( uint8_t uartNo )
+{
+	return( uartData[uartNo].rx.flag );
+}
 //********************************************************************************//
 // 受信データ取得
 //********************************************************************************//
-DRV_UART_RX *getDrvUartRx( uint8_t uartNo )
+DRV_UART_RX getDrvUartRx( uint8_t uartNo )
 {
-	DRV_UART_RX*	ret;
-	
-	if( uartData[uartNo].rx.flag == false ){
-		ret = NULL;
-	}else{
-		ret = &uartData[uartNo].rx.drvUartRx;
-		uartData[uartNo].rx.flag = false;
-	}
-	return( ret );
+	uartData[uartNo].rx.flag = false;
+
+	return( uartData[uartNo].rx.drvUartRx );
 }
 
 
