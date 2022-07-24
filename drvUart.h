@@ -19,8 +19,8 @@ typedef struct{
 	uint8_t			commandNum;
 	uint8_t			length[COMMAND_NUM_MAX];
 	uint8_t			txCommand[COMMAND_NUM_MAX][COMMAND_LEN_MAX];
-	unsigned char	txData[DRV_UART_TX_BUF_SIZE];
-	unsigned char	txDataNum;
+	unsigned char	txData[DRV_UART_TX_BUF_SIZE];		// 現在未使用
+	unsigned char	txDataNum;							// 現在未使用
 }DRV_UART_TX;
 
 //----------------------------------------

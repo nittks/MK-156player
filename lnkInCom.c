@@ -9,8 +9,8 @@
 #include "lnkInCom_inc.h"
 #include "lnkInCom.h"
 
-uint8_t		debugLog[1000][5]={0};
-uint16_t	debugLogCnt=0;
+static uint8_t		debugLog[1000][5]={0};
+static uint16_t	debugLogCnt=0;
 
 static void procCarSw( APL_DATA_CAR* aplDataCar );
 static uint16_t asciiToAngle( uint8_t* angleStr );
@@ -38,6 +38,8 @@ void lnkInComMain( void )
 	}
 	outAplDataCar.rx		= true;
 
+	memcpy( debugLog[debugLogCnt] , inDrvUartRx.rxData , 5 );
+	debugLogCnt = ( debugLogCnt >= 900 )? 0 : debugLogCnt+1;
 	switch( inDrvUartRx.rxData[UART_DATAPOS_ID] ){
 	case ID_WATER_TEMP:
 		if( inDrvUartRx.rxData[UART_DATAPOS_CONTROL] == CONTROL_NORMAL_OPERATION ){

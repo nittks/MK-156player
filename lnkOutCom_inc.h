@@ -1,6 +1,7 @@
 #ifndef LNK_OUT_COM_INC_H
 #define LNK_OUT_COM_INC_H
 
+#define RING_BUF_SIZE			((uint8_t)10)
 #define	UART_TX_ID	0x21
 #define	UART_TX_LENGTH	4
 
