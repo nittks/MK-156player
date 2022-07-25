@@ -8,6 +8,15 @@ typedef enum{
 	STATE_UP
 }STATE_CNT;
 
+enum{
+	DEFI_ID,
+	DEFI_CTRL,
+	DEFI_ANGLE_0,
+	DEFI_ANGLE_1,
+	DEFI_ANGLE_2,
+	DEFI_MAX,
+};
+#define BUF_FRAME_SIZE		16
 #define	CONTROL_NORMAL_OPERATION	(0x31)
 enum{
 	MIN,

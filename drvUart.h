@@ -34,7 +34,15 @@ typedef struct{
 	unsigned char	rxDataNum;
 }DRV_UART_RX;
 
+//----------------------------------------
+// 受信 Defi
+//----------------------------------------
+#define DRV_UART_RX_RING_BUF_SIZE	64
 
+typedef struct{
+	uint8_t		rxData[DRV_UART_RX_RING_BUF_SIZE];
+	uint8_t		posWrite;
+}DRV_UART_RX_DEFI;
 
 enum{	// LnkでWATER_TEMPだけ欲しい
 	ID_TURBO		= 0x01,
@@ -68,6 +76,7 @@ extern void interGetUartRxData0(void);
 extern void interGetUartRxData1(void);
 extern void setDrvUartTx( uint8_t uartNo , DRV_UART_TX *inP );
 extern bool getDrvUartRxFin( uint8_t uartNo );
+extern DRV_UART_RX_DEFI getDrvUartRxDefi( void );
 extern DRV_UART_RX getDrvUartRx( uint8_t uartNo );
 
 #endif

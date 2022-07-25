@@ -14,14 +14,17 @@
 
 static UART_DATA		uartData[UART_MAX];
 
+static DRV_UART_RX_DEFI	rxDefi;
+
 static int8_t USART_1_init();
 static int8_t USART_0_init();
 static void uartTx( uint8_t uartNo , USART_t* USART_REG );
 static void uartRx( uint8_t uartNo , USART_t* USART_REG );
+static void uartRx1Defi( uint8_t uartNo , USART_t* USART_REG );
 static bool isDefiNotFirstData( uint8_t uartNo , UART_RX_DATA* rx , uint8_t rxBuf );
 static bool isRxComplete( uint8_t uartNo , uint8_t rxCnt , uint8_t* rxData );
 
-static uint8_t		debugLog[1000][5]={0};
+static uint8_t	debugLog[1000][5]={0};
 static uint16_t	debugLogCnt=0;
 
 //********************************************************************************//
@@ -55,6 +58,10 @@ void initDrvUart( void )
 
 		uartData[uartNo].uartState		= UART_STATE_STANDBY;
 	}
+	for( uint8_t i=0 ; i<DRV_UART_RX_RING_BUF_SIZE ; i++ ){
+		rxDefi.rxData[i]	= 0;
+	}
+	rxDefi.posWrite	= 0;
 
 	//送信許可
 	USART0.CTRLB |=	1 << USART_TXEN_bp;    /* Transmitter Enable: enabled */
@@ -253,6 +260,13 @@ DRV_UART_RX getDrvUartRx( uint8_t uartNo )
 
 	return( uartData[uartNo].rx.drvUartRx );
 }
+//********************************************************************************//
+// 受信データ取得
+//********************************************************************************//
+DRV_UART_RX_DEFI getDrvUartRxDefi( void )
+{
+	return( rxDefi );		// 値渡し
+}
 
 
 //********************************************************************************//
@@ -267,9 +281,29 @@ void interGetUartRxData0(void)
 void interGetUartRxData1(void)
 {
 	cli();
-	uartRx(UART_1_DEFI , &USART1);
+//	PORTF.OUT = (~(PORTF.IN & (0x30))) | (PORTF.IN & (~0x30));
+
+	uartRx1Defi(UART_1_DEFI , &USART1);
+//	PORTF.OUT = (~(PORTF.IN & (0x30))) | (PORTF.IN & (~0x30));
 	sei();
 }
+//********************************************************************************//
+// UART受信データ割り込み処理
+// 大きく変更を入れるため分けた
+//********************************************************************************//
+static void uartRx1Defi( uint8_t uartNo , USART_t* USART_REG )
+{	
+	while( USART_REG->RXDATAH & USART_RXCIF_bm ){
+
+		//レジスタよりデータ取得
+		rxDefi.rxData[rxDefi.posWrite++] = USART_REG->RXDATAL;
+		if( rxDefi.posWrite >= DRV_UART_RX_RING_BUF_SIZE ){
+			rxDefi.posWrite = 0;
+		}
+	}
+}
+
+
 
 static void uartRx( uint8_t uartNo , USART_t* USART_REG )
 {
@@ -295,6 +329,7 @@ static void uartRx( uint8_t uartNo , USART_t* USART_REG )
 			*uartState = UART_STATE_STANDBY;	//待機中へリセット
 			rx->byteCnt=0;
 			rx->dataBufCnt=0;
+
 		}else{
 			//受信したので、タイムアウトタイマクリア
 			clearTimer( TIMER_DRV_IN_UART_TIMEOUT );
