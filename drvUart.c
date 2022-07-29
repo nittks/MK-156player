@@ -14,15 +14,13 @@
 
 static UART_DATA		uartData[UART_MAX];
 
-static DRV_UART_RX_DEFI	rxDefi;
+static DRV_UART_RX		rxBuf[UART_MAX];
 
 static int8_t USART_1_init();
 static int8_t USART_0_init();
 static void uartTx( uint8_t uartNo , USART_t* USART_REG );
 static void uartRx( uint8_t uartNo , USART_t* USART_REG );
-static void uartRx1Defi( uint8_t uartNo , USART_t* USART_REG );
-static bool isDefiNotFirstData( uint8_t uartNo , UART_RX_DATA* rx , uint8_t rxBuf );
-static bool isRxComplete( uint8_t uartNo , uint8_t rxCnt , uint8_t* rxData );
+static void uartRxRingBuf( uint8_t uartNo , USART_t* USART_REG );
 
 static uint8_t	debugLog[1000][5]={0};
 static uint16_t	debugLogCnt=0;
@@ -32,41 +30,27 @@ static uint16_t	debugLogCnt=0;
 //********************************************************************************//
 void initDrvUart( void )
 {
-	unsigned char	i;
-	
 	USART_1_init();		//defi
 	USART_0_init();		//MK-156
 
+	// 整理したい
 	for( uint8_t uartNo=0 ; uartNo <= UART_MAX ; uartNo++ ){
 		//送信
-		for( i=0 ; i<DRV_UART_RX_BUF_SIZE; i++ ){
-			uartData[uartNo].tx.drvUartTx.txData[i]	= 0;
-		}
-		uartData[uartNo].tx.drvUartTx.txDataNum =	0;
-		uartData[uartNo].tx.byteCnt	= 0;
-		uartData[uartNo].tx.cnt		= 0;
-		uartData[uartNo].tx.reqFlag	= false;
+		uartData[uartNo].byteCnt	= 0;
 
-		//受信
-		for( i=0 ; i<DRV_UART_RX_BUF_SIZE ; i++ ){
-			uartData[uartNo].rx.drvUartRx.rxData[i]	= 0;
+		uartData[uartNo].uartState	= UART_STATE_STANDBY;
+	
+		for( uint8_t i=0 ; i<DRV_UART_RX_RING_BUF_SIZE ; i++ ){
+			rxBuf[uartNo].rxData[i]	= 0;
 		}
-		uartData[uartNo].rx.drvUartRx.rxDataNum =	0;
-		uartData[uartNo].rx.byteCnt		= 0;
-		uartData[uartNo].rx.dataLen		= 0;
-		uartData[uartNo].rx.flag		= false;
-
-		uartData[uartNo].uartState		= UART_STATE_STANDBY;
+		rxBuf[uartNo].posWrite	= 0;
 	}
-	for( uint8_t i=0 ; i<DRV_UART_RX_RING_BUF_SIZE ; i++ ){
-		rxDefi.rxData[i]	= 0;
-	}
-	rxDefi.posWrite	= 0;
 
 	//送信許可
 	USART0.CTRLB |=	1 << USART_TXEN_bp;    /* Transmitter Enable: enabled */
 
 	//受信完了割込み許可
+	USART0.CTRLA |= ( USART_RXCIE_bm );
 	USART1.CTRLA |= ( USART_RXCIE_bm );
 }
 //********************************************************************************//
@@ -147,7 +131,7 @@ volatile	int32_t baud_reg_val = (uint16_t)USART_BAUD_RATE(9600);
 	;
 	USART0.CTRLB = 0 << USART_MPCM_bp       /* Multi-processor Communication Mode: disabled */
 //	               | 0 << USART_ODME_bp     /* Open Drain Mode Enable: disabled */
-//	               | 1 << USART_RXEN_bp     /* Receiver Enable: enabled */
+	               | 1 << USART_RXEN_bp     /* Receiver Enable: enabled */
 	               | USART_RXMODE_NORMAL_gc /* Normal mode */
 //	               | 0 << USART_SFDEN_bp    /* Start Frame Detection Enable: disabled */
 	               | 1 << USART_TXEN_bp;    /* Transmitter Enable: enabled */
@@ -177,8 +161,8 @@ volatile	int32_t baud_reg_val = (uint16_t)USART_BAUD_RATE(9600);
 //********************************************************************************//
 void setDrvUartTx( uint8_t uartNo , DRV_UART_TX *inP )
 {
-	uartData[uartNo].tx.drvUartTx	= *inP;
-	uartData[uartNo].tx.reqFlag		= true;		//送信要求セット
+	uartData[uartNo].drvUartTx	= *inP;
+	uartData[uartNo].byteCnt		= 0;
 
 	if( uartNo == UART_0_MK156 ){
 		if( uartData[UART_0_MK156].uartState == UART_STATE_STANDBY ){
@@ -209,24 +193,18 @@ void interSetUartTxData1(void)
 static void uartTx( uint8_t uartNo , USART_t* USART_REG )
 {
 	//長いのでポインタに入れる
-	UART_TX_DATA*	tx	= &uartData[uartNo].tx;
+	UART_DATA*	tx	= &uartData[uartNo];
 
 	while( USART_REG->STATUS & USART_DREIF_bm ){	//送信レジスタ空の間回す
 //		USART_REG->TXDATAH = tx->drvUartTx.txCommand[tx->byteCnt];
-		USART0.TXDATAL = tx->drvUartTx.txCommand[tx->commandCnt][tx->byteCnt];
+		USART0.TXDATAL = tx->drvUartTx.txCommand[tx->byteCnt];
 		tx->byteCnt++;
 
-		if( tx->byteCnt >= tx->drvUartTx.length[tx->commandCnt] ){
-			tx->byteCnt = 0;
-			tx->commandCnt++;	// 次のコマンドへ
-
-			if( tx->commandCnt >= tx->drvUartTx.commandNum ){
-				uartData[uartNo].uartState = UART_STATE_STANDBY;
-				tx->commandCnt = 0;
-				USART_REG->CTRLA &= (~USART_DREIF_bm);		//送信レジスタ空割込み禁止
-	//			USART_REG->CTRLA |= ( USART_TXCIE_bm);		//送信完了割込み許可
-				break;
-			}
+		if( tx->byteCnt >= COMMAND_LEN_MAX ){
+			uartData[uartNo].uartState = UART_STATE_STANDBY;
+			USART_REG->CTRLA &= (~USART_DREIF_bm);		//送信レジスタ空割込み禁止
+//			USART_REG->CTRLA |= ( USART_TXCIE_bm);		//送信完了割込み許可
+			break;
 		}
 	}
 	sei();	//割込み許可
@@ -245,29 +223,12 @@ void interUartTxFin( uint8_t uartNo )
 	sei();	//割込み許可
 }
 //********************************************************************************//
-// 受信完了確認
-//********************************************************************************//
-bool getDrvUartRxFin( uint8_t uartNo )
-{
-	return( uartData[uartNo].rx.flag );
-}
-//********************************************************************************//
 // 受信データ取得
 //********************************************************************************//
 DRV_UART_RX getDrvUartRx( uint8_t uartNo )
 {
-	uartData[uartNo].rx.flag = false;
-
-	return( uartData[uartNo].rx.drvUartRx );
+	return( rxBuf[uartNo] );
 }
-//********************************************************************************//
-// 受信データ取得
-//********************************************************************************//
-DRV_UART_RX_DEFI getDrvUartRxDefi( void )
-{
-	return( rxDefi );		// 値渡し
-}
-
 
 //********************************************************************************//
 // UART受信データ割り込み処理
@@ -275,128 +236,29 @@ DRV_UART_RX_DEFI getDrvUartRxDefi( void )
 void interGetUartRxData0(void)
 {
 	cli();
-	uartRx(UART_0_MK156 , &USART0);
+	uartRxRingBuf(UART_0_MK156 , &USART0);
 	sei();
 }
 void interGetUartRxData1(void)
 {
 	cli();
-//	PORTF.OUT = (~(PORTF.IN & (0x30))) | (PORTF.IN & (~0x30));
-
-	uartRx1Defi(UART_1_DEFI , &USART1);
-//	PORTF.OUT = (~(PORTF.IN & (0x30))) | (PORTF.IN & (~0x30));
+	uartRxRingBuf(UART_1_DEFI , &USART1);
 	sei();
 }
 //********************************************************************************//
 // UART受信データ割り込み処理
 // 大きく変更を入れるため分けた
 //********************************************************************************//
-static void uartRx1Defi( uint8_t uartNo , USART_t* USART_REG )
+static void uartRxRingBuf( uint8_t uartNo , USART_t* USART_REG )
 {	
 	while( USART_REG->RXDATAH & USART_RXCIF_bm ){
 
 		//レジスタよりデータ取得
-		rxDefi.rxData[rxDefi.posWrite++] = USART_REG->RXDATAL;
-		if( rxDefi.posWrite >= DRV_UART_RX_RING_BUF_SIZE ){
-			rxDefi.posWrite = 0;
+		rxBuf[uartNo].rxData[rxBuf[uartNo].posWrite++] = USART_REG->RXDATAL;
+		if( rxBuf[uartNo].posWrite >= DRV_UART_RX_RING_BUF_SIZE ){
+			rxBuf[uartNo].posWrite = 0;
 		}
 	}
-}
-
-
-
-static void uartRx( uint8_t uartNo , USART_t* USART_REG )
-{
-	//長いのでポインタに入れる
-	UART_RX_DATA*	rx	= &uartData[uartNo].rx;		//rxだと被って置換時大変そう。もっといい名称ほしい。intrnalVariableRx,inside,insRx?
-	UART_TX_DATA*	tx	= &uartData[uartNo].tx;
-	UART_STATE*		uartState	= &uartData[uartNo].uartState;
-
-	unsigned char	rxBuf;
-	unsigned char	timerCnt;
-	
-	while( USART_REG->RXDATAH & USART_RXCIF_bm ){
-
-		//レジスタよりデータ取得
-		rxBuf = USART_REG->RXDATAL;
-		
-		//タイマオーバーフロー or フレーム間タイムアウト
-		//フレームの最初(ID)から受信しなおす
-		timerCnt	= getTimerCnt  ( TIMER_DRV_IN_UART_TIMEOUT );
-		if( ((timerCnt == TIMER_OVER_FLOW ) || (timerCnt > UART_FRAME_TIMEOUT)) ||
-			( isDefiNotFirstData( uartNo , rx , rxBuf) )
-		){
-			*uartState = UART_STATE_STANDBY;	//待機中へリセット
-			rx->byteCnt=0;
-			rx->dataBufCnt=0;
-
-		}else{
-			//受信したので、タイムアウトタイマクリア
-			clearTimer( TIMER_DRV_IN_UART_TIMEOUT );
-		}
-
-		rx->dataBuf[rx->byteCnt] = rxBuf;
-		rx->byteCnt++;
-					
-		//受信完了
-		if( isRxComplete(uartNo , rx->byteCnt , &rx->dataBuf[0] ) ){
-			//送信要求有りの場合、送信状態へ移行
-			if( tx->reqFlag == true ){	
-				tx->reqFlag = false;
-				*uartState = UART_STATE_STANDBY;
-			}else{
-				*uartState = UART_STATE_STANDBY;
-			}
-			//Lnk取得用配列へコピー
-			memcpy( &rx->drvUartRx.rxData[0] , &rx->dataBuf[0] , rx->byteCnt);
-			if( debugLogCnt < 1000 ){
-				memcpy( &debugLog[debugLogCnt++][0] , &rx->dataBuf[0]  , rx->byteCnt);
-			}else{
-				debugLogCnt=0;
-			}
-			rx->drvUartRx.rxDataNum	= rx->byteCnt;
-			rx->byteCnt = 0;
-			rx->flag = true;
-		}
-	}
-}
-
-static bool isDefiNotFirstData( uint8_t uartNo , UART_RX_DATA* rx , uint8_t rxBuf )
-{
-	if( uartNo == UART_1_DEFI ){
-		if( ((rx->byteCnt==0) && ((rxBuf==0)	 )) ||		// ReciverIDが0x00
-			((rx->byteCnt==0) && ((rxBuf&0xF0)!=0)) ||		// ReceiverIDを期待したが上位0以外が来た
-			((rx->byteCnt!=0) && ((rxBuf&0xF0)==0))			// ControlかAngleを期待したがIDが来た
-		){
-			return( true );
-		}
-	}
-	return( false );
-}
-
-
-static bool isRxComplete( uint8_t uartNo , uint8_t rxCnt , uint8_t* rxData )
-{
-	bool	ret=false;
-
-	switch( uartNo ){
-		case UART_1_DEFI:
-			if( rxCnt >= UART_LEN_DEFI){
-				ret	= true;
-			}
-		break;
-		case UART_0_MK156:
-			if( ( rxCnt >= UART_MK156_LEN_POS ) &&
-				( rxCnt >= UART_LEN_MK156(rxData[UART_MK156_LEN_POS]) )
-			){
-				ret = true;
-			}
-			break;
-		default:
-			//取りえない
-			break;
-	}
-	return( ret );
 }
 
 

@@ -16,33 +16,18 @@ enum{
 #define COMMAND_NUM_MAX			4
 #define	COMMAND_LEN_MAX			10
 typedef struct{
-	uint8_t			commandNum;
-	uint8_t			length[COMMAND_NUM_MAX];
-	uint8_t			txCommand[COMMAND_NUM_MAX][COMMAND_LEN_MAX];
-	unsigned char	txData[DRV_UART_TX_BUF_SIZE];		// 現在未使用
-	unsigned char	txDataNum;							// 現在未使用
+	uint8_t			txCommand[COMMAND_LEN_MAX];
 }DRV_UART_TX;
 
 //----------------------------------------
 // 受信
-//----------------------------------------
-#define DRV_UART_RX_BUF_SIZE	8
-#define UART_RX_ID			(0x11)
-
-typedef struct{
-	unsigned char	rxData[DRV_UART_RX_BUF_SIZE];
-	unsigned char	rxDataNum;
-}DRV_UART_RX;
-
-//----------------------------------------
-// 受信 Defi
 //----------------------------------------
 #define DRV_UART_RX_RING_BUF_SIZE	64
 
 typedef struct{
 	uint8_t		rxData[DRV_UART_RX_RING_BUF_SIZE];
 	uint8_t		posWrite;
-}DRV_UART_RX_DEFI;
+}DRV_UART_RX;
 
 enum{	// LnkでWATER_TEMPだけ欲しい
 	ID_TURBO		= 0x01,
@@ -76,7 +61,6 @@ extern void interGetUartRxData0(void);
 extern void interGetUartRxData1(void);
 extern void setDrvUartTx( uint8_t uartNo , DRV_UART_TX *inP );
 extern bool getDrvUartRxFin( uint8_t uartNo );
-extern DRV_UART_RX_DEFI getDrvUartRxDefi( void );
 extern DRV_UART_RX getDrvUartRx( uint8_t uartNo );
 
 #endif

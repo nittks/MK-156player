@@ -6,7 +6,6 @@
 #include "aplData.h"
 #include "drvInSw.h"
 
-static APL_DATA_ROT_ENC judgeRotEnc( DRV_IN_ROT_ENC_STATE rotEncState );
 static APL_DATA_PUSH_SW judgePushSw( DRV_IN_PUSH_SW_STATE pushSwState );
 
 //********************************************************************************

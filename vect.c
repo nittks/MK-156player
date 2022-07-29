@@ -44,7 +44,7 @@ ISR(NVMCTRL_EE_vect){		//EEPROMアクセス可能割込み
 // 全割り込み。使用時はここより上に記載し、下の一覧をコメントアウトする
 //********************************************************************************
 /* CRCSCAN interrupt vectors */
-ISR(CRCSCAN_NMI_vect)	{	debugVect();	}
+//ISR(CRCSCAN_NMI_vect)	{	debugVect();	}
 
 /* BOD interrupt vectors */
 ISR(BOD_VLM_vect)		{	debugVect();	}
@@ -101,7 +101,7 @@ ISR(USART2_TXC_vect)	{	debugVect();	}
 ISR(AC0_AC_vect)		{	debugVect();	}
 /* ADC0 interrupt vectors */
 ISR(ADC0_RESRDY_vect)	{	debugVect();	}
-ISR(ADC0_WCOMP_vect)	{	debugVect();	}
+//ISR(ADC0_WCOMP_vect)	{	debugVect();	}
 
 /* PORTC interrupt vectors */
 ISR(PORTC_PORT_vect)	{	debugVect();	}
@@ -113,11 +113,11 @@ ISR(PORTF_PORT_vect)	{	debugVect();	}
 /* NVMCTRL interrupt vectors */
 //ISR(NVMCTRL_EE_vect)	{	debugVect();	}
 /* PORTB interrupt vectors */
-ISR(PORTB_PORT_vect)	{	debugVect();	}
+//ISR(PORTB_PORT_vect)	{	debugVect();	}
 /* PORTE interrupt vectors */
-ISR(PORTE_PORT_vect)	{	debugVect();	}
+//ISR(PORTE_PORT_vect)	{	debugVect();	}
 
 static void debugVect( void )
 {
-	volatile	bool	brakepoint = true;
+	;		// break point
 }

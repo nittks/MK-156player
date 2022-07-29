@@ -8,6 +8,39 @@ typedef enum{
 	STATE_UP
 }STATE_CNT;
 
+//*******************************************************
+// MK-156
+//*******************************************************
+#define MK156_MAX			10
+#define HEADER_BYTE_NUM		6
+typedef struct{
+	uint8_t	len;
+	uint8_t	cmd;
+	uint8_t	feedback[MK156_MAX-HEADER_BYTE_NUM];
+	uint8_t	sum[2];
+}MK156_FRAME;
+
+// データ位置
+enum{
+	MK156_FORMAT00_STARTBYTE	= 0,
+	MK156_FORMAT01_VERSION		= 1,
+	MK156_FORMAT02_LENGTH		= 2,
+	MK156_FORMAT03_COMMAND		= 3,
+	MK156_FORMAT04_FEEDBACK		= 4,
+	MK156_FORMAT07_SUM			= 7,
+	MK156_FORMAT09_ENDBYTE		= 9,
+};
+
+#define	MK156_START_BYTE		0x7E
+#define MK156_VERSION			0xFF
+#define MK156_END_BYTE			0xEF
+
+#define MK156_CMD_SD_PLAY_FIN	0x3D
+
+
+//*******************************************************
+// Defi
+//*******************************************************
 enum{
 	DEFI_ID,
 	DEFI_CTRL,
