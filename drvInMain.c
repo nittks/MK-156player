@@ -17,4 +17,5 @@ void initDrvIn( void )
 void drvInMain( void )
 {
 	drvInSwMain();
+	drvInCarSwMain();
 }

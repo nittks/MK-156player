@@ -7,6 +7,7 @@
 
 //Lnkが取得する
 static DRV_IN_CAR_SW	drvInCarSw;
+static DEBOUNCE_TIME_CNT	debounceTimeCnt;	
 
 //********************************************************************************
 // 初期化
@@ -14,6 +15,8 @@ static DRV_IN_CAR_SW	drvInCarSw;
 void initDrvInCarSw( void )
 {
 	drvInCarSw.vtc	= DRV_IN_CAR_SW_OFF;
+	debounceTimeCnt.on	= 0;
+	debounceTimeCnt.off	= 0;
 }
 
 //********************************************************************************
@@ -29,16 +32,19 @@ DRV_IN_CAR_SW *getDrvInCarSw( void )
 //********************************************************************************
 void drvInCarSwMain( void )
 {
-	static	uint8_t		debounceTimeCnt = 0;
-	
 	if( PORT_VTC == ON ){
-		drvInCarSw.vtc	= DRV_IN_CAR_SW_ON;
-	}else{
-		if( debounceTimeCnt >= DEBOUNCE_TIME ){
-			drvInCarSw.vtc	= DRV_IN_CAR_SW_OFF;
-			debounceTimeCnt	= 0;
+		debounceTimeCnt.off	= 0;
+		if( debounceTimeCnt.on >= DEBOUNCE_TIME ){
+			drvInCarSw.vtc	= DRV_IN_CAR_SW_ON;
 		}else{
-			debounceTimeCnt++;
+			debounceTimeCnt.on++;
+		}
+	}else{
+		debounceTimeCnt.on	= 0;
+		if( debounceTimeCnt.off >= DEBOUNCE_TIME ){
+			drvInCarSw.vtc	= DRV_IN_CAR_SW_OFF;
+		}else{
+			debounceTimeCnt.off++;
 		}
 	}
 }

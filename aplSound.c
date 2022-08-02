@@ -15,7 +15,8 @@ static APL_SOUND	aplSound;
 
 static bool		waterTempState;
 static bool		vtecOnState;
-
+static bool		preVtc;
+static uint16_t	vtecCoolTimeCnt;
 
 static void porcWaterTemp( void );
 static void procVtec( void );
@@ -29,6 +30,8 @@ void initAplSound( void )
 
 	waterTempState	= WATER_TEMP_STATE_LOW;
 	vtecOnState		= false;
+	preVtc			= false;
+	vtecCoolTimeCnt		= VTEC_COOL_TIME;
 	
 }
 //********************************************************************************
@@ -93,15 +96,15 @@ static void procVtec( void )
 {
 	APL_DATA_CAR	*inAplDataCar	= getAplDataCar();
 
-	if( vtecOnState == false ){
-		if( inAplDataCar->vtc == true ){
-			vtecOnState		= true;
+	aplSound.vtec	= false;
+
+	if( vtecCoolTimeCnt >= VTEC_COOL_TIME ){
+		if( (inAplDataCar->vtc == true) && (preVtc == false) ){		// ONエッジ
 			aplSound.vtec	= true;
+			vtecCoolTimeCnt	= 0;
 		}
 	}else{
-		aplSound.vtec	= false;
-		if( inAplDataCar->vtc == false ){
-			vtecOnState	= false;
-		}
+		vtecCoolTimeCnt++;
 	}
+	preVtc	= inAplDataCar->vtc;
 }
