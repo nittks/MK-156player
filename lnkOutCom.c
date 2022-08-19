@@ -74,11 +74,13 @@ void lnkOutComMain( void )
 	if( inAplSound->vtec ){
 		requestList.vtec	= true;
 	}
-	
+/*	
 	if( resend ){		// エラーのため、前回送信コマンドを再送
 		setDrvUartTx( UART_0_MK156 , &outDrvUartTx	);
-	}else if(	( requestList.byte != 0x00 ) &&		// 再生要求が有る
-				( playingList.byte == 0x00 )		// 再生中ではない
+	}else
+*/
+	 if(	( requestList.byte != 0x00 ) //&&		// 再生要求が有る
+//				( playingList.byte == 0x00 )		// 再生中ではない
 	){
 		uint8_t	bitNo;
 		for( bitNo=0 ; bitNo<SOUND_NUM ; bitNo++ ){				// 再生要求があるbitNoを番号として抽出
@@ -87,7 +89,7 @@ void lnkOutComMain( void )
 			}
 		}
 		requestList.byte &= ~(1<<bitNo);
-		playingList.byte |=  (1<<bitNo);
+//		playingList.byte |=  (1<<bitNo);
 		sendLen[posWrite] = createCmd( sendBuf[posWrite]	, (uint8_t)(1<<bitNo) );
 
 		// setDrvUartTxの使用に合わせて値を作る。仕様変更したい
@@ -102,12 +104,13 @@ void lnkOutComMain( void )
 static uint8_t createCmd( uint8_t* out , uint8_t fileNo )
 {
 	uint8_t			byteCnt		= 0;
+	volatile	static uint8_t		DEBUG_ACK	= ACK_OFF;
 
 	out[byteCnt++]	= START_BYTE;
 	out[byteCnt++]	= VERSION_INFO;
 	out[byteCnt++]	= COMMAND_LEN;
 	out[byteCnt++]	= COMMAND_PLAY_TRACK;
-	out[byteCnt++]	= ACK_OFF;
+	out[byteCnt++]	= DEBUG_ACK;		//ACK_ON;
 	out[byteCnt++]	= DEFAULT_FOLDER;
 	out[byteCnt++]	= fileNo;
 

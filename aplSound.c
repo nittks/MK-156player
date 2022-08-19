@@ -104,6 +104,7 @@ static void procVtec( void )
 			vtecCoolTimeCnt	= 0;
 		}
 	}else{
+		aplSound.vtec	= false;
 		vtecCoolTimeCnt++;
 	}
 	preVtc	= inAplDataCar->vtc;

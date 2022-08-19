@@ -22,13 +22,33 @@ typedef enum{
 //********************************************************************************
 // 水温
 //********************************************************************************
-#define	WATER_TEMP_LOW		((uint8_t)65)
-#define	WATER_TEMP_NORMAL	((uint8_t)75)
+#define	WATER_TEMP_LOW		((uint8_t)73)
+#define	WATER_TEMP_NORMAL	((uint8_t)78)
+
+/*
+
+75 , 100 , 110 , 120
+
+*/
+enum{
+	WATER_TMP_STATE_COOL_NORMAL,
+	WATER_TMP_STATE_NORMAL_100,
+	WATER_TMP_STATE_100_110,
+	WATER_TMP_STATE_110_120,
+	WATER_TMP_STATE_120OVER,
+	WATER_TMP_STATE_MAX
+};
+
+static uint8_t	waterTmpTable[WATER_TMP_STATE_MAX] = { 75 , 100 , 110 , 120 , 0 };
+
+
+
+
 
 //********************************************************************************
 // VTEC
 //********************************************************************************
-#define VTEC_COOL_TIME		((uint16_t)(30000/CYC_TIME_MS))		// 音声再使用まで30sec
+#define VTEC_COOL_TIME		((uint16_t)(10000/CYC_TIME_MS))		// 音声再使用まで30sec
 
 
 

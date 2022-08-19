@@ -171,11 +171,14 @@ static bool pickRxFrame( uint8_t* rxFrameData )
 		return( false );
 	}
 
+	bool	result	= true;
 	uint8_t	byteCnt=0;
 	while( byteCnt < DEFI_MAX ){
 		uint8_t rxData = inDrvUartRx.rxData[posRead[UART_1_DEFI]++];
 		if( posRead[UART_1_DEFI] >= DRV_UART_RX_RING_BUF_SIZE ){
 			posRead[UART_1_DEFI] = 0;
+		}else if( posRead[UART_1_DEFI] >= inDrvUartRx.posWrite ){
+			result	= false;
 		}
 
 		if( byteCnt == 0 ){
@@ -192,7 +195,7 @@ static bool pickRxFrame( uint8_t* rxFrameData )
 
 		byteCnt++;
 	}
-	return( true );
+	return( result );
 }
 //**********************************************************************
 //**********************************************************************
