@@ -9,8 +9,10 @@
 typedef struct {
 	bool			waterOk;
 	bool			vtec;
-	double			ledGreen;
-	double			ledBlue;
+	uint8_t			ledGreen;
+	uint8_t			ledBlue;
+	uint8_t			cycCntGreen;
+	uint8_t			cycCntBlue;
 }APL_INDICATOR;
 
 

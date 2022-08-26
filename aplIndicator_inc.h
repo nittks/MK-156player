@@ -55,7 +55,7 @@ static uint8_t	waterTmpTable[WATER_TMP_STATE_MAX] = { 75 , 100 , 110 , 120 , 0 }
 //********************************************************************************
 #define LED_BRIGHT_MAX	((uint8_t)100)
 #define LED_BRIGHT_TIME	((uint16_t)1000)
-#define LED_CHANGE_MS	((uint8_t)100)
-#define LED_BRIGHT_STEP	(((double)LED_BRIGHT_MAX/LED_BRIGHT_TIME)*(LED_CHANGE_MS*CYC_TIME_MS))	// XXmsで100%分変化させる
+#define LED_CHANGE_MS	((uint8_t)10)
+#define LED_BRIGHT_STEP	(((double)LED_BRIGHT_MAX/LED_BRIGHT_TIME)*LED_CHANGE_MS)	// XXmsで100%分変化させる
 
 #endif

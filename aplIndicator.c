@@ -21,7 +21,8 @@ static uint16_t	vtecCoolTimeCnt;
 static void porcWaterTemp( void );
 static void procVtec( void );
 static void procLed( void );
-
+static void brightDown( uint8_t* bright , uint8_t* cycCnt );
+static void brightUp( uint8_t* bright , volatile uint8_t* cycCnt );
 //********************************************************************************
 // 初期化
 //********************************************************************************
@@ -31,6 +32,8 @@ void initAplIndicator( void )
 	aplIndicator.vtec			= false;
 	aplIndicator.ledGreen		= 0;
 	aplIndicator.ledBlue		= 0;
+	aplIndicator.cycCntGreen	= 0;
+	aplIndicator.cycCntBlue		= 0;
 	
 	waterTempState		= WATER_TEMP_STATE_LOW;
 	vtecOnState			= false;
@@ -123,14 +126,49 @@ static void procLed( void )
 	if( ( waterTempState == WATER_TEMP_STATE_LOW ) ||
 		( inAplDataCar->vtc == true )
 	){
-		aplIndicator.ledGreen	= ( aplIndicator.ledGreen > 0				)? aplIndicator.ledGreen - LED_BRIGHT_STEP : 0;
+		brightDown	( &aplIndicator.ledGreen , &aplIndicator.cycCntGreen  );
 	}else if( waterTempState == WATER_TEMP_STATE_NORMAL ){
-		aplIndicator.ledGreen	= ( aplIndicator.ledGreen < LED_BRIGHT_MAX	)? aplIndicator.ledGreen + LED_BRIGHT_STEP : LED_BRIGHT_MAX;
+		brightUp	( &aplIndicator.ledGreen , &aplIndicator.cycCntGreen  );
 	}
 
 	if( inAplDataCar->vtc == false ){
-		aplIndicator.ledBlue	= ( aplIndicator.ledBlue > 0				)? aplIndicator.ledBlue - LED_BRIGHT_STEP : 0;
+		brightDown	( &aplIndicator.ledBlue , &aplIndicator.cycCntBlue  );
 	}else if( inAplDataCar->vtc == true ){
-		aplIndicator.ledBlue	= ( aplIndicator.ledBlue < LED_BRIGHT_MAX	)? aplIndicator.ledBlue + LED_BRIGHT_STEP : LED_BRIGHT_MAX;
+		brightUp	( &aplIndicator.ledBlue , &aplIndicator.cycCntBlue  );
 	}
 }
+
+//********************************************************************************
+//********************************************************************************
+static void brightDown( uint8_t* bright , uint8_t* cycCnt )
+{
+	if( (*cycCnt) >= LED_CHANGE_MS/CYC_TIME_MS ){
+		(*cycCnt)	= 0;
+
+		if( (*bright) > 0 ){
+			(*bright)	-= LED_BRIGHT_STEP;
+		}else{
+			(*bright)	= 0;
+		}
+	}else{
+		(*cycCnt)++;
+	}
+}
+//********************************************************************************
+//********************************************************************************
+static void brightUp( uint8_t* bright , volatile uint8_t* cycCnt )
+{
+	if( (*cycCnt) < LED_CHANGE_MS/CYC_TIME_MS ){
+		(*cycCnt)++;
+	}else{
+		(*cycCnt)	= 0;
+
+		if( (*bright) < LED_BRIGHT_MAX ){
+			(*bright)	+= LED_BRIGHT_STEP;
+		}else{
+			(*bright)	= LED_BRIGHT_MAX;
+		}
+	}
+}
+
+
