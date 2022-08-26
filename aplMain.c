@@ -2,18 +2,18 @@
 
 #include "aplData.h"
 #include "aplCtrl.h"
-#include "aplSound.h"
+#include "aplIndicator.h"
 
 void initApl( void )
 {
 	initAplData();
 	initAplCtrl();
-	initAplSound();
+	initAplIndicator();
 }
 
 void aplMain( void )
 {
    	aplDataMain();
 	aplCtrlMain();
-	aplSoundMain();
+	aplIndicatorMain();
 }

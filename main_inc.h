@@ -60,4 +60,7 @@ enum{
 };
 
 
+#define PORTMUX_TWI1_DEFAULT_gc		(0x10<<2)		// ioavr128da32.hに無かった
+
+
 #endif

@@ -32,14 +32,14 @@
 #define	END_BYTE				((uint8_t)0xEF)
 
 //************************************
-#define  SOUND_NUM			((uint8_t)2)
+#define  INDICATOR_NUM			((uint8_t)2)
 typedef union{
 	uint8_t		byte;
 	struct{
 		bool		waterTemp	: 1;
 		bool		vtec		: 1;
 	};
-}SOUND_LIST;
+}INDICATOR_LIST;
 
 
 /*

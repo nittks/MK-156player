@@ -4,7 +4,7 @@
 
 #include "aplData.h"
 #include "aplCtrl.h"
-#include "aplSound.h"
+#include "aplIndicator.h"
 #include "drvUart.h"
 
 #include "lnkOutCom_inc.h"
@@ -15,8 +15,8 @@ static uint8_t			sendBuf[RING_BUF_SIZE][COMMAND_LEN_MAX]={0};	// MK156へ送信�
 static uint8_t			sendLen[RING_BUF_SIZE]={0};						// MK156へ送信するデータサイズのリングバッファ
 static uint8_t			posRead;										// リングバッファ読込位置
 static uint8_t			posWrite;										// リングバッファ書込位置
-static SOUND_LIST		playingList;
-static SOUND_LIST		requestList;
+static INDICATOR_LIST		playingList;
+static INDICATOR_LIST		requestList;
 static DRV_UART_TX		outDrvUartTx;
 static bool				resend;
 
@@ -65,13 +65,13 @@ void setLnkOutCom( void )
 //********************************************************************************
 void lnkOutComMain( void )
 {
-	APL_SOUND			*inAplSound			= getAplSound();
+	APL_INDICATOR			*inAplIndicator			= getAplIndicator();
 
-	if( inAplSound->waterOk ){
+	if( inAplIndicator->waterOk ){
 		requestList.waterTemp	= true;
 	}
 
-	if( inAplSound->vtec ){
+	if( inAplIndicator->vtec ){
 		requestList.vtec	= true;
 	}
 /*	
@@ -83,7 +83,7 @@ void lnkOutComMain( void )
 //				( playingList.byte == 0x00 )		// 再生中ではない
 	){
 		uint8_t	bitNo;
-		for( bitNo=0 ; bitNo<SOUND_NUM ; bitNo++ ){				// 再生要求があるbitNoを番号として抽出
+		for( bitNo=0 ; bitNo<INDICATOR_NUM ; bitNo++ ){				// 再生要求があるbitNoを番号として抽出
 			if( (requestList.byte & (1<<bitNo)) != 0x00 ){
 				break;;
 			}
