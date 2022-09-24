@@ -179,6 +179,7 @@ static bool pickRxFrame( uint8_t* rxFrameData )
 			posRead[UART_1_DEFI] = 0;
 		}else if( posRead[UART_1_DEFI] >= inDrvUartRx.posWrite ){
 			result	= false;
+			break;
 		}
 
 		if( byteCnt == 0 ){
