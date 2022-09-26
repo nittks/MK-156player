@@ -108,6 +108,7 @@ ERR_TIMER ERR_TABLE	= {
 };
 
 
+#define	STATE_BOOT_TIME		( 2000 / TASK_CYC_MS )
 
 
 #endif

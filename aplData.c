@@ -16,7 +16,7 @@ static APL_DATA_EEP		aplDataEep;
 void initAplData( void )
 {
 	
-	aplDataCar.rx				= false;
+	aplDataCar.rxFlag			= false;
 	aplDataCar.waterTemp		= 0;
 	
 	aplDataSw.rotEncSet			= APL_DATA_ROT_ENC_STOP;

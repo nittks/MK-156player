@@ -20,7 +20,7 @@ enum{
 };
 
 typedef struct{
-	bool			rx;
+	bool			rxFlag;
 	uint8_t			waterTemp;
 	
 	unsigned char	sumerr;

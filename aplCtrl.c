@@ -13,6 +13,7 @@ static APL_CTRL_SET_PALSE	aplCtrlSetPalseBak;
 static APL_CTRL_SETTING		aplCtrlSetting;
 static APL_CTRL_ERR_FLAG	aplCtrlErrFlag;		//フラグ？フラグで良い？state list 
 static ERR_TIMER			errTimer;
+static uint8_t				stateBootTimerCnt;
 
 static void stateJudge( void );
 static void judgeSetting( void );
@@ -38,6 +39,8 @@ void initAplCtrl( void )
 	
 	errTimer.rx				= 0;
 	errTimer.sum			= 0;
+
+	stateBootTimerCnt		= 0;
 }
 //********************************************************************************
 // 制御状態取得
@@ -99,9 +102,15 @@ static void stateJudge( void )
 	// 初回起動
 	//****************************************
 	case APL_CTRL_STATE_BOOT:		//起動初回
-		if( inAplDataEep->read != APL_DATA_EEP_STATE_UNREAD ){		//EEPROM読み込み済み
-			apryEep();		//初回はEEPROMのデータを適用する
-			aplCtrl.state = APL_CTRL_STATE_NOMARL;
+		if( stateBootTimerCnt < STATE_BOOT_TIME ){
+			stateBootTimerCnt++;
+		}else{
+			if( ( inAplDataCar->rxFlag ) &&
+				( inAplDataEep->read != APL_DATA_EEP_STATE_UNREAD )
+			){
+				apryEep();		//初回はEEPROMのデータを適用する
+				aplCtrl.state = APL_CTRL_STATE_NOMARL;
+			}
 		}
 		break;
 
@@ -209,7 +218,7 @@ static void judgeErr( void )
 	APL_DATA_CAR	*inAplDataCar	= getAplDataCar();
 	
 	// 通信途絶
-	if( inAplDataCar->rx == false ){
+	if( inAplDataCar->rxFlag == false ){
 		errTimer.rx++;
 		if( errTimer.rx >= ERR_TABLE.rx ){
 			aplCtrlErrFlag.rx	= true;
@@ -220,7 +229,7 @@ static void judgeErr( void )
 	}
 	
 	// 通信SUMエラー
-	if( ( inAplDataCar->rx == true ) &&
+	if( ( inAplDataCar->rxFlag == true ) &&
 		( inAplDataCar->sumerr = true )
 	){
 		errTimer.sum++;

@@ -133,20 +133,18 @@ static void procCarComSw( void )
 	memcpy( debugLog[debugLogCnt] , inDrvUartRx.rxData , 5 );
 	debugLogCnt = ( debugLogCnt >= 900 )? 0 : debugLogCnt+1;
 */
-	outAplDataCar.rx	= false;		// 多分今は使ってない。見直したい
-
 	while( pickRxFrame( &rxFrameData[0] )){
 		switch( rxFrameData[UART_DATAPOS_ID] ){
 			case ID_WATER_TEMP:
 				if( rxFrameData[UART_DATAPOS_CONTROL] == CONTROL_NORMAL_OPERATION ){
 					volatile uint16_t angle = asciiToAngle( &rxFrameData[UART_DATAPOS_ANGLE] );
 					outAplDataCar.waterTemp	= angleToSensor( angle , ID_WATER_TEMP );
+					outAplDataCar.rxFlag	= true;
 				}
 				break;
 			default:
 				break;
 		}
-		outAplDataCar.rx	= true;
 	}	
 	setAplDataCar( &outAplDataCar );
 }
