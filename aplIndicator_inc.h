@@ -22,8 +22,8 @@ typedef enum{
 //********************************************************************************
 // 水温
 //********************************************************************************
-#define	WATER_TEMP_LOW		((uint8_t)73)
-#define	WATER_TEMP_NORMAL	((uint8_t)78)
+#define	WATER_TEMP_LOW		((uint8_t)55)
+#define	WATER_TEMP_NORMAL	((uint8_t)65)
 
 /*
 
